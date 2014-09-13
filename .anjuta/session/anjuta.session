@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/adb.c#28%%%../../src/adb.h#384%%%../../src/file_sync_client.c#27%%%../../src/adb_client.c#38%%%../../src/gadb.c#37%%%../../src/transport.h#24
+Files=../../src/gadb.c#52
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -17,6 +17,9 @@ Working directories=../../../gadb
 Shortcut=gadb//src//gadb%%%gadb//src//libzipfile//libzipfile.a%%%gadb//src//libcutils//libcutils.a
 Expand=gadb%%%gadb//src%%%gadb//src//libcutils%%%gadb//src//libzipfile%%%gadb//src//libzipfile//libzipfile.a%%%gadb//src//gadb%%%gadb//dist_doc%%%gadb//GADB
 
+[Debugger]
+Stop at beginning=2
+
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32
 Selected Configuration=Debug
@@ -24,6 +27,3 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
-
-[Debugger]
-Stop at beginning=2
