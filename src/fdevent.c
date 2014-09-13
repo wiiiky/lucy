@@ -688,8 +688,8 @@ void fdevent_add(fdevent * fde, unsigned events)
 void fdevent_del(fdevent * fde, unsigned events)
 {
     fdevent_set(fde,
-                (fde->
-                 state & FDE_EVENTMASK) & (~(events & FDE_EVENTMASK)));
+                (fde->state & FDE_EVENTMASK) &
+                (~(events & FDE_EVENTMASK)));
 }
 
 void fdevent_subproc_setup()

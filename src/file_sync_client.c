@@ -24,7 +24,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <sys/types.h>
-#include <zipfile/zipfile.h>
+#include <libzipfile/zipfile.h>
 
 #include "sysdeps.h"
 #include "adb.h"

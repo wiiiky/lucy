@@ -96,7 +96,8 @@ am_gadb_OBJECTS = utils.$(OBJEXT) usb_vendors.$(OBJEXT) \
 	sockets.$(OBJEXT) services.$(OBJEXT) \
 	get_my_path_linux.$(OBJEXT) file_sync_client.$(OBJEXT) \
 	fdevent.$(OBJEXT) console.$(OBJEXT) commandline.$(OBJEXT) \
-	adb_client.$(OBJEXT) adb_auth_host.$(OBJEXT) adb.$(OBJEXT)
+	adb_client.$(OBJEXT) adb_auth_host.$(OBJEXT) adb.$(OBJEXT) \
+	gadb.$(OBJEXT)
 gadb_OBJECTS = $(am_gadb_OBJECTS)
 am__DEPENDENCIES_1 =
 gadb_DEPENDENCIES = $(am__DEPENDENCIES_1) libzipfile/libzipfile.a \
@@ -301,6 +302,7 @@ AM_CPPFLAGS = \
 	$(GADB_CFLAGS)
 
 AM_CFLAGS = \
+	 -I./include \
 	 -Wall\
 	 -g
 
@@ -330,7 +332,8 @@ gadb_SOURCES = \
 	adb_auth_host.c \
 	adb_auth.h \
 	adb.h \
-	adb.c
+	adb.c \
+	gadb.c
 
 gadb_LDFLAGS = -lc -lcrypto -pthread 
 gadb_LDADD = $(GADB_LIBS) libzipfile/libzipfile.a libcutils/libcutils.a -lz
@@ -432,6 +435,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fdevent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_sync_client.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gadb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get_my_path_linux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockets.Po@am__quote@

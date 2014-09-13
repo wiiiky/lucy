@@ -530,9 +530,8 @@ static void wait_for_state(int fd, void *cookie)
 
     D("wait_for_state %d\n", sinfo->state);
 
-    atransport *t =
-        acquire_one_transport(sinfo->state, sinfo->transport,
-                              sinfo->serial, &err);
+    atransport *t = acquire_one_transport(sinfo->state, sinfo->transport,
+                                          sinfo->serial, &err);
     if (t != 0) {
         writex(fd, "OKAY", 4);
     } else {

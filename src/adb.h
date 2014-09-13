@@ -489,4 +489,31 @@ int sendfailmsg(int fd, const char *reason);
 int handle_host_request(char *service, transport_type ttype, char *serial,
                         int reply_fd, asocket * s);
 
+#if ADB_HOST
+void connect_emulator(char *port_spec, char *buffer, int buffer_size);
+void connect_device(char *host, char *buffer, int buffer_size);
+int launch_server(int server_port);
+#endif
+
+#if DEBUG_PACKETS
+#define DUMPMAX 32
+void print_packet(const char *label, apacket * p)
+#endif
+int adb_main(int is_daemon, int server_port);
+void build_local_name(char *target_str, size_t target_size,
+                      int server_port);
+void start_logging(void);
+int local_name_to_fd(const char *name);
+void handle_packet(apacket * p, atransport * t);
+void parse_banner(char *banner, atransport * t);
+void adb_auth_verified(atransport * t);
+void handle_offline(atransport * t);
+void handle_online(atransport * t);
+void put_apacket(apacket * p);
+apacket *get_apacket(void);
+void adb_qemu_trace(const char *fmt, ...);
+void adb_trace_init(void);
+void fatal_errno(const char *fmt, ...);
+void fatal(const char *fmt, ...);
+
 #endif

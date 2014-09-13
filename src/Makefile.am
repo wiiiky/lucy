@@ -13,6 +13,7 @@ AM_CPPFLAGS = \
 	$(GADB_CFLAGS)
 
 AM_CFLAGS =\
+	 -I./include \
 	 -Wall\
 	 -g
 
@@ -44,7 +45,8 @@ gadb_SOURCES =  \
 	adb_auth_host.c \
 	adb_auth.h \
 	adb.h \
-	adb.c
+	adb.c \
+	gadb.c
 
 gadb_LDFLAGS =  -lc -lcrypto -pthread 
 
