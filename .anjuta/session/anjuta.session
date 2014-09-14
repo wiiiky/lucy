@@ -2,16 +2,16 @@
 Maximized=1
 Geometry=1301x744+65+24
 
+[File Loader]
+Files=../../src/gadb.c#102
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
 [Execution]
 Program uri=../../Debug/src/gadb
 Run in terminal=2
 Working directories=../../../gadb
-
-[File Loader]
-Files=../../src/gadb.c#43
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Project Manager]
 Shortcut=gadb//src//gadb%%%gadb//src//libzipfile//libzipfile.a%%%gadb//src//libcutils//libcutils.a

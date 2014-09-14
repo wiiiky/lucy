@@ -47,6 +47,7 @@ const static gchar *GADB_AUTHORS[] = {
 
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
 
+/*创建菜单栏*/
 static GtkWidget *createMenuBar()
 {
     GtkWidget *menuBar = gtk_menu_bar_new();
@@ -64,7 +65,7 @@ static GtkWidget *createMenuBar()
     return menuBar;
 }
 
-
+/*About菜单项激活后的回调函数*/
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
 {
     GtkWidget *dialog = gtk_about_dialog_new();
@@ -84,6 +85,28 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     gtk_widget_destroy(dialog);
 }
 
+static GtkWidget *createStackWithSwitcher()
+{
+    GtkWidget *box=gtk_box_new (GTK_ORIENTATION_VERTICAL,10);
+    GtkWidget *stack=gtk_stack_new ();
+    GtkWidget *switcher=gtk_stack_switcher_new ();
+    gtk_stack_switcher_set_stack (GTK_STACK_SWITCHER(switcher),GTK_STACK(stack));
+
+    gtk_container_set_border_width (GTK_CONTAINER(box),10);
+    gtk_box_pack_start (GTK_BOX(box),switcher,FALSE,FALSE,0);
+    gtk_box_pack_start (GTK_BOX(box),stack,TRUE,TRUE,0);
+
+    gtk_stack_set_transition_duration (GTK_STACK(stack),500);
+    gtk_stack_set_transition_type (GTK_STACK(stack),
+                                   GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
+    /* TODO */
+    GtkWidget *app=gtk_label_new ("Applications");
+    gtk_stack_add_titled (GTK_STACK(stack),app,"Applications","app");
+    GtkWidget *sms=gtk_label_new ("SMS");
+    gtk_stack_add_titled (GTK_STACK(stack),sms,"SMS","sms");
+
+    return box;
+}
 
 int main(int argc, char **argv)
 {
@@ -103,6 +126,7 @@ int main(int argc, char **argv)
     gtk_container_add(GTK_CONTAINER(window), rootBox);
 
     gtk_box_pack_start(GTK_BOX(rootBox), createMenuBar(), FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX(rootBox),createStackWithSwitcher (),TRUE,TRUE,0);
 
     gtk_widget_show_all(window);
     gtk_main();
