@@ -1,7 +1,7 @@
-GADB
+AML
 =================
 
-GUI(based on gtk+-3.0) for ADB.
+Android Manager for Linux.
 
 ##Introduce
 I hack ADB source and try to create a Android Manger for Linux.

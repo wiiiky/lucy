@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT(gadb, 0.1)
+AC_INIT(aml, 0.1)
 
 AC_CONFIG_HEADERS([config.h])
 
@@ -14,7 +14,7 @@ AC_PROG_RANLIB
 
 
 
-PKG_CHECK_MODULES(GADB, gtk+-3.0
+PKG_CHECK_MODULES(AML, gtk+-3.0
 				  libhardware
 				  [libssl ])
 

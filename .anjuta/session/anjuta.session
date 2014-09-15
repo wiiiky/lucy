@@ -3,19 +3,19 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/gadb.c#102
+Files=../../src/aml.c#85
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Execution]
-Program uri=../../Debug/src/gadb
+Program uri=../../Debug/src/aml
 Run in terminal=2
-Working directories=../../../gadb
+Working directories=../../../aml
 
 [Project Manager]
-Shortcut=gadb//src//gadb%%%gadb//src//libzipfile//libzipfile.a%%%gadb//src//libcutils//libcutils.a
-Expand=gadb%%%gadb//src%%%gadb//src//libcutils%%%gadb//src//libzipfile%%%gadb//src//libzipfile//libzipfile.a%%%gadb//src//gadb%%%gadb//dist_doc%%%gadb//GADB
+Shortcut=aml//src//aml%%%aml//src//libzipfile//libzipfile.a%%%aml//src//libcutils//libcutils.a
+Expand=aml%%%aml//src%%%aml//src//libcutils%%%aml//src//libzipfile%%%aml//src//libzipfile//libzipfile.a%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32

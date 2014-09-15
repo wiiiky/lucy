@@ -10,16 +10,16 @@ AM_CPPFLAGS = \
 	-DHAVE_FORKEXEC=1 \
 	-DHAVE_SYMLINKS \
 	-DHAVE_TERMIO_H \
-	$(GADB_CFLAGS)
+	$(AML_CFLAGS)
 
 AM_CFLAGS =\
 	 -I./include \
 	 -Wall\
 	 -g
 
-bin_PROGRAMS = gadb
+bin_PROGRAMS = aml
 
-gadb_SOURCES =  \
+aml_SOURCES =  \
 	utils.h \
 	utils.c \
 	usb_vendors.h \
@@ -46,11 +46,11 @@ gadb_SOURCES =  \
 	adb_auth.h \
 	adb.h \
 	adb.c \
-	gadb.c
+	aml.c
 
-gadb_LDFLAGS =  -lc -lcrypto -pthread 
+aml_LDFLAGS =  -lc -lcrypto -pthread 
 
-gadb_LDADD = $(GADB_LIBS) libzipfile/libzipfile.a libcutils/libcutils.a -lz
+aml_LDADD = $(AML_LIBS) libzipfile/libzipfile.a libcutils/libcutils.a -lz
 
 
 SUBDIRS = \
