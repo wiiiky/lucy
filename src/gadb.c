@@ -101,11 +101,19 @@ static GtkWidget *createStackWithSwitcher()
                                    GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     /* TODO */
     GtkWidget *app=gtk_label_new ("Applications");
-    gtk_stack_add_titled (GTK_STACK(stack),app,"Applications","app");
+    gtk_stack_add_titled (GTK_STACK(stack),app,"app","Applications");
     GtkWidget *sms=gtk_label_new ("SMS");
-    gtk_stack_add_titled (GTK_STACK(stack),sms,"SMS","sms");
+    gtk_stack_add_titled (GTK_STACK(stack),sms,"sms","SMS");
 
-    return box;
+    GtkWidget *rootStack=gtk_stack_new ();
+    gtk_stack_add_named (GTK_STACK(rootStack),box,"connected");
+    GtkWidget *dc=gtk_label_new ("Disconnected");
+    gtk_stack_add_named (GTK_STACK(rootStack),dc,"disconnected");
+
+    gtk_widget_show_all (box);
+    gtk_widget_show_all (dc);
+
+    return rootStack;
 }
 
 int main(int argc, char **argv)
