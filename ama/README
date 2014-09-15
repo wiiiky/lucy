@@ -1,0 +1,9 @@
+AMA
+======
+
+###Introduce
+AMA means 'Android Manager for Android'. This is an Android APP that opens a listening socket to wait for AML (runs in host PC ) to connnect.
+
+After connection, AML sends request and AMA reponses.
+
+###TODO
