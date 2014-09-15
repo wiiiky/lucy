@@ -2,7 +2,6 @@ package org.wl.ama;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Debug;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
@@ -11,12 +10,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Scanner;
-import java.util.logging.LogRecord;
 
 
 public class MainActivity extends Activity {
@@ -24,6 +22,9 @@ public class MainActivity extends Activity {
     private TextView textView=null;
     private ServerSocket serverSocket=null;
     private Handler handler=null;
+
+    /* 监听的端口号 */
+    private static int listenPort=37859;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
         textView=(TextView)findViewById(R.id.tv);
 
         handler=new Handler();
-        startListen();
+        new Thread(serverThread).start();
     }
 
 
@@ -56,57 +57,66 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String connectionStatus="unknown";
-
-    private void showToastMessage(String s){
-        Toast.makeText(MainActivity.this,s,
-                Toast.LENGTH_SHORT).show();
-    }
-
-    private Runnable showConnectionStatus=new Runnable() {
+    private String logStr="";
+    private Runnable addLog=new Runnable() {
         @Override
         public void run() {
-            showToastMessage(connectionStatus);
+            textView.setText(textView.getText()+logStr+"\n");
         }
     };
 
-    private Runnable socketThread=new Thread(){
+    private Runnable serverThread =new Thread(){
         public void run(){
             Socket client=null;
             try{
-                serverSocket=new ServerSocket(38300);
-                serverSocket.setSoTimeout(10*1000);
-
-                client=serverSocket.accept();
-                Scanner socketIn=new Scanner(client.getInputStream());
-                PrintWriter socketOut=new PrintWriter(client.getOutputStream());
+                serverSocket=new ServerSocket(listenPort);
+                logStr="Listening on "+listenPort;
+                handler.post(addLog);
+                while((client = serverSocket.accept())!=null){
+                    new ConnectionThread(client).start();
+                    logStr="Connect to "+client.getRemoteSocketAddress().toString();
+                    handler.post(addLog);
+                }
             }catch (SocketTimeoutException e){
-                Log.e("SocketTimeoutException","!");
-                connectionStatus=e.getMessage();
+                logStr="SocketTimeoutException: "+e.getMessage();
             }catch (IOException e){
-                Log.e("IOException",e.getMessage());
-                connectionStatus=e.getMessage();
+                logStr="IOException: "+e.getMessage();
             }finally {
                 if (serverSocket!=null){
                     try{
                         serverSocket.close();
                     }catch (IOException e){
-                        Log.e("IOEception2",e.getMessage());
-                        connectionStatus=e.getMessage();
+                        logStr="IOException: "+e.getMessage();
                     }
                 }
             }
-            if (client==null){
-                //connectionStatus="Connection not established!!!";
-            }else{
-                connectionStatus="Connection established!!!";
-            }
-            handler.post(showConnectionStatus);
+            handler.post(addLog);
         }
-
     };
 
-    private void startListen(){
-        new Thread(socketThread).start();
+    private class ConnectionThread extends Thread{
+        /* 处理一个链接的线程，目前只是echo */
+        private Socket socket=null;
+        public ConnectionThread(Socket s){
+            socket=s;
+        }
+
+        public void run(){
+            try {
+                InputStreamReader inputReader=new InputStreamReader(socket.getInputStream());
+                PrintWriter printWriter=new PrintWriter(socket.getOutputStream());
+                char[] buf=new char[4096];
+                while(inputReader.read(buf)>0){
+                    printWriter.write(buf);
+                    printWriter.flush();
+                }
+            } catch (IOException e) {
+                Log.e("IOException",e.getMessage()!=null?e.getMessage():"!");
+            }finally {
+
+            }
+            logStr=socket.getRemoteSocketAddress().toString()+" is disconnected";
+            handler.post(addLog);
+        }
     }
 }
