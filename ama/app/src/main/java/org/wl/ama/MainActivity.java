@@ -3,15 +3,11 @@ package org.wl.ama;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -20,7 +16,7 @@ import java.net.SocketTimeoutException;
 public class MainActivity extends Activity {
 
     private TextView textView=null;
-    private ServerSocket serverSocket=null;
+    private static ServerSocket serverSocket=null;
     private Handler handler=null;
 
     /* 监听的端口号 */
@@ -34,7 +30,13 @@ public class MainActivity extends Activity {
         textView=(TextView)findViewById(R.id.tv);
 
         handler=new Handler();
-        new Thread(serverThread).start();
+        startServer();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        NotificationHelper.cancelAll(this);
     }
 
 
@@ -65,7 +67,15 @@ public class MainActivity extends Activity {
         }
     };
 
-    private Runnable serverThread =new Thread(){
+    private static Thread serverThread=null;
+    private void startServer(){
+        if(serverThread==null||serverThread.isAlive()==false||serverSocket.isClosed()) {
+            serverThread=new Thread(serverRunnable);
+            serverThread.start();
+        }
+    }
+
+    private Runnable serverRunnable =new Thread(){
         public void run(){
             Socket client=null;
             try{
@@ -76,6 +86,7 @@ public class MainActivity extends Activity {
                     new ConnectionThread(client).start();
                     logStr="Connect to "+client.getRemoteSocketAddress().toString();
                     handler.post(addLog);
+                    NotificationHelper.show("PC Connected",client.getRemoteSocketAddress().toString(),MainActivity.this);
                 }
             }catch (SocketTimeoutException e){
                 logStr="SocketTimeoutException: "+e.getMessage();
@@ -93,30 +104,4 @@ public class MainActivity extends Activity {
             handler.post(addLog);
         }
     };
-
-    private class ConnectionThread extends Thread{
-        /* 处理一个链接的线程，目前只是echo */
-        private Socket socket=null;
-        public ConnectionThread(Socket s){
-            socket=s;
-        }
-
-        public void run(){
-            try {
-                InputStreamReader inputReader=new InputStreamReader(socket.getInputStream());
-                PrintWriter printWriter=new PrintWriter(socket.getOutputStream());
-                char[] buf=new char[4096];
-                while(inputReader.read(buf)>0){
-                    printWriter.write(buf);
-                    printWriter.flush();
-                }
-            } catch (IOException e) {
-                Log.e("IOException",e.getMessage()!=null?e.getMessage():"!");
-            }finally {
-
-            }
-            logStr=socket.getRemoteSocketAddress().toString()+" is disconnected";
-            handler.post(addLog);
-        }
-    }
 }
