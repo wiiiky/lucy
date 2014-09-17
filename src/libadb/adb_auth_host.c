@@ -37,7 +37,7 @@
 #include "mincrypt/rsa.h"
 #undef RSA_verify
 
-#include <cutils/list.h>
+#include "libcutils/list.h"
 
 #include <openssl/evp.h>
 #include <openssl/objects.h>

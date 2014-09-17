@@ -15,7 +15,6 @@ AC_PROG_RANLIB
 
 
 PKG_CHECK_MODULES(AML, gtk+-3.0
-				  libhardware
 				  [libssl ])
 
 
