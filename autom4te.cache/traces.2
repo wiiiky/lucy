@@ -1019,7 +1019,9 @@ m4trace:configure.ac:12: -1- _AM_SUBST_NOTMAKE([am__fastdepCC_TRUE])
 m4trace:configure.ac:12: -1- _AM_SUBST_NOTMAKE([am__fastdepCC_FALSE])
 m4trace:configure.ac:13: -1- m4_pattern_allow([^RANLIB$])
 m4trace:configure.ac:17: -1- PKG_CHECK_MODULES([AML], [gtk+-3.0
-				  libssl ])
+				  libssl
+				  libcrypto
+				  libzip])
 m4trace:configure.ac:17: -1- PKG_PROG_PKG_CONFIG
 m4trace:configure.ac:17: -1- m4_pattern_forbid([^_?PKG_[A-Z_]+$])
 m4trace:configure.ac:17: -1- m4_pattern_allow([^PKG_CONFIG(_(PATH|LIBDIR|SYSROOT_DIR|ALLOW_SYSTEM_(CFLAGS|LIBS)))?$])
@@ -1031,22 +1033,30 @@ m4trace:configure.ac:17: -1- m4_pattern_allow([^PKG_CONFIG$])
 m4trace:configure.ac:17: -1- m4_pattern_allow([^AML_CFLAGS$])
 m4trace:configure.ac:17: -1- m4_pattern_allow([^AML_LIBS$])
 m4trace:configure.ac:17: -1- PKG_CHECK_EXISTS([gtk+-3.0
-				  libssl ], [pkg_cv_[]AML_CFLAGS=`$PKG_CONFIG --[]cflags "gtk+-3.0
-				  libssl " 2>/dev/null`
+				  libssl
+				  libcrypto
+				  libzip], [pkg_cv_[]AML_CFLAGS=`$PKG_CONFIG --[]cflags "gtk+-3.0
+				  libssl
+				  libcrypto
+				  libzip" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
 m4trace:configure.ac:17: -1- PKG_CHECK_EXISTS([gtk+-3.0
-				  libssl ], [pkg_cv_[]AML_LIBS=`$PKG_CONFIG --[]libs "gtk+-3.0
-				  libssl " 2>/dev/null`
+				  libssl
+				  libcrypto
+				  libzip], [pkg_cv_[]AML_LIBS=`$PKG_CONFIG --[]libs "gtk+-3.0
+				  libssl
+				  libcrypto
+				  libzip" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes ], [pkg_failed=yes])
 m4trace:configure.ac:17: -1- _PKG_SHORT_ERRORS_SUPPORTED
-m4trace:configure.ac:23: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
+m4trace:configure.ac:26: -1- _m4_warn([obsolete], [AC_OUTPUT should be used without arguments.
 You should run autoupdate.], [])
-m4trace:configure.ac:23: -1- m4_pattern_allow([^LIB@&t@OBJS$])
-m4trace:configure.ac:23: -1- m4_pattern_allow([^LTLIBOBJS$])
-m4trace:configure.ac:23: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
-m4trace:configure.ac:23: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
-m4trace:configure.ac:23: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
-m4trace:configure.ac:23: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
-m4trace:configure.ac:23: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
-m4trace:configure.ac:23: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
-m4trace:configure.ac:23: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS
+m4trace:configure.ac:26: -1- m4_pattern_allow([^LIB@&t@OBJS$])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^LTLIBOBJS$])
+m4trace:configure.ac:26: -1- AM_CONDITIONAL([am__EXEEXT], [test -n "$EXEEXT"])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^am__EXEEXT_TRUE$])
+m4trace:configure.ac:26: -1- m4_pattern_allow([^am__EXEEXT_FALSE$])
+m4trace:configure.ac:26: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_TRUE])
+m4trace:configure.ac:26: -1- _AM_SUBST_NOTMAKE([am__EXEEXT_FALSE])
+m4trace:configure.ac:26: -1- _AC_AM_CONFIG_HEADER_HOOK(["$ac_file"])
+m4trace:configure.ac:26: -1- _AM_OUTPUT_DEPENDENCY_COMMANDS

@@ -13,7 +13,8 @@ AM_CPPFLAGS = \
 	$(AML_CFLAGS)
 
 AM_CFLAGS =\
-	 -Wall\
+     -pthread \
+	 -Wall \
 	 -g
 
 bin_PROGRAMS = aml
@@ -25,10 +26,6 @@ aml_LDADD = \
 	libadb/libadb.a \
 	libadb/libzipfile/libzipfile.a \
 	libadb/libcutils/libcutils.a \
-	-lz \
-	-lc \
-	-lcrypto \
-	-lpthread  \
 	$(AML_LIBS)
 
 
