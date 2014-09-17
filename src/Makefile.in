@@ -90,20 +90,11 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_aml_OBJECTS = utils.$(OBJEXT) usb_vendors.$(OBJEXT) \
-	usb_linux.$(OBJEXT) transport_usb.$(OBJEXT) \
-	transport_local.$(OBJEXT) transport.$(OBJEXT) \
-	sockets.$(OBJEXT) services.$(OBJEXT) \
-	get_my_path_linux.$(OBJEXT) file_sync_client.$(OBJEXT) \
-	fdevent.$(OBJEXT) console.$(OBJEXT) commandline.$(OBJEXT) \
-	adb_client.$(OBJEXT) adb_auth_host.$(OBJEXT) adb.$(OBJEXT) \
-	aml.$(OBJEXT)
+am_aml_OBJECTS = aml.$(OBJEXT)
 aml_OBJECTS = $(am_aml_OBJECTS)
 am__DEPENDENCIES_1 =
-aml_DEPENDENCIES = $(am__DEPENDENCIES_1) libzipfile/libzipfile.a \
-	libcutils/libcutils.a
-aml_LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(aml_LDFLAGS) $(LDFLAGS) -o \
-	$@
+aml_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
+	libadb/libcutils/libcutils.a $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -302,44 +293,24 @@ AM_CPPFLAGS = \
 	$(AML_CFLAGS)
 
 AM_CFLAGS = \
-	 -I./include \
 	 -Wall\
 	 -g
 
 aml_SOURCES = \
-	utils.h \
-	utils.c \
-	usb_vendors.h \
-	usb_vendors.c \
-	usb_linux.c \
-	transport_usb.c \
-	transport_local.c \
-	transport.h \
-	transport.c \
-	sysdeps.h \
-	sockets.c \
-	services.c \
-	mutex_list.h \
-	get_my_path_linux.c \
-	file_sync_service.h \
-	file_sync_client.c \
-	fdevent.h \
-	fdevent.c \
-	console.c \
-	commandline.c \
-	adb_client.h \
-	adb_client.c \
-	adb_auth_host.c \
-	adb_auth.h \
-	adb.h \
-	adb.c \
 	aml.c
 
-aml_LDFLAGS = -lc -lcrypto -pthread 
-aml_LDADD = $(AML_LIBS) libzipfile/libzipfile.a libcutils/libcutils.a -lz
+aml_LDADD = \
+	libadb/libadb.a \
+	libadb/libzipfile/libzipfile.a \
+	libadb/libcutils/libcutils.a \
+	-lz \
+	-lc \
+	-lcrypto \
+	-lpthread  \
+	$(AML_LIBS)
+
 SUBDIRS = \
-	libzipfile \
-	libcutils
+	libadb
 
 all: all-recursive
 
@@ -420,7 +391,7 @@ clean-binPROGRAMS:
 
 aml$(EXEEXT): $(aml_OBJECTS) $(aml_DEPENDENCIES) $(EXTRA_aml_DEPENDENCIES) 
 	@rm -f aml$(EXEEXT)
-	$(AM_V_CCLD)$(aml_LINK) $(aml_OBJECTS) $(aml_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(aml_OBJECTS) $(aml_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -428,23 +399,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adb_auth_host.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/adb_client.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/commandline.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fdevent.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_sync_client.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/get_my_path_linux.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/services.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockets.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transport.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transport_local.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/transport_usb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/usb_linux.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/usb_vendors.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/utils.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

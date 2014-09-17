@@ -30,10 +30,10 @@
 #include <stdint.h>
 #include <gtk/gtk.h>
 
-#include "sysdeps.h"
-#include "adb.h"
-#include "adb_auth.h"
-#include "usb_vendors.h"
+#include "libadb/sysdeps.h"
+#include "libadb/adb.h"
+#include "libadb/adb_auth.h"
+#include "libadb/usb_vendors.h"
 
 #define PROGRAM_NAME "GADB"
 #define GADB_WEBSITE "https://github.com/wiiiky/gadb"

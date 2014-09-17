@@ -24,6 +24,7 @@ PKG_CHECK_MODULES(AML, gtk+-3.0
 AC_OUTPUT([
 		   Makefile
 		   src/Makefile
-		   src/libzipfile/Makefile
-		   src/libcutils/Makefile
+		   src/libadb/Makefile
+		   src/libadb/libzipfile/Makefile
+		   src/libadb/libcutils/Makefile
 		   ])
