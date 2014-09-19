@@ -1,22 +1,42 @@
 package org.wl.ama;
 
 import android.app.Activity;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class PackagesActivity extends Activity {
 
     private ListView listPackages=null;
+    private PackageListAdapter packageListAdapter=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_packages);
 
+        ArrayList<PackageListModel> list=new ArrayList<PackageListModel>();
+        PackageManager manager=getPackageManager();
+        List<PackageInfo> packages=manager.getInstalledPackages(0);
+        for (int i=0;i<packages.size();i++){
+            PackageInfo info=packages.get(i);
+            PackageListModel model=new PackageListModel(
+                    info.applicationInfo.loadIcon(manager),
+                    info.packageName,
+                    info.applicationInfo.loadLabel(manager).toString());
+            list.add(model);
+        }
+
         listPackages=(ListView)findViewById(R.id.listPackages);
+        packageListAdapter=new PackageListAdapter(this,list);
+        listPackages.setAdapter(packageListAdapter);
     }
 
 
