@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.wl.ama" >
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -11,13 +11,17 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleInstance"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".PackagesActivity"
+            android:label="@string/title_activity_packages" >
         </activity>
     </application>
 

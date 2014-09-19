@@ -1,10 +1,14 @@
 package org.wl.ama;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -13,9 +17,10 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements View.OnClickListener {
 
-    private TextView textView=null;
+    private TextView tvLog =null;
+    private Button btnPackages=null;
     private static ServerSocket serverSocket=null;
     private Handler handler=null;
 
@@ -27,7 +32,10 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        textView=(TextView)findViewById(R.id.tv);
+        tvLog =(TextView)findViewById(R.id.tvLog);
+        btnPackages=(Button)findViewById(R.id.btnPackages);
+
+        btnPackages.setOnClickListener(this);
 
         handler=new Handler();
         startServer();
@@ -63,7 +71,7 @@ public class MainActivity extends Activity {
     private Runnable addLog=new Runnable() {
         @Override
         public void run() {
-            textView.setText(textView.getText()+logStr+"\n");
+            tvLog.setText(tvLog.getText()+logStr+"\n");
         }
     };
 
@@ -72,6 +80,8 @@ public class MainActivity extends Activity {
         if(serverThread==null||serverThread.isAlive()==false||serverSocket.isClosed()) {
             serverThread=new Thread(serverRunnable);
             serverThread.start();
+        }else{
+            tvLog.setText("Listening on " + listenPort);
         }
     }
 
@@ -104,4 +114,13 @@ public class MainActivity extends Activity {
             handler.post(addLog);
         }
     };
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId()==R.id.btnPackages){
+            Intent intent=new Intent(this,PackagesActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+        }
+    }
 }

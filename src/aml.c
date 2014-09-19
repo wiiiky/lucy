@@ -35,12 +35,15 @@
 #include "libadb/adb_auth.h"
 #include "libadb/usb_vendors.h"
 
-#define PROGRAM_NAME "GADB"
-#define GADB_WEBSITE "https://github.com/wiiiky/gadb"
-#define GADB_COMMENTS "Android Manager for Linux"
-#define GADB_COPYRIGH "Copyright (c) Wiky L"
-#define GADB_VERSION "0.1"
-const static gchar *GADB_AUTHORS[] = {
+#define PROGRAM_NAME "AML"
+#define AML_WEBSITE "https://github.com/wiiiky/aml"
+#define AML_COMMENTS "Android Manager for Linux"
+#define AML_COPYRIGH "Copyright (c) Wiky L"
+#define AML_VERSION "0.1"
+
+#define MAINWINDOW_TITLE "Android Manager"
+
+const static gchar *AML_AUTHORS[] = {
     "Wiky L (wiiiky@yeah.net)",
     NULL
 };
@@ -71,14 +74,14 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     GtkWidget *dialog = gtk_about_dialog_new();
     gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dialog),
                                       PROGRAM_NAME);
-    gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), GADB_VERSION);
+    gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), AML_VERSION);
     gtk_about_dialog_set_license_type(GTK_ABOUT_DIALOG(dialog),
                                       GTK_LICENSE_GPL_3_0);
     gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),
-                                   GADB_COPYRIGH);
-    gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), GADB_COMMENTS);
-    gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), GADB_WEBSITE);
-    gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog), GADB_AUTHORS);
+                                   AML_COPYRIGH);
+    gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), AML_COMMENTS);
+    gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), AML_WEBSITE);
+    gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog), AML_AUTHORS);
 
     gtk_dialog_run(GTK_DIALOG(dialog));
 
@@ -127,7 +130,7 @@ int main(int argc, char **argv)
     GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_default_size(GTK_WINDOW(window), 960, 640);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-    gtk_window_set_title(GTK_WINDOW(window), "GADB");
+    gtk_window_set_title(GTK_WINDOW(window), MAINWINDOW_TITLE);
     g_signal_connect(G_OBJECT(window), "destroy",
                      G_CALLBACK(gtk_main_quit), NULL);
 
