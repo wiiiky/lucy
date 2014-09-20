@@ -93,7 +93,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 logStr="Listening on "+listenPort;
                 handler.post(addLog);
                 while((client = serverSocket.accept())!=null){
-                    new ConnectionThread(client).start();
+                    new ConnectionThread(MainActivity.this,client).start();
                     logStr="Connect to "+client.getRemoteSocketAddress().toString();
                     handler.post(addLog);
                     NotificationHelper.show("PC Connected",client.getRemoteSocketAddress().toString(),MainActivity.this);

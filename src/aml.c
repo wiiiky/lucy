@@ -1,5 +1,5 @@
 /*
- * gadb.c
+ * aml.c
  *
  * Copyright (C) 2014 - Wiky L
  *
