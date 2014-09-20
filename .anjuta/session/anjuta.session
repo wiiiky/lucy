@@ -2,16 +2,16 @@
 Maximized=1
 Geometry=1301x744+65+24
 
-[File Loader]
-Files=../../src/aml.c#2
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Program uri=../../Debug/src/aml
 Run in terminal=2
 Working directories=../../../aml
+
+[File Loader]
+Files=../../src/aml.c#177%%%../../src/amlapplicationview.h#35%%%../../src/amlapplicationview.c#67%%%../../src/amlprotocol.h#41%%%../../src/amlprotocol.c#40
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
 [Project Manager]
 Shortcut=aml//src//libadb//libadb.a%%%aml//src//libadb//libzipfile//libzipfile.a%%%aml//src//libadb//libcutils//libcutils.a

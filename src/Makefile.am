@@ -20,7 +20,11 @@ AM_CFLAGS =\
 bin_PROGRAMS = aml
 
 aml_SOURCES =  \
-	aml.c
+	aml.c \
+	amlapplicationview.h \
+	amlapplicationview.c \
+	amlprotocol.h \
+	amlprotocol.c
 
 aml_LDADD = \
 	libadb/libadb.a \

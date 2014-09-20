@@ -35,6 +35,8 @@
 #include "libadb/adb_auth.h"
 #include "libadb/usb_vendors.h"
 
+#include "amlapplicationview.h"
+
 #define PROGRAM_NAME "AML"
 #define AML_WEBSITE "https://github.com/wiiiky/aml"
 #define AML_COMMENTS "Android Manager for Linux"
@@ -77,8 +79,7 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dialog), AML_VERSION);
     gtk_about_dialog_set_license_type(GTK_ABOUT_DIALOG(dialog),
                                       GTK_LICENSE_GPL_3_0);
-    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog),
-                                   AML_COPYRIGH);
+    gtk_about_dialog_set_copyright(GTK_ABOUT_DIALOG(dialog), AML_COPYRIGH);
     gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(dialog), AML_COMMENTS);
     gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dialog), AML_WEBSITE);
     gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(dialog), AML_AUTHORS);
@@ -86,6 +87,68 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     gtk_dialog_run(GTK_DIALOG(dialog));
 
     gtk_widget_destroy(dialog);
+}
+
+static GtkWidget *createApplicationPage()
+{
+    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 5);
+    GtkWidget *scrolledWidnow = gtk_scrolled_window_new(NULL, NULL);
+    gtk_box_pack_start(GTK_BOX(box), scrolledWidnow, TRUE, TRUE, 0);
+    GtkListStore *appStore = gtk_list_store_new(4,
+                                                GDK_TYPE_PIXBUF,
+                                                G_TYPE_STRING,
+                                                G_TYPE_STRING,
+                                                G_TYPE_FLOAT);
+    GtkWidget *appList =
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(appStore));
+    gtk_container_add(GTK_CONTAINER(scrolledWidnow), appList);
+    gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(appList), FALSE);
+    gtk_tree_view_set_grid_lines(GTK_TREE_VIEW(appList),
+                                 GTK_TREE_VIEW_GRID_LINES_VERTICAL);
+
+    GtkTreeViewColumn *column;
+    GtkCellRenderer *renderer;
+    renderer = gtk_cell_renderer_pixbuf_new();
+    column = gtk_tree_view_column_new_with_attributes("Icon",
+                                                      renderer,
+                                                      "pixbuf",
+                                                      0,
+                                                      "xalign", 3, NULL);
+    gtk_tree_view_column_set_fixed_width(GTK_TREE_VIEW_COLUMN(column),
+                                         100);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(appList), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Application Name",
+                                                      renderer,
+                                                      "text",
+                                                      1,
+                                                      "xalign", 3, NULL);
+    gtk_tree_view_column_set_expand(GTK_TREE_VIEW_COLUMN(column), TRUE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(appList), column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("Version",
+                                                      renderer,
+                                                      "text",
+                                                      2,
+                                                      "xalign", 3, NULL);
+    gtk_tree_view_column_set_expand(GTK_TREE_VIEW_COLUMN(column), TRUE);
+    gtk_tree_view_append_column(GTK_TREE_VIEW(appList), column);
+
+
+    int i;
+    for (i = 0; i < 50; i++) {
+        GtkTreeIter iter;
+        gtk_list_store_append(GTK_LIST_STORE(appStore), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(appStore), &iter,
+                           0, NULL,
+                           1, "Android Manager for Android",
+                           2, "0.01", 3, 0.5, -1);
+    }
+
+
+    return box;
 }
 
 static GtkWidget *createStackWithSwitcher()
@@ -104,8 +167,9 @@ static GtkWidget *createStackWithSwitcher()
     gtk_stack_set_transition_type(GTK_STACK(stack),
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     /* TODO */
-    GtkWidget *app = gtk_label_new("Applications");
-    gtk_stack_add_titled(GTK_STACK(stack), app, "app", "Applications");
+    AmlApplicationView *app = aml_application_view_new();
+    gtk_stack_add_titled(GTK_STACK(stack), GTK_WIDGET(app), "app",
+                         "Applications");
     GtkWidget *sms = gtk_label_new("SMS");
     gtk_stack_add_titled(GTK_STACK(stack), sms, "sms", "SMS");
 

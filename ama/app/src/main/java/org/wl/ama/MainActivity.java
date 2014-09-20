@@ -87,7 +87,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private Runnable serverRunnable =new Thread(){
         public void run(){
-            Socket client=null;
+            Socket client;
             try{
                 serverSocket=new ServerSocket(listenPort);
                 logStr="Listening on "+listenPort;
