@@ -1,17 +1,14 @@
 package org.wl.ama;
 
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.List;
+import org.wl.ama.protocol.*;
 
 /**
  * Created by wiky on 9/16/14.
@@ -24,6 +21,12 @@ public class ConnectionThread extends Thread {
     private PrintWriter printWriter=null;
     private BufferedReader bufferedReader=null;
     private Context mContext=null;
+
+    /*
+     * 请求数据
+     */
+    private static String REQUEST_PACKAGES="packages";
+    private static String REQUEST_ICON="icon:";
 
     public ConnectionThread(Context ctx,Socket s){
         socket=s;
@@ -38,8 +41,9 @@ public class ConnectionThread extends Thread {
             String buf;
             while((buf=bufferedReader.readLine())!=null){
                 String lower=buf.toLowerCase();
-                if (lower.equals("packages")){
+                if (lower.startsWith(REQUEST_PACKAGES)) {
                     onPackagesResponse();
+                }else if(lower.startsWith(REQUEST_ICON)){
                 }else {
                     onUnknownResponse(buf);
                 }
@@ -68,20 +72,14 @@ public class ConnectionThread extends Thread {
     }
 
     private void onPackagesResponse(){
-        PackageManager pManager=mContext.getPackageManager();
-        List<PackageInfo> packageInfos=pManager.getInstalledPackages(0);
-        for (int i=0;i<packageInfos.size();i++){
-            PackageInfo info=packageInfos.get(i);
-            String data=info.packageName+":" +
-                    info.applicationInfo.loadLabel(pManager).toString() +
-                    info.versionName + ":" +
-                    "\n";
-            printWriter.write(data);
-        }
-        printWriter.write("\n");
-        printWriter.flush();
+        new PackagesResponse(mContext).onResponse(printWriter);
     }
 
+
+    /*
+     * 未知的请求
+     * 直接返回该请求数据
+     */
     private void onUnknownResponse(String buf){
         printWriter.write(buf);
         printWriter.flush();
