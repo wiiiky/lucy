@@ -31,7 +31,7 @@ int socket_local_server(const char *name, int namespaceId, int type)
     return -1;
 }
 
-#else /* !HAVE_WINSOCK */
+#else                           /* !HAVE_WINSOCK */
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -70,14 +70,14 @@ int socket_local_server_bind(int s, const char *name, int namespaceId)
     if (namespaceId == ANDROID_SOCKET_NAMESPACE_RESERVED
         || namespaceId == ANDROID_SOCKET_NAMESPACE_FILESYSTEM) {
 #endif
-        /*ignore ENOENT*/
+        /*ignore ENOENT */
         unlink(addr.sun_path);
     }
 
     n = 1;
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
 
-    if(bind(s, (struct sockaddr *) &addr, alen) < 0) {
+    if (bind(s, (struct sockaddr *) &addr, alen) < 0) {
         return -1;
     }
 
@@ -96,9 +96,10 @@ int socket_local_server(const char *name, int namespace, int type)
 {
     int err;
     int s;
-    
+
     s = socket(AF_LOCAL, type, 0);
-    if (s < 0) return -1;
+    if (s < 0)
+        return -1;
 
     err = socket_local_server_bind(s, name, namespace);
 
@@ -121,4 +122,4 @@ int socket_local_server(const char *name, int namespace, int type)
     return s;
 }
 
-#endif /* !HAVE_WINSOCK */
+#endif                          /* !HAVE_WINSOCK */

@@ -63,13 +63,11 @@ static void aml_application_view_instance_init(AmlApplicationView * self)
     self->priv = AML_APPLICATION_VIEW_GET_PRIVATE(self);
 
     AmlApplicationViewPrivate *priv = self->priv;
-    priv->appStore =
-        (GtkListStore *)
+    priv->appStore = (GtkListStore *)
         gtk_list_store_new(AML_APPLICATION_VIEW_COL_NUMBER,
                            GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING,
                            G_TYPE_FLOAT);
-    priv->appView =
-        (GtkTreeView *)
+    priv->appView = (GtkTreeView *)
         gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->appStore));
     g_object_ref_sink(priv->appStore);
     g_object_ref_sink(priv->appView);
@@ -94,9 +92,11 @@ GType aml_application_view_get_type(void)
     if (g_once_init_enter(&aml_application_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(AmlApplicationViewClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) aml_application_view_class_init,
-(GClassFinalizeFunc) NULL, NULL, sizeof(AmlApplicationView), 0,
-(GInstanceInitFunc) aml_application_view_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+            (GClassInitFunc) aml_application_view_class_init,
+            (GClassFinalizeFunc) NULL, NULL, sizeof(AmlApplicationView), 0,
+            (GInstanceInitFunc) aml_application_view_instance_init, NULL
+        };
         GType aml_application_view_type_id;
         aml_application_view_type_id =
             g_type_register_static(GTK_TYPE_SCROLLED_WINDOW,

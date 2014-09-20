@@ -21,28 +21,27 @@
 extern "C" {
 #endif
 
-        /* Load an entire file into a malloc'd chunk of memory
-         * that is length_of_file + 1 (null terminator).  If
-         * sz is non-zero, return the size of the file via sz.
-         * Returns 0 on failure.
-         */
-extern void *load_file(const char *fn, unsigned *sz);
+    /* Load an entire file into a malloc'd chunk of memory
+     * that is length_of_file + 1 (null terminator).  If
+     * sz is non-zero, return the size of the file via sz.
+     * Returns 0 on failure.
+     */
+    extern void *load_file(const char *fn, unsigned *sz);
 
-        /* Connects your process to the system debugger daemon
-         * so that on a crash it may be logged or interactively
-         * debugged (depending on system settings).
-         */
-extern void debuggerd_connect(void);
+    /* Connects your process to the system debugger daemon
+     * so that on a crash it may be logged or interactively
+     * debugged (depending on system settings).
+     */
+    extern void debuggerd_connect(void);
 
 
-        /* This is the range of UIDs (and GIDs) that are reserved
-         * for assigning to applications.
-         */
+    /* This is the range of UIDs (and GIDs) that are reserved
+     * for assigning to applications.
+     */
 #define FIRST_APPLICATION_UID 10000
 #define LAST_APPLICATION_UID 99999
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __CUTILS_MISC_H */ 
+#endif                          /* __CUTILS_MISC_H */

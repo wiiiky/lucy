@@ -55,16 +55,16 @@
 extern "C" {
 #endif
 
-struct asocket {
-    int fd;           /* primary socket fd */
-    int abort_fd[2];  /* pipe used to abort */
-};
+    struct asocket {
+        int fd;                 /* primary socket fd */
+        int abort_fd[2];        /* pipe used to abort */
+    };
 
 /* Create an asocket from fd.
  * Sets the socket to non-blocking mode.
  * Returns NULL on error with errno set.
  */
-struct asocket *asocket_init(int fd);
+    struct asocket *asocket_init(int fd);
 
 /* Blocking socket I/O with timeout.
  * Calling asocket_abort() from another thread will cause each of these
@@ -74,30 +74,31 @@ struct asocket *asocket_init(int fd);
  * EINTR is handled in-call.
  * Other semantics are identical to the regular syscalls.
  */
-int asocket_connect(struct asocket *s, const struct sockaddr *addr,
-        socklen_t addrlen, int timeout);
+    int asocket_connect(struct asocket *s, const struct sockaddr *addr,
+                        socklen_t addrlen, int timeout);
 
-int asocket_accept(struct asocket *s, struct sockaddr *addr,
-        socklen_t *addrlen, int timeout);
+    int asocket_accept(struct asocket *s, struct sockaddr *addr,
+                       socklen_t * addrlen, int timeout);
 
-int asocket_read(struct asocket *s, void *buf, size_t count, int timeout);
+    int asocket_read(struct asocket *s, void *buf, size_t count,
+                     int timeout);
 
-int asocket_write(struct asocket *s, const void *buf, size_t count,
-        int timeout);
+    int asocket_write(struct asocket *s, const void *buf, size_t count,
+                      int timeout);
 
 /* Abort above calls and shutdown socket.
  * Further I/O operations on this socket will immediately fail after this call.
  * asocket_destroy() should be used to release resources once all threads
  * have returned from blocking calls on the socket.
  */
-void asocket_abort(struct asocket *s);
+    void asocket_abort(struct asocket *s);
 
 /* Close socket and free asocket structure.
  * Must not be called until all calls on this structure have completed.
  */
-void asocket_destroy(struct asocket *s);
+    void asocket_destroy(struct asocket *s);
 
 #ifdef __cplusplus
 }
 #endif
-#endif //__CUTILS_ABORT_SOCKET__H__
+#endif                          //__CUTILS_ABORT_SOCKET__H__

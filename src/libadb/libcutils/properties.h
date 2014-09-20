@@ -38,19 +38,22 @@ extern "C" {
 ** If the property read fails or returns an empty value, the default
 ** value is used (if nonnull).
 */
-int property_get(const char *key, char *value, const char *default_value);
+    int property_get(const char *key, char *value,
+                     const char *default_value);
 
 /* property_set: returns 0 on success, < 0 on failure
 */
-int property_set(const char *key, const char *value);
+    int property_set(const char *key, const char *value);
 
 /* property_set_sync: returns 0 on success, < 0 on failure
 **
 ** symbol needed for Motorola RILs. Calls property_set
 */
-int property_set_sync(const char *key, const char *value);
+    int property_set_sync(const char *key, const char *value);
 
-int property_list(void (*propfn)(const char *key, const char *value, void *cookie), void *cookie);    
+    int property_list(void (*propfn)
+                      (const char *key, const char *value, void *cookie),
+                      void *cookie);
 
 
 #ifdef HAVE_SYSTEM_PROPERTY_SERVER
@@ -60,17 +63,16 @@ int property_list(void (*propfn)(const char *key, const char *value, void *cooki
  */
 #define SYSTEM_PROPERTY_PIPE_NAME       "/tmp/android-sysprop"
 
-enum {
-    kSystemPropertyUnknown = 0,
-    kSystemPropertyGet,
-    kSystemPropertySet,
-    kSystemPropertyList
-};
-#endif /*HAVE_SYSTEM_PROPERTY_SERVER*/
+    enum {
+        kSystemPropertyUnknown = 0,
+        kSystemPropertyGet,
+        kSystemPropertySet,
+        kSystemPropertyList
+    };
+#endif                          /*HAVE_SYSTEM_PROPERTY_SERVER */
 
 
 #ifdef __cplusplus
 }
 #endif
-
 #endif

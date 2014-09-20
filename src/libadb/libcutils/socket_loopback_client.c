@@ -46,9 +46,10 @@ int socket_loopback_client(int port, int type)
     addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
     s = socket(AF_INET, type, 0);
-    if(s < 0) return -1;
+    if (s < 0)
+        return -1;
 
-    if(connect(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+    if (connect(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         close(s);
         return -1;
     }
@@ -56,4 +57,3 @@ int socket_loopback_client(int port, int type)
     return s;
 
 }
-

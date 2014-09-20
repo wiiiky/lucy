@@ -23,7 +23,8 @@
 
 #include "abort_socket.h"
 
-struct asocket *asocket_init(int fd) {
+struct asocket *asocket_init(int fd)
+{
     int abort_fd[2];
     int flags;
     struct asocket *s;
@@ -57,7 +58,8 @@ struct asocket *asocket_init(int fd) {
 }
 
 int asocket_connect(struct asocket *s, const struct sockaddr *addr,
-        socklen_t addrlen, int timeout) {
+                    socklen_t addrlen, int timeout)
+{
 
     int ret;
 
@@ -117,7 +119,8 @@ int asocket_connect(struct asocket *s, const struct sockaddr *addr,
 }
 
 int asocket_accept(struct asocket *s, struct sockaddr *addr,
-        socklen_t *addrlen, int timeout) {
+                   socklen_t * addrlen, int timeout)
+{
 
     int ret;
     struct pollfd pfd[2];
@@ -163,7 +166,8 @@ int asocket_accept(struct asocket *s, struct sockaddr *addr,
     return ret;
 }
 
-int asocket_read(struct asocket *s, void *buf, size_t count, int timeout) {
+int asocket_read(struct asocket *s, void *buf, size_t count, int timeout)
+{
     int ret;
     struct pollfd pfd[2];
 
@@ -209,7 +213,8 @@ int asocket_read(struct asocket *s, void *buf, size_t count, int timeout) {
 }
 
 int asocket_write(struct asocket *s, const void *buf, size_t count,
-        int timeout) {
+                  int timeout)
+{
     int ret;
     struct pollfd pfd[2];
 
@@ -254,7 +259,8 @@ int asocket_write(struct asocket *s, const void *buf, size_t count,
     return ret;
 }
 
-void asocket_abort(struct asocket *s) {
+void asocket_abort(struct asocket *s)
+{
     int ret;
     char buf = 0;
 
@@ -267,7 +273,8 @@ void asocket_abort(struct asocket *s) {
     } while (ret < 0 && errno == EINTR);
 }
 
-void asocket_destroy(struct asocket *s) {
+void asocket_destroy(struct asocket *s)
+{
     struct asocket s_copy = *s;
 
     /* Clients should *not* be using these fd's after calling

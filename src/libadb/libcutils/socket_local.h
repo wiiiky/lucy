@@ -17,7 +17,7 @@
 #ifndef __SOCKET_LOCAL_H
 #define __SOCKET_LOCAL_H
 
-#define FILESYSTEM_SOCKET_PREFIX "/tmp/" 
+#define FILESYSTEM_SOCKET_PREFIX "/tmp/"
 #define ANDROID_RESERVED_SOCKET_PREFIX "/dev/socket/"
 
 /*
@@ -32,8 +32,8 @@
  * constants) or if the name is too long.
  * 
  * @return 0 on success or -1 on failure
- */ 
-int socket_make_sockaddr_un(const char *name, int namespaceId, 
-        struct sockaddr_un *p_addr, socklen_t *alen);
+ */
+int socket_make_sockaddr_un(const char *name, int namespaceId,
+                            struct sockaddr_un *p_addr, socklen_t * alen);
 
 #endif

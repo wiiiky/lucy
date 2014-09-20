@@ -184,7 +184,7 @@ static void find_usb_device(const char *base,
 
             // should have device and configuration descriptors, and atleast two endpoints
             if (desclength < USB_DT_DEVICE_SIZE + USB_DT_CONFIG_SIZE) {
-                D("desclength %d is too small\n", desclength);
+                D("desclength %d is too small\n", (int) desclength);
                 adb_close(fd);
                 continue;
             }
@@ -299,7 +299,8 @@ static void find_usb_device(const char *base,
 
                         register_device_callback(devname, devpath,
                                                  local_ep_in, local_ep_out,
-                                                 interface->bInterfaceNumber,
+                                                 interface->
+                                                 bInterfaceNumber,
                                                  device->iSerialNumber,
                                                  zero_mask);
                         break;

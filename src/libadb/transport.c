@@ -1125,7 +1125,8 @@ int readx(int fd, void *ptr, size_t len)
     }
 
 #if ADB_TRACE
-    D("readx: fd=%d wanted=%d got=%d\n", fd, len0, len0 - len);
+    D("readx: fd=%d wanted=%d got=%d\n", (int) fd, (int) len0,
+      (int) (len0 - len));
     dump_hex(ptr, len0);
 #endif
     return 0;

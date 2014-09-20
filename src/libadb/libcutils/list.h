@@ -21,13 +21,12 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif                          /* __cplusplus */
 
-struct listnode
-{
-    struct listnode *next;
-    struct listnode *prev;
-};
+    struct listnode {
+        struct listnode *next;
+        struct listnode *prev;
+    };
 
 #define node_to_item(node, container, member) \
     (container *) (((char*) (node)) - offsetof(container, member))
@@ -44,9 +43,9 @@ struct listnode
 #define list_for_each_reverse(node, list) \
     for (node = (list)->prev; node != (list); node = node->prev)
 
-void list_init(struct listnode *list);
-void list_add_tail(struct listnode *list, struct listnode *item);
-void list_remove(struct listnode *item);
+    void list_init(struct listnode *list);
+    void list_add_tail(struct listnode *list, struct listnode *item);
+    void list_remove(struct listnode *item);
 
 #define list_empty(list) ((list) == (list)->next)
 #define list_head(list) ((list)->next)
@@ -54,6 +53,6 @@ void list_remove(struct listnode *item);
 
 #ifdef __cplusplus
 };
-#endif /* __cplusplus */
+#endif                          /* __cplusplus */
 
 #endif

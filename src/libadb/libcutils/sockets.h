@@ -24,7 +24,7 @@
 
 #ifdef HAVE_WINSOCK
 #include <winsock2.h>
-typedef int  socklen_t;
+typedef int socklen_t;
 #elif HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
@@ -44,55 +44,52 @@ extern "C" {
  * This is inline and not in libcutils proper because we want to use this in
  * third-party daemons with minimal modification.
  */
-static inline int android_get_control_socket(const char *name)
-{
-	char key[64] = ANDROID_SOCKET_ENV_PREFIX;
-	const char *val;
-	int fd;
+    static inline int android_get_control_socket(const char *name) {
+        char key[64] = ANDROID_SOCKET_ENV_PREFIX;
+        const char *val;
+        int fd;
 
-	/* build our environment variable, counting cycles like a wolf ... */
+        /* build our environment variable, counting cycles like a wolf ... */
 #if HAVE_STRLCPY
-	strlcpy(key + sizeof(ANDROID_SOCKET_ENV_PREFIX) - 1,
-		name,
-		sizeof(key) - sizeof(ANDROID_SOCKET_ENV_PREFIX));
-#else	/* for the host, which may lack the almightly strncpy ... */
-	strncpy(key + sizeof(ANDROID_SOCKET_ENV_PREFIX) - 1,
-		name,
-		sizeof(key) - sizeof(ANDROID_SOCKET_ENV_PREFIX));
-	key[sizeof(key)-1] = '\0';
+         strlcpy(key + sizeof(ANDROID_SOCKET_ENV_PREFIX) - 1,
+                 name, sizeof(key) - sizeof(ANDROID_SOCKET_ENV_PREFIX));
+#else                           /* for the host, which may lack the almightly strncpy ... */
+         strncpy(key + sizeof(ANDROID_SOCKET_ENV_PREFIX) - 1,
+                 name, sizeof(key) - sizeof(ANDROID_SOCKET_ENV_PREFIX));
+         key[sizeof(key) - 1] = '\0';
 #endif
 
-	val = getenv(key);
-	if (!val)
-		return -1;
+         val = getenv(key);
+        if (!val)
+             return -1;
 
-	errno = 0;
-	fd = strtol(val, NULL, 10);
-	if (errno)
-		return -1;
+         errno = 0;
+         fd = strtol(val, NULL, 10);
+        if (errno)
+             return -1;
 
-	return fd;
-}
-
+         return fd;
+    }
 /*
  * See also android.os.LocalSocketAddress.Namespace
- */
-// Linux "abstract" (non-filesystem) namespace
+ */// Linux "abstract" (non-filesystem) namespace
 #define ANDROID_SOCKET_NAMESPACE_ABSTRACT 0
 // Android "reserved" (/dev/socket) namespace
 #define ANDROID_SOCKET_NAMESPACE_RESERVED 1
 // Normal filesystem namespace
 #define ANDROID_SOCKET_NAMESPACE_FILESYSTEM 2
-
-extern int socket_loopback_client(int port, int type);
-extern int socket_network_client(const char *host, int port, int type);
-extern int socket_loopback_server(int port, int type);
-extern int socket_local_server(const char *name, int namespaceId, int type);
-extern int socket_local_server_bind(int s, const char *name, int namespaceId);
-extern int socket_local_client_connect(int fd, 
-        const char *name, int namespaceId, int type);
-extern int socket_local_client(const char *name, int namespaceId, int type);
-extern int socket_inaddr_any_server(int port, int type);
+    extern int socket_loopback_client(int port, int type);
+    extern int socket_network_client(const char *host, int port, int type);
+    extern int socket_loopback_server(int port, int type);
+    extern int socket_local_server(const char *name, int namespaceId,
+                                   int type);
+    extern int socket_local_server_bind(int s, const char *name,
+                                        int namespaceId);
+    extern int socket_local_client_connect(int fd, const char *name,
+                                           int namespaceId, int type);
+    extern int socket_local_client(const char *name, int namespaceId,
+                                   int type);
+    extern int socket_inaddr_any_server(int port, int type);
 
 /*
  * socket_peer_is_trusted - Takes a socket which is presumed to be a
@@ -103,10 +100,10 @@ extern int socket_inaddr_any_server(int port, int type);
  * Note: This only works as advertised on the Android OS and always
  * just returns true when called on other operating systems.
  */
-extern bool socket_peer_is_trusted(int fd);
+    extern bool socket_peer_is_trusted(int fd);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __CUTILS_SOCKETS_H */ 
+#endif                          /* __CUTILS_SOCKETS_H */

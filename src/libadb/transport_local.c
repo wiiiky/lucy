@@ -156,7 +156,7 @@ static void *server_socket_thread(void *arg)
     int serverfd, fd;
     struct sockaddr addr;
     socklen_t alen;
-    int port = (int) arg;
+    int port = (int) (long) arg;
 
     D("transport: server_socket_thread() starting\n");
     serverfd = -1;
@@ -324,7 +324,7 @@ void local_init(int port)
 
     D("transport: local %s init\n", HOST ? "client" : "server");
 
-    if (adb_thread_create(&thr, func, (void *) port)) {
+    if (adb_thread_create(&thr, func, (void *) (long) port)) {
         fatal_errno("cannot create local socket %s thread",
                     HOST ? "client" : "server");
     }

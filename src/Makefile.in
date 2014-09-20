@@ -91,7 +91,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_aml_OBJECTS = aml.$(OBJEXT) amlapplicationview.$(OBJEXT) \
-	amlprotocol.$(OBJEXT)
+	amlprotocol.$(OBJEXT) amlaboutdialog.$(OBJEXT) \
+	amlmainwindow.$(OBJEXT)
 aml_OBJECTS = $(am_aml_OBJECTS)
 am__DEPENDENCIES_1 =
 aml_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
@@ -303,7 +304,11 @@ aml_SOURCES = \
 	amlapplicationview.h \
 	amlapplicationview.c \
 	amlprotocol.h \
-	amlprotocol.c
+	amlprotocol.c \
+	amlaboutdialog.h \
+	amlaboutdialog.c \
+	amlmainwindow.h \
+	amlmainwindow.c
 
 aml_LDADD = \
 	libadb/libadb.a \
@@ -402,7 +407,9 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aml.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlaboutdialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlapplicationview.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlprotocol.Po@am__quote@
 
 .c.o:

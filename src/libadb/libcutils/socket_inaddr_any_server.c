@@ -45,12 +45,13 @@ int socket_inaddr_any_server(int port, int type)
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     s = socket(AF_INET, type, 0);
-    if(s < 0) return -1;
+    if (s < 0)
+        return -1;
 
     n = 1;
     setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &n, sizeof(n));
 
-    if(bind(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+    if (bind(s, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         close(s);
         return -1;
     }
@@ -62,7 +63,7 @@ int socket_inaddr_any_server(int port, int type)
 
         if (ret < 0) {
             close(s);
-            return -1; 
+            return -1;
         }
     }
 
