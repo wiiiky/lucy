@@ -16,6 +16,9 @@
 
 static gpointer aml_main_window_parent_class = NULL;
 
+#define APPLICATION_VIEW_NAME "app"
+#define SMS_VIEW_NAME   "sms"
+
 static void aml_main_window_finalize(GObject * obj);
 
 /* 创建菜单栏 */
@@ -24,6 +27,9 @@ static GtkWidget *aml_main_window_menu_bar(AmlMainWindow * self);
 static GtkWidget *aml_main_window_stack_with_switcher(AmlMainWindow *
                                                       self);
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
+/* 界面切换 */
+static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
+                                  gpointer data);
 
 enum {
     AML_MAIN_WINDOW_DUMMY_PROPERTY
@@ -33,6 +39,7 @@ struct _AmlMainWindowPrivate {
     AmlApplicationView *appView;
     GtkStack *rootStack;        /* 根容器，包括正常显示的界面以及，出错界面 */
     GtkStack *contentStack;     /* 正常显示的界面容器 */
+    GtkStackSwitcher *contentStackSwitcher;
 };
 
 
@@ -86,6 +93,7 @@ static void aml_main_window_finalize(GObject * obj)
     _g_object_unref0(self->priv->appView);
     _g_object_unref0(self->priv->rootStack);
     _g_object_unref0(self->priv->contentStack);
+    _g_object_unref0(self->priv->contentStackSwitcher);
     G_OBJECT_CLASS(aml_main_window_parent_class)->finalize(obj);
 }
 
@@ -97,10 +105,10 @@ GType aml_main_window_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(AmlMainWindowClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) aml_main_window_class_init,
-                (GClassFinalizeFunc) NULL,
+            (GClassInitFunc) aml_main_window_class_init,
+            (GClassFinalizeFunc) NULL,
             NULL, sizeof(AmlMainWindow), 0,
-                (GInstanceInitFunc) aml_main_window_instance_init, NULL
+            (GInstanceInitFunc) aml_main_window_instance_init, NULL
         };
         GType aml_main_window_type_id;
         aml_main_window_type_id =
@@ -138,10 +146,25 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     aml_about_dialog_destroy(dialog);
 }
 
+static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
+                                  gpointer data)
+{
+    AmlMainWindow *self = (AmlMainWindow *) data;
+    const gchar *name = gtk_stack_get_visible_child_name(stack);
+    if (g_strcmp0(name, APPLICATION_VIEW_NAME) == 0) {
+        AmlApplicationView *appView = self->priv->appView;
+        aml_application_view_update(appView, NULL);
+    } else if (g_strcmp0(name, SMS_VIEW_NAME) == 0) {
+        g_printf("sms!\n");
+    }
+}
+
 static GtkWidget *aml_main_window_stack_with_switcher(AmlMainWindow * self)
 {
     GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
     GtkWidget *stack = gtk_stack_new();
+    g_signal_connect(stack, "notify::visible-child-name",
+                     (GCallback) onContentStackChanged, self);
     GtkWidget *switcher = gtk_stack_switcher_new();
     gtk_stack_switcher_set_stack(GTK_STACK_SWITCHER(switcher),
                                  GTK_STACK(stack));
@@ -155,10 +178,10 @@ static GtkWidget *aml_main_window_stack_with_switcher(AmlMainWindow * self)
                                   GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
     /* TODO */
     AmlApplicationView *app = aml_application_view_new();
-    gtk_stack_add_titled(GTK_STACK(stack), GTK_WIDGET(app), "app",
-                         "Applications");
+    gtk_stack_add_titled(GTK_STACK(stack), GTK_WIDGET(app),
+                         APPLICATION_VIEW_NAME, "Applications");
     GtkWidget *sms = gtk_label_new("SMS");
-    gtk_stack_add_titled(GTK_STACK(stack), sms, "sms", "SMS");
+    gtk_stack_add_titled(GTK_STACK(stack), sms, SMS_VIEW_NAME, "SMS");
 
     GtkWidget *rootStack = gtk_stack_new();
     gtk_stack_add_named(GTK_STACK(rootStack), box, "connected");
@@ -171,9 +194,11 @@ static GtkWidget *aml_main_window_stack_with_switcher(AmlMainWindow * self)
     self->priv->appView = app;
     self->priv->rootStack = GTK_STACK(rootStack);
     self->priv->contentStack = GTK_STACK(stack);
+    self->priv->contentStackSwitcher = GTK_STACK_SWITCHER(switcher);
     g_object_ref_sink(self->priv->rootStack);
     g_object_ref_sink(self->priv->contentStack);
     g_object_ref_sink(self->priv->appView);
+    g_object_ref_sink(self->priv->contentStackSwitcher);
 
     return rootStack;
 }

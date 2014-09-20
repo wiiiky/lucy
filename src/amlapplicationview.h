@@ -6,6 +6,7 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include "amlprotocol.h"
 
 G_BEGIN_DECLS
 #define TYPE_AML_APPLICATION_VIEW (aml_application_view_get_type ())
@@ -31,6 +32,17 @@ struct _AmlApplicationViewClass {
 GType aml_application_view_get_type(void) G_GNUC_CONST;
 AmlApplicationView *aml_application_view_new(void);
 AmlApplicationView *aml_application_view_construct(GType object_type);
+
+/*
+ * 彻底更新应用列表，该函数保证显示内容与list一致，不多不少
+ */
+void aml_application_view_update(AmlApplicationView * self, GList * list);
+
+/*
+ * 在应用列表中增加一项，不会检查是否重复
+ */
+void aml_application_view_append(AmlApplicationView * self,
+                                 AmlProtocolApplication * data);
 
 
 G_END_DECLS

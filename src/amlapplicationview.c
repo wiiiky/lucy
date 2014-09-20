@@ -24,11 +24,14 @@ enum {
 static void aml_application_view_finalize(GObject * obj);
 
 typedef enum {
-    AML_APPLICATION_VIEW_COL_ICON,
-    AML_APPLICATION_VIEW_COL_NAME,
-    AML_APPLICATION_VIEW_COL_VERSION,
+    AML_APPLICATION_VIEW_COL_ICON,  /*图标 */
+    AML_APPLICATION_VIEW_COL_NAME,  /*应用名 */
+    AML_APPLICATION_VIEW_COL_VERSION,   /*版本号 */
+    AML_APPLICATION_VIEW_COL_PACKAGE,   /* 包名 */
+
     AML_APPLICATION_VIEW_COL_XALIGN,
 
+    AML_APPLICATION_VIEW_COL_FLAG,  /* 标记位, used in aml_application_view_update */
     AML_APPLICATION_VIEW_COL_NUMBER
 } AmlApplicationViewColumns;
 
@@ -66,7 +69,7 @@ static void aml_application_view_instance_init(AmlApplicationView * self)
     priv->appStore = (GtkListStore *)
         gtk_list_store_new(AML_APPLICATION_VIEW_COL_NUMBER,
                            GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING,
-                           G_TYPE_FLOAT);
+                           G_TYPE_STRING, G_TYPE_FLOAT, G_TYPE_INT);
     priv->appView = (GtkTreeView *)
         gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->appStore));
     g_object_ref_sink(priv->appStore);
@@ -106,4 +109,28 @@ GType aml_application_view_get_type(void)
                           aml_application_view_type_id);
     }
     return aml_application_view_type_id__volatile;
+}
+
+/*
+ * 彻底更新应用列表，该函数保证显示内容与list一致，不多不少
+ */
+void aml_application_view_update(AmlApplicationView * self, GList * list)
+{
+}
+
+/*
+ * 在应用列表中增加一项，不会检查是否重复
+ */
+void aml_application_view_append(AmlApplicationView * self,
+                                 AmlProtocolApplication * data)
+{
+    GtkListStore *store = self->priv->appStore;
+    GtkTreeIter iter;
+
+    gtk_list_store_append(store, &iter);
+    gtk_list_store_set(store, &iter,
+                       AML_APPLICATION_VIEW_COL_NAME,
+                       data->appName,
+                       AML_APPLICATION_VIEW_COL_VERSION,
+                       data->version, -1);
 }

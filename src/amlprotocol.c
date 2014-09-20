@@ -18,17 +18,19 @@
  */
 #include "amlprotocol.h"
 
-AmlProtocolPackage *aml_protocol_package_new(const gchar * packageName,
-                                             const gchar * appName,
-                                             const gchar * version,
-                                             const gchar * iconId,
-                                             const gchar * installedTime,
-                                             const gchar *
-                                             installedLocation,
-                                             const gchar * description)
+AmlProtocolApplication *aml_protocol_package_new(const gchar * packageName,
+                                                 const gchar * appName,
+                                                 const gchar * version,
+                                                 const gchar * iconId,
+                                                 const gchar *
+                                                 installedTime,
+                                                 const gchar *
+                                                 installedLocation,
+                                                 const gchar * description)
 {
-    AmlProtocolPackage *p =
-        (AmlProtocolPackage *) g_slice_alloc0(sizeof(AmlProtocolPackage));
+    AmlProtocolApplication *p =
+        (AmlProtocolApplication *)
+        g_slice_alloc0(sizeof(AmlProtocolApplication));
     p->packageName = g_strdup(packageName);
     p->appName = g_strdup(appName);
     p->version = g_strdup(version);
@@ -39,11 +41,9 @@ AmlProtocolPackage *aml_protocol_package_new(const gchar * packageName,
     return p;
 }
 
-void aml_protocol_package_free(AmlProtocolPackage * p)
+static inline void
+aml_protocol_package_free_internal(AmlProtocolApplication * p)
 {
-    if (p == NULL) {
-        return;
-    }
     g_free(p->packageName);
     g_free(p->appName);
     g_free(p->version);
@@ -51,5 +51,27 @@ void aml_protocol_package_free(AmlProtocolPackage * p)
     g_free(p->installedTime);
     g_free(p->installedLocation);
     g_free(p->description);
-    g_slice_free1(sizeof(AmlProtocolPackage), p);
+}
+
+void aml_protocol_package_free(AmlProtocolApplication * p)
+{
+    if (p == NULL) {
+        return;
+    }
+    aml_protocol_package_free_internal(p);
+    g_slice_free1(sizeof(AmlProtocolApplication), p);
+}
+
+AmlProtocolApplication *aml_protocol_find(GList * list,
+                                          const gchar * package)
+{
+    while (list) {
+        AmlProtocolApplication *app =
+            (AmlProtocolApplication *) list->data;
+        if (g_strcmp0(app->packageName, package) == 0) {
+            return app;
+        }
+        list = g_list_next(list);
+    }
+    return NULL;
 }

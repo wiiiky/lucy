@@ -67,10 +67,10 @@ GType aml_about_dialog_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(AmlAboutDialogClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) aml_about_dialog_class_init,
-                (GClassFinalizeFunc) NULL,
+            (GClassInitFunc) aml_about_dialog_class_init,
+            (GClassFinalizeFunc) NULL,
             NULL, sizeof(AmlAboutDialog), 0,
-                (GInstanceInitFunc) aml_about_dialog_instance_init, NULL
+            (GInstanceInitFunc) aml_about_dialog_instance_init, NULL
         };
         GType aml_about_dialog_type_id;
         aml_about_dialog_type_id =
