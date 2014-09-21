@@ -31,6 +31,7 @@
 
 #include "libadb/sysdeps.h"
 #include "libadb/adb.h"
+#include "libadb/adb_client.h"
 #include "libadb/adb_auth.h"
 #include "libadb/usb_vendors.h"
 
@@ -39,10 +40,13 @@
 
 int main(int argc, char **argv)
 {
-    gtk_init(&argc, &argv);
     adb_sysdeps_init();
     adb_trace_init();
-/*    return adb_commandline(argc - 1, argv + 1);*/
+    if (g_strcmp0(argv[0], "adb") == 0) {
+        return adb_commandline(argc - 1, argv + 1);
+    }
+    adb_connect("host:start-server");
+    gtk_init(&argc, &argv);
 
     AmlMainWindow *window = aml_main_window_new();
 
