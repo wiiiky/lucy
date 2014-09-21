@@ -8,10 +8,13 @@
 #include "amlapplicationview.h"
 #include "amlaboutdialog.h"
 #include "amladb.h"
+#include "libadb/sysdeps.h"
+#include "libadb/adb_client.h"
 
 #define MAINWINDOW_TITLE "Android Manager"
 #define ADB_FORWARD_LOCAL   (37859)
 #define ADB_FORWARD_REMOTE  (37859)
+#define AMA_ACTIVITY_NAME   "org.wl.ama/.MainActivity"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -221,14 +224,47 @@ void aml_main_window_show(AmlMainWindow * window)
     gtk_main();
 }
 
+static void onActivityStart(GObject * source_object,
+                            GAsyncResult * res, gpointer user_data)
+{
+    int fd = aml_adb_am_start_finish(res);
+    if (fd < 0) {
+        g_error("Failed to start activity: %s\n", adb_error());
+        return;
+    }
+    gchar buf[1024];
+    int n = adb_read(fd, buf, sizeof(buf));
+    while ((n = adb_read(fd, buf, sizeof(buf))) > 0) {
+        if (g_strstr_len(buf, n, "Error")) {
+            g_error("Failed to start activaty!\n");
+        }
+    }
+    adb_close(fd);
+}
+
+static void onForward(GObject * source_object,
+                      GAsyncResult * res, gpointer user_data)
+{
+    int ret = aml_adb_forward_finish(res);
+    if (ret == 0) {
+        /* OK */
+        aml_adb_am_start(AMA_ACTIVITY_NAME, onActivityStart, user_data);
+    } else {
+        g_error("Failed to forward tcp port! %s\n", adb_error());
+    }
+}
+
 static void onStartServer(GObject * source_object,
                           GAsyncResult * res, gpointer user_data)
 {
     int ret = aml_adb_start_server_finish(res);
     if (ret == 0) {
         /* OK */
+        aml_adb_forward(ADB_FORWARD_LOCAL, ADB_FORWARD_REMOTE,
+                        onForward, user_data);
     } else {
         /* ERROR, failed to start(or connect to) adb server */
+        g_error("Failed to start adb server! %s\n", adb_error());
     }
 }
 

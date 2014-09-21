@@ -23,27 +23,29 @@
 
 typedef struct {
     gchar *buf;
-} CommandData;
+} AmlTaskData;
 
-static CommandData *command_data_new(const gchar * buf)
+static AmlTaskData *aml_task_data_new(const gchar * buf)
 {
-    CommandData *data = (CommandData *) g_malloc(sizeof(CommandData));
+    AmlTaskData *data = (AmlTaskData *) g_malloc(sizeof(AmlTaskData));
     data->buf = g_strdup(buf);
     return data;
 }
 
-static void command_data_free(CommandData * data)
+static void aml_task_data_free(AmlTaskData * data)
 {
     g_free(data->buf);
     g_free(data);
 }
+
+/***********************aml_adb_command****************************/
 
 static void aml_adb_command_thread(GTask * task,
                                    gpointer source_object,
                                    gpointer task_data,
                                    GCancellable * cancellable)
 {
-    CommandData *data = (CommandData *) task_data;
+    AmlTaskData *data = (AmlTaskData *) task_data;
     int ret = adb_command(data->buf);
     g_task_return_int(task, ret);
 }
@@ -52,9 +54,9 @@ void aml_adb_command(const gchar * buf, GAsyncReadyCallback callback,
                      gpointer data)
 {
     GTask *task = g_task_new(NULL, NULL, callback, data);
-    CommandData *task_data = command_data_new(buf);
+    AmlTaskData *task_data = aml_task_data_new(buf);
     g_task_set_task_data(task, task_data,
-                         (GDestroyNotify) command_data_free);
+                         (GDestroyNotify) aml_task_data_free);
     g_task_run_in_thread(task, aml_adb_command_thread);
 }
 
@@ -63,25 +65,37 @@ int aml_adb_command_finish(GAsyncResult * result)
     return g_task_propagate_int(G_TASK(result), NULL);
 }
 
+/**********************aml_adb_connect***************************/
 
-static void aml_adb_start_server_thread(GTask * task,
-                                        gpointer source_object,
-                                        gpointer task_data,
-                                        GCancellable * cancellable)
+static void aml_adb_connect_thread(GTask * task, gpointer source_object,
+                                   gpointer task_data,
+                                   GCancellable * cancellable)
 {
-    int ret = adb_connect("host:start-server");
+    AmlTaskData *data = (AmlTaskData *) task_data;
+    int ret = adb_connect(data->buf);
     g_task_return_int(task, ret);
 }
 
-void aml_adb_start_server(GAsyncReadyCallback callback, gpointer data)
+void aml_adb_connect(const gchar * buf, GAsyncReadyCallback callback,
+                     gpointer data)
 {
     GTask *task = g_task_new(NULL, NULL, callback, data);
-    g_task_run_in_thread(task, aml_adb_start_server_thread);
+    AmlTaskData *task_data = aml_task_data_new(buf);
+    g_task_set_task_data(task, task_data,
+                         (GDestroyNotify) aml_task_data_free);
+    g_task_run_in_thread(task, aml_adb_connect_thread);
 }
 
-int aml_adb_start_server_finish(GAsyncResult * result)
+int aml_adb_connect_finish(GAsyncResult * result)
 {
     return g_task_propagate_int(G_TASK(result), NULL);
+}
+
+/**************************************************************/
+
+void aml_adb_start_server(GAsyncReadyCallback callback, gpointer data)
+{
+    aml_adb_connect("host:start-server", callback, data);
 }
 
 
@@ -92,4 +106,22 @@ void aml_adb_forward(guint local, guint remote,
     g_snprintf(buf, sizeof(buf), "host-usb:forward:tcp:%u;tcp:%u", local,
                remote);
     aml_adb_command(buf, callback, data);
+}
+
+void aml_adb_am_start(const gchar * activity,
+                      GAsyncReadyCallback callback, gpointer data)
+{
+    gchar buf[64];
+    g_snprintf(buf, sizeof(buf), "shell:am start -n %s", activity);
+    aml_adb_connect(buf, callback, data);
+}
+
+void aml_adb_install_app(const gchar * filepath,
+                         GAsyncReadyCallback callback, gpointer data)
+{
+}
+
+int aml_adb_install_app_finish(GAsyncResult * result)
+{
+    return 0;
 }

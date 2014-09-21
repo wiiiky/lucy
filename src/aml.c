@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 {
     adb_sysdeps_init();
     adb_trace_init();
-    if (g_strcmp0(argv[0], "adb") == 0) {
+    if (g_strcmp0(argv[0], "adb") == 0 || g_strcmp0(argv[0], "./adb") == 0) {
         /* 
          * 如果argv[0]，则本次程序以adb的方式执行
          * 这可能是由两种情况引起的，
