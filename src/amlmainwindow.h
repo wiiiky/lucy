@@ -35,6 +35,11 @@ AmlMainWindow *aml_main_window_construct(GType object_type);
 
 void aml_main_window_show(AmlMainWindow * window);
 
+/*
+ * 启动adb服务器
+ */
+void aml_main_window_start_server(AmlMainWindow * window);
+
 
 G_END_DECLS
 #endif

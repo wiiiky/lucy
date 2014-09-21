@@ -19,5 +19,17 @@
 #ifndef __AML_ADB_H__
 #define __AML_ADB_H__
 
+#include <gtk/gtk.h>
+
+/*
+ * adb 相关
+ */
+
+
+/*
+ * 启动adb服务器
+ */
+void aml_adb_start_server(GAsyncReadyCallback callback, gpointer data);
+int aml_adb_start_server_finish(GAsyncResult * result);
 
 #endif

@@ -7,6 +7,7 @@
 #include "amlmainwindow.h"
 #include "amlapplicationview.h"
 #include "amlaboutdialog.h"
+#include "amladb.h"
 
 #define MAINWINDOW_TITLE "Android Manager"
 
@@ -215,4 +216,16 @@ void aml_main_window_show(AmlMainWindow * window)
 {
     gtk_widget_show_all(GTK_WIDGET(window));
     gtk_main();
+}
+
+static void onStartServer(GObject * source_object,
+                          GAsyncResult * res, gpointer user_data)
+{
+    int ret = aml_adb_start_server_finish(res);
+    printf("%d\n", ret);
+}
+
+void aml_main_window_start_server(AmlMainWindow * window)
+{
+    aml_adb_start_server(onStartServer, window);
 }
