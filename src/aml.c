@@ -42,12 +42,17 @@ int main(int argc, char **argv)
     adb_sysdeps_init();
     adb_trace_init();
     if (g_strcmp0(argv[0], "adb") == 0) {
+        /* 
+         * 如果argv[0]，则本次程序以adb的方式执行
+         * 这可能是由两种情况引起的，
+         * A.程序本身就被命名为adb；
+         * B.execl执行服务器进程；见libadb/adb.c:1145
+         */
         return adb_commandline(argc - 1, argv + 1);
     }
     gtk_init(&argc, &argv);
 
     AmlMainWindow *window = aml_main_window_new();
-    aml_main_window_start_server(window);
 
     aml_main_window_show(window);
 

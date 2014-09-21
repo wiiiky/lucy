@@ -25,11 +25,28 @@
  * adb 相关
  */
 
+/*
+ * 使用GTask异步执行adb命令
+ * 执行完毕调用callback
+ * XXX：这里的buf不是adb命令行的参数，而是adb源代码中adb_command函数的参数
+ */
+void aml_adb_command(const gchar * buf, GAsyncReadyCallback callback,
+                     gpointer data);
+int aml_adb_command_finish(GAsyncResult * result);
+
 
 /*
  * 启动adb服务器
  */
 void aml_adb_start_server(GAsyncReadyCallback callback, gpointer data);
 int aml_adb_start_server_finish(GAsyncResult * result);
+
+/*
+ * 重定向tcp端口
+ * aml_adb_command的简单封装
+ */
+void aml_adb_forward(guint local, guint remote,
+                     GAsyncReadyCallback callback, gpointer data);
+#define aml_adb_forward_finish(result) aml_adb_command_finish(result)
 
 #endif

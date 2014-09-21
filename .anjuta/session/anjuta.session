@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/aml.c#26
+Files=../../src/aml.c#34%%%../../src/amladb.h#29%%%../../src/amladb.c#54%%%../../src/amlmainwindow.c#88%%%../../src/amlmainwindow.h#40
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
@@ -15,7 +15,7 @@ Working directories=../../../aml
 
 [Project Manager]
 Shortcut=aml//src//libadb//libadb.a%%%aml//src//libadb//libzipfile//libzipfile.a%%%aml//src//libadb//libcutils//libcutils.a
-Expand=aml%%%aml//src%%%aml//src//libadb%%%aml//src//libadb//libadb.a%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
+Expand=aml%%%aml//src%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
 
 [Debugger]
 Stop at beginning=2

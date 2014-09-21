@@ -10,6 +10,8 @@
 #include "amladb.h"
 
 #define MAINWINDOW_TITLE "Android Manager"
+#define ADB_FORWARD_LOCAL   (37859)
+#define ADB_FORWARD_REMOTE  (37859)
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -215,6 +217,7 @@ static GtkWidget *aml_main_window_stack_with_switcher(AmlMainWindow * self)
 void aml_main_window_show(AmlMainWindow * window)
 {
     gtk_widget_show_all(GTK_WIDGET(window));
+    aml_main_window_start_server(window);
     gtk_main();
 }
 
@@ -222,7 +225,11 @@ static void onStartServer(GObject * source_object,
                           GAsyncResult * res, gpointer user_data)
 {
     int ret = aml_adb_start_server_finish(res);
-    printf("%d\n", ret);
+    if (ret == 0) {
+        /* OK */
+    } else {
+        /* ERROR, failed to start(or connect to) adb server */
+    }
 }
 
 void aml_main_window_start_server(AmlMainWindow * window)
