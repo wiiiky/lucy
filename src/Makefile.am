@@ -28,7 +28,11 @@ aml_SOURCES =  \
 	amlaboutdialog.h \
 	amlaboutdialog.c \
 	amlmainwindow.h \
-	amlmainwindow.c
+	amlmainwindow.c \
+	amlsocket.c \
+	amlsocket.h \
+	amladb.c \
+	amladb.h
 
 aml_LDADD = \
 	libadb/libadb.a \

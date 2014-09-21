@@ -35,6 +35,11 @@ typedef enum {
     AML_APPLICATION_VIEW_COL_NUMBER
 } AmlApplicationViewColumns;
 
+#define COLUMN_ICON_WIDTH   (100)
+#define COLUMN_NAME_WIDTH   (150)
+#define COLUMN_VERSION_WIDTH (120)
+#define COLUMN_PACKAGE_WIDTH (140)
+
 
 AmlApplicationView *aml_application_view_construct(GType object_type)
 {
@@ -74,6 +79,46 @@ static void aml_application_view_instance_init(AmlApplicationView * self)
         gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->appStore));
     g_object_ref_sink(priv->appStore);
     g_object_ref_sink(priv->appView);
+
+    GtkCellRenderer *renderer;
+    GtkTreeViewColumn *column;
+    renderer = gtk_cell_renderer_pixbuf_new();
+    column = gtk_tree_view_column_new_with_attributes("ICON", renderer,
+                                                      "pixbuf",
+                                                      AML_APPLICATION_VIEW_COL_ICON,
+                                                      NULL);
+    gtk_tree_view_column_set_fixed_width(column, COLUMN_ICON_WIDTH);
+    gtk_tree_view_append_column(priv->appView, column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("NAME", renderer,
+                                                      "text",
+                                                      AML_APPLICATION_VIEW_COL_NAME,
+                                                      "xalign",
+                                                      AML_APPLICATION_VIEW_COL_XALIGN,
+                                                      NULL);
+    gtk_tree_view_column_set_fixed_width(column, COLUMN_NAME_WIDTH);
+    gtk_tree_view_append_column(priv->appView, column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("VERSION", renderer,
+                                                      "text",
+                                                      AML_APPLICATION_VIEW_COL_VERSION,
+                                                      "xalign",
+                                                      AML_APPLICATION_VIEW_COL_XALIGN,
+                                                      NULL);
+    gtk_tree_view_column_set_fixed_width(column, COLUMN_VERSION_WIDTH);
+    gtk_tree_view_append_column(priv->appView, column);
+
+    renderer = gtk_cell_renderer_text_new();
+    column = gtk_tree_view_column_new_with_attributes("PACKAGE", renderer,
+                                                      "text",
+                                                      AML_APPLICATION_VIEW_COL_PACKAGE,
+                                                      "xalign",
+                                                      AML_APPLICATION_VIEW_COL_XALIGN,
+                                                      NULL);
+    gtk_tree_view_column_set_fixed_width(column, COLUMN_PACKAGE_WIDTH);
+    gtk_tree_view_append_column(priv->appView, column);
 }
 
 
@@ -132,5 +177,7 @@ void aml_application_view_append(AmlApplicationView * self,
                        AML_APPLICATION_VIEW_COL_NAME,
                        data->appName,
                        AML_APPLICATION_VIEW_COL_VERSION,
-                       data->version, -1);
+                       data->version,
+                       AML_APPLICATION_VIEW_COL_PACKAGE,
+                       data->packageName, -1);
 }

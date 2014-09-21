@@ -2,23 +2,20 @@
 Maximized=1
 Geometry=1301x744+65+24
 
-[File Loader]
-Files=../../src/aml.c#37%%%../../src/amlapplicationview.h#36%%%../../src/amlapplicationview.c#72%%%../../src/amlprotocol.c#54%%%../../src/amlprotocol.h#47%%%../../src/amlmainwindow.c#154%%%../../src/amlmainwindow.h#27
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Program uri=../../Debug/src/aml
 Run in terminal=2
 Working directories=../../../aml
 
+[File Loader]
+Files=../../src/amlmainwindow.c#181%%%../../src/amlapplicationview.c#173%%%../../src/amlapplicationview.h#1%%%../../src/amlprotocol.h#49%%%../../src/amlprotocol.c#62%%%../../src/amlsocket.c#20%%%../../src/amlsocket.h#23%%%../../src/amladb.c#19%%%../../src/amladb.h#23
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
 [Project Manager]
 Shortcut=aml//src//libadb//libadb.a%%%aml//src//libadb//libzipfile//libzipfile.a%%%aml//src//libadb//libcutils//libcutils.a
-Expand=aml%%%aml//src%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
-
-[Debugger]
-Stop at beginning=2
+Expand=aml%%%aml//src%%%aml//src//libadb%%%aml//src//libadb//libadb.a%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32
@@ -27,3 +24,6 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2

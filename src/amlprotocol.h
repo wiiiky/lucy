@@ -31,23 +31,25 @@ typedef struct {
     gchar *description;
 } AmlProtocolApplication;
 
-AmlProtocolApplication *aml_protocol_package_new(const gchar * packageName,
-                                                 const gchar * appName,
-                                                 const gchar * version,
-                                                 const gchar * iconId,
-                                                 const gchar *
-                                                 installedTime,
-                                                 const gchar *
-                                                 installedLocation,
-                                                 const gchar *
-                                                 description);
-void aml_protocol_package_free(AmlProtocolApplication * p);
+AmlProtocolApplication *aml_protocol_application_new(const gchar *
+                                                     packageName,
+                                                     const gchar * appName,
+                                                     const gchar * version,
+                                                     const gchar * iconId,
+                                                     const gchar *
+                                                     installedTime,
+                                                     const gchar *
+                                                     installedLocation,
+                                                     const gchar *
+                                                     description);
+void aml_protocol_application_free(AmlProtocolApplication * p);
 
 /*
  * 从一个列表中找出包名为package的项，未找到返回NULL
  */
-AmlProtocolApplication *aml_protocol_find(GList * list,
-                                          const gchar * package);
+AmlProtocolApplication *aml_protocol_application_find(GList * list,
+                                                      const gchar *
+                                                      package);
 
 
 #endif

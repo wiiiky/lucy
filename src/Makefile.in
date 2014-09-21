@@ -92,7 +92,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_aml_OBJECTS = aml.$(OBJEXT) amlapplicationview.$(OBJEXT) \
 	amlprotocol.$(OBJEXT) amlaboutdialog.$(OBJEXT) \
-	amlmainwindow.$(OBJEXT)
+	amlmainwindow.$(OBJEXT) amlsocket.$(OBJEXT) amladb.$(OBJEXT)
 aml_OBJECTS = $(am_aml_OBJECTS)
 am__DEPENDENCIES_1 =
 aml_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
@@ -308,7 +308,11 @@ aml_SOURCES = \
 	amlaboutdialog.h \
 	amlaboutdialog.c \
 	amlmainwindow.h \
-	amlmainwindow.c
+	amlmainwindow.c \
+	amlsocket.c \
+	amlsocket.h \
+	amladb.c \
+	amladb.h
 
 aml_LDADD = \
 	libadb/libadb.a \
@@ -408,9 +412,11 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aml.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlaboutdialog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amladb.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlapplicationview.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlprotocol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlsocket.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
