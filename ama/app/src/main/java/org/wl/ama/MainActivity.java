@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -118,7 +117,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.btnPackages){
-            Intent intent=new Intent(this,PackagesActivity.class);
+            Intent intent=new Intent(this,ApplicationActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
         }

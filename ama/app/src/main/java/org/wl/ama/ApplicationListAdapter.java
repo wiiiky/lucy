@@ -4,21 +4,22 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.wl.ama.model.ApplicationListModel;
 
 import java.util.ArrayList;
 
 /**
  * Created by wiky on 9/19/14.
  */
-public class PackageListAdapter extends BaseAdapter {
-    private ArrayList<PackageListModel> data;
+public class ApplicationListAdapter extends BaseAdapter {
+    private ArrayList<ApplicationListModel> data;
     private Context mContext;
 
-    public PackageListAdapter(Context context,ArrayList<PackageListModel> list){
+    public ApplicationListAdapter(Context context, ArrayList<ApplicationListModel> list){
         data=list;
         mContext=context;
     }
@@ -41,7 +42,7 @@ public class PackageListAdapter extends BaseAdapter {
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder=getViewHolder(view);
-        PackageListModel d=(PackageListModel)getItem(i);
+        ApplicationListModel d=(ApplicationListModel)getItem(i);
         holder.icon.setImageDrawable(d.icon);
         holder.packageName.setText(d.packageName);
         holder.appName.setText(d.appName);

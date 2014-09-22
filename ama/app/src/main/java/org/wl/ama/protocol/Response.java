@@ -1,5 +1,7 @@
 package org.wl.ama.protocol;
 
+import android.content.Context;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -11,6 +13,12 @@ import java.io.PrintWriter;
  */
 public abstract class Response {
 
+    protected Context mContext;
+
+    public Response(Context ctx){
+        mContext=ctx;
+    }
+
     public abstract String getData();
 
     public void onResponse(PrintWriter writer){
@@ -19,7 +27,7 @@ public abstract class Response {
     }
 
     public void onResponse(OutputStreamWriter writer) throws IOException {
-        writer.write(getData());
+        writer.write(getData()+"\n");
         writer.flush();
     }
 }

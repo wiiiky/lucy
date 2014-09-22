@@ -8,26 +8,28 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
+import org.wl.ama.model.ApplicationListModel;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class PackagesActivity extends Activity {
+public class ApplicationActivity extends Activity {
 
     private ListView listPackages=null;
-    private PackageListAdapter packageListAdapter=null;
+    private ApplicationListAdapter packageListAdapter=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_packages);
 
-        ArrayList<PackageListModel> list=new ArrayList<PackageListModel>();
+        ArrayList<ApplicationListModel> list=new ArrayList<ApplicationListModel>();
         PackageManager manager=getPackageManager();
         List<PackageInfo> packages=manager.getInstalledPackages(0);
         for (int i=0;i<packages.size();i++){
             PackageInfo info=packages.get(i);
-            PackageListModel model=new PackageListModel(
+            ApplicationListModel model=new ApplicationListModel(
                     info.applicationInfo.loadIcon(manager),
                     info.packageName,
                     info.applicationInfo.loadLabel(manager).toString());
@@ -35,7 +37,7 @@ public class PackagesActivity extends Activity {
         }
 
         listPackages=(ListView)findViewById(R.id.listPackages);
-        packageListAdapter=new PackageListAdapter(this,list);
+        packageListAdapter=new ApplicationListAdapter(this,list);
         listPackages.setAdapter(packageListAdapter);
     }
 

@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by wiky on 9/20/14.
  */
-public class PackagesResponse extends Response {
+public class ApplicationsResponse extends Response {
     /*
      * sdcard表示安装在SD卡
      * phone表示应用安装在手机内存
@@ -18,10 +18,8 @@ public class PackagesResponse extends Response {
     private static String INSTALLED_IN_SDCARD="sdcard";
     private static String INSTALLED_IN_PHONE="phone";
 
-    private Context mContext=null;
-
-    public PackagesResponse(Context ctx){
-        mContext=ctx;
+    public ApplicationsResponse(Context ctx) {
+        super(ctx);
     }
 
     /*

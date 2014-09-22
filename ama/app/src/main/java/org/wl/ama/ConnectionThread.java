@@ -25,8 +25,9 @@ public class ConnectionThread extends Thread {
     /*
      * 请求数据
      */
-    private static String REQUEST_PACKAGES="packages";
+    private static String REQUEST_PACKAGES="applications";
     private static String REQUEST_ICON="icon:";
+    private static String REQUEST_VERSION="version";
 
     public ConnectionThread(Context ctx,Socket s){
         socket=s;
@@ -41,9 +42,11 @@ public class ConnectionThread extends Thread {
             String buf;
             while((buf=bufferedReader.readLine())!=null){
                 String lower=buf.toLowerCase();
-                if (lower.startsWith(REQUEST_PACKAGES)) {
-                    onPackagesResponse();
-                }else if(lower.startsWith(REQUEST_ICON)){
+                if (lower.equals(REQUEST_PACKAGES)) {
+                    onApplicationsResponse();
+                }else if(lower.startsWith(REQUEST_ICON)) {
+                }else if(lower.equals(REQUEST_VERSION)){
+                    onVersionResponse();
                 }else {
                     onUnknownResponse(buf);
                 }
@@ -71,10 +74,13 @@ public class ConnectionThread extends Thread {
         }
     }
 
-    private void onPackagesResponse(){
-        new PackagesResponse(mContext).onResponse(printWriter);
+    private void onApplicationsResponse(){
+        new ApplicationsResponse(mContext).onResponse(printWriter);
     }
 
+    private void onVersionResponse(){
+
+    }
 
     /*
      * 未知的请求
