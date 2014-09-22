@@ -224,22 +224,56 @@ void aml_main_window_show(AmlMainWindow * window)
     gtk_main();
 }
 
+
+static void onInstallAma(GObject * source_object,
+                         GAsyncResult * res, gpointer user_data)
+{
+    int ret = aml_adb_install_app_finish(res);
+    if (ret == 0) {
+        /* OK */
+        g_message("installed OK");
+    } else {
+        g_message("Failed to install apk: %s", adb_error());
+    }
+}
+
+static const gchar *getAmaAPKPath()
+{
+    const gchar *pkgdata = PACKAGE_DATA_DIR "/apk/app-debug.apk";
+    const gchar *srcdata = PACKAGE_SRC_DIR "/../res/apk/app-debug.apk";
+
+    if (g_file_test(pkgdata, G_FILE_TEST_EXISTS)) {
+        return pkgdata;
+    } else if (g_file_test(srcdata, G_FILE_TEST_EXISTS)) {
+        return srcdata;
+    }
+    return NULL;
+}
+
 static void onActivityStart(GObject * source_object,
                             GAsyncResult * res, gpointer user_data)
 {
     int fd = aml_adb_am_start_finish(res);
     if (fd < 0) {
-        g_error("Failed to start activity: %s\n", adb_error());
-        return;
+        goto onStartFailed;
     }
     gchar buf[1024];
     int n = adb_read(fd, buf, sizeof(buf));
     while ((n = adb_read(fd, buf, sizeof(buf))) > 0) {
         if (g_strstr_len(buf, n, "Error")) {
-            g_error("Failed to start activaty!\n");
+            goto onStartFailed;
         }
     }
     adb_close(fd);
+    return;
+  onStartFailed:
+    adb_close(fd);
+    g_message("Failed to start ama!");
+    const gchar *apkpath = getAmaAPKPath();
+    if (apkpath == NULL) {
+        g_error("AMA apk file is missing!!");
+    }
+    aml_adb_install_app(apkpath, onInstallAma, user_data);
 }
 
 static void onForward(GObject * source_object,
@@ -248,7 +282,6 @@ static void onForward(GObject * source_object,
     int ret = aml_adb_forward_finish(res);
     if (ret == 0) {
         /* OK */
-        aml_adb_am_start(AMA_ACTIVITY_NAME, onActivityStart, user_data);
     } else {
         g_error("Failed to forward tcp port! %s\n", adb_error());
     }
@@ -262,6 +295,7 @@ static void onStartServer(GObject * source_object,
         /* OK */
         aml_adb_forward(ADB_FORWARD_LOCAL, ADB_FORWARD_REMOTE,
                         onForward, user_data);
+        aml_adb_am_start(AMA_ACTIVITY_NAME, onActivityStart, user_data);
     } else {
         /* ERROR, failed to start(or connect to) adb server */
         g_error("Failed to start adb server! %s\n", adb_error());

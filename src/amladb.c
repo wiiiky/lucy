@@ -21,6 +21,12 @@
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
 
+/*
+ * install_app在commandline.c中定义，但没有在头文件中声明过
+ */
+int install_app(transport_type transport, char *serial, int argc,
+                char **argv);
+
 typedef struct {
     gchar *buf;
 } AmlTaskData;
@@ -116,12 +122,33 @@ void aml_adb_am_start(const gchar * activity,
     aml_adb_connect(buf, callback, data);
 }
 
+static void aml_adb_install_app_thread(GTask * task,
+                                       gpointer source_object,
+                                       gpointer task_data,
+                                       GCancellable * cancellable)
+{
+    gchar *argv[2] = { "install", NULL };
+    AmlTaskData *data = (AmlTaskData *) task_data;
+    argv[1] = data->buf;
+    int ret = install_app(kTransportAny, NULL, 2, argv);
+
+    g_task_return_int(task, ret);
+}
+
+/*
+ * 安装apk到android手机
+ */
 void aml_adb_install_app(const gchar * filepath,
                          GAsyncReadyCallback callback, gpointer data)
 {
+    GTask *task = g_task_new(NULL, NULL, callback, data);
+    AmlTaskData *task_data = aml_task_data_new(filepath);
+    g_task_set_task_data(task, task_data,
+                         (GDestroyNotify) aml_task_data_free);
+    g_task_run_in_thread(task, aml_adb_install_app_thread);
 }
 
 int aml_adb_install_app_finish(GAsyncResult * result)
 {
-    return 0;
+    return g_task_propagate_int(G_TASK(result), NULL);
 }

@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/aml.c#45%%%../../src/amladb.h#69%%%../../src/amlmainwindow.c#236%%%../../src/amlmainwindow.h#40%%%../../src/amlsocket.h#10%%%../../src/amladb.c#125
+Files=../../src/aml.c#45%%%../../src/amladb.h#26%%%../../src/amlmainwindow.c#26%%%../../src/amlmainwindow.h#40%%%../../src/amlsocket.h#10%%%../../src/amladb.c#144
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

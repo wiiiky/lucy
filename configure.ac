@@ -26,6 +26,7 @@ PKG_CHECK_MODULES(AML,
 AC_OUTPUT([
 		   Makefile
 		   src/Makefile
+		   res/Makefile
 		   src/libadb/Makefile
 		   src/libadb/libzipfile/Makefile
 		   src/libadb/libcutils/Makefile

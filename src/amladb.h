@@ -25,6 +25,7 @@
  * adb 相关
  */
 
+
 /*
  * 使用GTask异步执行adb_command
  * 执行完毕调用callback
