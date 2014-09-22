@@ -114,12 +114,38 @@ void aml_adb_forward(guint local, guint remote,
     aml_adb_command(buf, callback, data);
 }
 
+
+static void aml_adb_am_start_thread(GTask * task, gpointer source_object,
+                                    gpointer task_data,
+                                    GCancellable * cancellable)
+{
+    AmlTaskData *data = (AmlTaskData *) task_data;
+    int fd = adb_connect(data->buf);
+    if (fd < 0) {
+        g_task_return_int(task, fd);
+    }
+    gchar buf[1024];
+    int n = adb_read(fd, buf, sizeof(buf));
+    while ((n = adb_read(fd, buf, sizeof(buf))) > 0) {
+        if (g_strstr_len(buf, n, "Error")) {
+            adb_close(fd);
+            g_task_return_int(task, -1);
+        }
+    }
+    adb_close(fd);
+    g_task_return_int(task, n);
+}
+
 void aml_adb_am_start(const gchar * activity,
                       GAsyncReadyCallback callback, gpointer data)
 {
     gchar buf[64];
     g_snprintf(buf, sizeof(buf), "shell:am start -n %s", activity);
-    aml_adb_connect(buf, callback, data);
+    GTask *task = g_task_new(NULL, NULL, callback, data);
+    AmlTaskData *task_data = aml_task_data_new(buf);
+    g_task_set_task_data(task, task_data,
+                         (GDestroyNotify) aml_task_data_free);
+    g_task_run_in_thread(task, aml_adb_am_start_thread);
 }
 
 static void aml_adb_install_app_thread(GTask * task,

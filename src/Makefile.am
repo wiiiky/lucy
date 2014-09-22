@@ -29,10 +29,10 @@ aml_SOURCES =  \
 	amlaboutdialog.c \
 	amlmainwindow.h \
 	amlmainwindow.c \
-	amlsocket.c \
-	amlsocket.h \
 	amladb.c \
-	amladb.h
+	amladb.h \
+	amlsocket.h \
+	amlsocket.c
 
 aml_LDADD = \
 	libadb/libadb.a \

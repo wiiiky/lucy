@@ -8,6 +8,7 @@
 #include "amlapplicationview.h"
 #include "amlaboutdialog.h"
 #include "amladb.h"
+#include "amlsocket.h"
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
 
@@ -15,6 +16,7 @@
 #define ADB_FORWARD_LOCAL   (37859)
 #define ADB_FORWARD_REMOTE  (37859)
 #define AMA_ACTIVITY_NAME   "org.wl.ama/.MainActivity"
+#define AMA_APK_NAME    "app-debug.apk"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -224,23 +226,29 @@ void aml_main_window_show(AmlMainWindow * window)
     gtk_main();
 }
 
+static void onActivityStartFinal(GObject * source_object,
+                                 GAsyncResult * res, gpointer user_data)
+{
+    if (aml_adb_am_start_finish(res)) {
+        g_error("Failed to start ama final!");
+    }
+}
 
 static void onInstallAma(GObject * source_object,
                          GAsyncResult * res, gpointer user_data)
 {
     int ret = aml_adb_install_app_finish(res);
-    if (ret == 0) {
-        /* OK */
-        g_message("installed OK");
-    } else {
-        g_message("Failed to install apk: %s", adb_error());
+    if (ret) {
+        g_error("Failed to install apk: %s", adb_error());
+        return;
     }
+    aml_adb_am_start(AMA_ACTIVITY_NAME, onActivityStartFinal, user_data);
 }
 
 static const gchar *getAmaAPKPath()
 {
-    const gchar *pkgdata = PACKAGE_DATA_DIR "/apk/app-debug.apk";
-    const gchar *srcdata = PACKAGE_SRC_DIR "/../res/apk/app-debug.apk";
+    const gchar *pkgdata = PACKAGE_DATA_DIR "/apk/" AMA_APK_NAME;
+    const gchar *srcdata = PACKAGE_SRC_DIR "/../res/apk/" AMA_APK_NAME;
 
     if (g_file_test(pkgdata, G_FILE_TEST_EXISTS)) {
         return pkgdata;
@@ -253,27 +261,15 @@ static const gchar *getAmaAPKPath()
 static void onActivityStart(GObject * source_object,
                             GAsyncResult * res, gpointer user_data)
 {
-    int fd = aml_adb_am_start_finish(res);
-    if (fd < 0) {
-        goto onStartFailed;
-    }
-    gchar buf[1024];
-    int n = adb_read(fd, buf, sizeof(buf));
-    while ((n = adb_read(fd, buf, sizeof(buf))) > 0) {
-        if (g_strstr_len(buf, n, "Error")) {
-            goto onStartFailed;
+    if (aml_adb_am_start_finish(res)) {
+        g_message("Failed to start ama!");
+        const gchar *apkpath = getAmaAPKPath();
+        if (apkpath == NULL) {
+            g_error("AMA apk file is missing!!");
         }
+        aml_adb_install_app(apkpath, onInstallAma, user_data);
+    } else {
     }
-    adb_close(fd);
-    return;
-  onStartFailed:
-    adb_close(fd);
-    g_message("Failed to start ama!");
-    const gchar *apkpath = getAmaAPKPath();
-    if (apkpath == NULL) {
-        g_error("AMA apk file is missing!!");
-    }
-    aml_adb_install_app(apkpath, onInstallAma, user_data);
 }
 
 static void onForward(GObject * source_object,

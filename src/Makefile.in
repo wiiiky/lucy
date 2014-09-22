@@ -92,7 +92,7 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_aml_OBJECTS = aml.$(OBJEXT) amlapplicationview.$(OBJEXT) \
 	amlprotocol.$(OBJEXT) amlaboutdialog.$(OBJEXT) \
-	amlmainwindow.$(OBJEXT) amlsocket.$(OBJEXT) amladb.$(OBJEXT)
+	amlmainwindow.$(OBJEXT) amladb.$(OBJEXT) amlsocket.$(OBJEXT)
 aml_OBJECTS = $(am_aml_OBJECTS)
 am__DEPENDENCIES_1 =
 aml_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
@@ -309,10 +309,10 @@ aml_SOURCES = \
 	amlaboutdialog.c \
 	amlmainwindow.h \
 	amlmainwindow.c \
-	amlsocket.c \
-	amlsocket.h \
 	amladb.c \
-	amladb.h
+	amladb.h \
+	amlsocket.h \
+	amlsocket.c
 
 aml_LDADD = \
 	libadb/libadb.a \
