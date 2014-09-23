@@ -2,23 +2,20 @@
 Maximized=1
 Geometry=1301x744+65+24
 
-[Execution]
-Program uri=../../Debug/src/aml
-Run in terminal=2
-Working directories=../../../aml
-
 [File Loader]
-Files=../../src/aml.c#45%%%../../src/amladb.h#65%%%../../src/amladb.c#132%%%../../src/amlsocket.c#136%%%../../src/amlsocket.h#52%%%../../src/amlmainwindow.c#264
+Files=../../src/lcmainwindow.c#18
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
 
-[Project Manager]
-Shortcut=aml//src//libadb//libadb.a%%%aml//src//libadb//libzipfile//libzipfile.a%%%aml//src//libadb//libcutils//libcutils.a
-Expand=aml%%%aml//src%%%aml//src//aml%%%aml//dist_doc%%%aml//AML
+[Execution]
+Program uri=../../Debug/src/lucy
+Run in terminal=2
+Working directories=../../../lucy
 
-[Debugger]
-Stop at beginning=2
+[Project Manager]
+Shortcut=lucy//src//libadb//libadb.a%%%lucy//src//libadb//libzipfile//libzipfile.a%%%lucy//src//libadb//libcutils//libcutils.a
+Expand=lucy%%%lucy//src%%%lucy//src//lucy%%%lucy//dist_doc%%%lucy//LUCY
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32
@@ -27,3 +24,6 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2

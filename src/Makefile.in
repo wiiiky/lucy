@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = aml$(EXEEXT)
+bin_PROGRAMS = lucy$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -90,12 +90,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_aml_OBJECTS = aml.$(OBJEXT) amlapplicationview.$(OBJEXT) \
-	amlprotocol.$(OBJEXT) amlaboutdialog.$(OBJEXT) \
-	amlmainwindow.$(OBJEXT) amladb.$(OBJEXT) amlsocket.$(OBJEXT)
-aml_OBJECTS = $(am_aml_OBJECTS)
+am_lucy_OBJECTS = lucy.$(OBJEXT) lcapplicationview.$(OBJEXT) \
+	lcprotocol.$(OBJEXT) lcaboutdialog.$(OBJEXT) \
+	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT)
+lucy_OBJECTS = $(am_lucy_OBJECTS)
 am__DEPENDENCIES_1 =
-aml_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
+lucy_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
 	libadb/libcutils/libcutils.a $(am__DEPENDENCIES_1)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -125,8 +125,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(aml_SOURCES)
-DIST_SOURCES = $(aml_SOURCES)
+SOURCES = $(lucy_SOURCES)
+DIST_SOURCES = $(lucy_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -195,8 +195,6 @@ am__relativize = \
   done; \
   reldir="$$dir2"
 ACLOCAL = @ACLOCAL@
-AML_CFLAGS = @AML_CFLAGS@
-AML_LIBS = @AML_LIBS@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AUTOCONF = @AUTOCONF@
@@ -223,6 +221,8 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LTLIBOBJS = @LTLIBOBJS@
+LUCY_CFLAGS = @LUCY_CFLAGS@
+LUCY_LIBS = @LUCY_LIBS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
 OBJEXT = @OBJEXT@
@@ -292,33 +292,33 @@ AM_CPPFLAGS = \
 	-DHAVE_FORKEXEC=1 \
 	-DHAVE_SYMLINKS \
 	-DHAVE_TERMIO_H \
-	$(AML_CFLAGS)
+	$(LUCY_CFLAGS)
 
 AM_CFLAGS = \
      -pthread \
 	 -Wall \
 	 -g
 
-aml_SOURCES = \
-	aml.c \
-	amlapplicationview.h \
-	amlapplicationview.c \
-	amlprotocol.h \
-	amlprotocol.c \
-	amlaboutdialog.h \
-	amlaboutdialog.c \
-	amlmainwindow.h \
-	amlmainwindow.c \
-	amladb.c \
-	amladb.h \
-	amlsocket.h \
-	amlsocket.c
+lucy_SOURCES = \
+	lucy.c \
+	lcapplicationview.h \
+	lcapplicationview.c \
+	lcprotocol.h \
+	lcprotocol.c \
+	lcaboutdialog.h \
+	lcaboutdialog.c \
+	lcmainwindow.h \
+	lcmainwindow.c \
+	lcadb.c \
+	lcadb.h \
+	lcsocket.h \
+	lcsocket.c
 
-aml_LDADD = \
+lucy_LDADD = \
 	libadb/libadb.a \
 	libadb/libzipfile/libzipfile.a \
 	libadb/libcutils/libcutils.a \
-	$(AML_LIBS)
+	$(LUCY_LIBS)
 
 SUBDIRS = \
 	libadb
@@ -400,9 +400,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-aml$(EXEEXT): $(aml_OBJECTS) $(aml_DEPENDENCIES) $(EXTRA_aml_DEPENDENCIES) 
-	@rm -f aml$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(aml_OBJECTS) $(aml_LDADD) $(LIBS)
+lucy$(EXEEXT): $(lucy_OBJECTS) $(lucy_DEPENDENCIES) $(EXTRA_lucy_DEPENDENCIES) 
+	@rm -f lucy$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(lucy_OBJECTS) $(lucy_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -410,13 +410,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aml.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlaboutdialog.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amladb.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlapplicationview.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlmainwindow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlprotocol.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/amlsocket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcaboutdialog.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcadb.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcapplicationview.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmainwindow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lucy.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
