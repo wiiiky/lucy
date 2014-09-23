@@ -1,9 +1,9 @@
-AMA
+Lily
 ======
 
 ###Introduce
-AMA means 'Android Manager for Android'. This is an Android APP that opens a listening socket to wait for AML (runs in host PC ) to connnect.
+Lily is the Android part of Android Manager. This is an Android APP that opens a listening socket to wait for Lucy (runs in host PC ) to connnect.
 
-After connection, AML sends request and AMA reponses.
+Lucy communicates with lily through USB cable.
 
 ###TODO

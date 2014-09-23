@@ -3,7 +3,7 @@ Maximized=1
 Geometry=1301x744+65+24
 
 [File Loader]
-Files=../../src/lcmainwindow.c#18
+Files=../../src/lcmainwindow.c#275%%%../../src/lcadb.c#1%%%../../src/lcprotocol.c#1%%%../../src/lcsocket.c#225%%%../../src/lcsocket.h#49
 
 [Document Manager]
 bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n

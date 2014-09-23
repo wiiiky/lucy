@@ -50,7 +50,7 @@ public class ApplicationsResponse extends Response {
                 getApplicationIconId(info)+":"+
                 getApplicationInstalledTime(info)+":"+
                 getApplicationInstalledLocation(info)+":"+
-                getApplicationDescription(info)+":"+
+                getApplicationDescription(info)+
                 "\n";
         return  data;
     }

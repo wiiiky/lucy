@@ -74,6 +74,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     };
 
+    public void showLog(String log){
+        logStr=log;
+        handler.post(addLog);
+    }
+
     private static Thread serverThread=null;
     private void startServer(){
         if(serverThread==null||serverThread.isAlive()==false||serverSocket.isClosed()) {
@@ -89,28 +94,25 @@ public class MainActivity extends Activity implements View.OnClickListener {
             Socket client;
             try{
                 serverSocket=new ServerSocket(listenPort);
-                logStr="Listening on "+listenPort;
-                handler.post(addLog);
+                showLog("Listening on "+listenPort);
                 while((client = serverSocket.accept())!=null){
                     new ConnectionThread(MainActivity.this,client).start();
-                    logStr="Connect to "+client.getRemoteSocketAddress().toString();
-                    handler.post(addLog);
+                    showLog("Connect to "+client.getRemoteSocketAddress().toString());
                     NotificationHelper.show("PC Connected",client.getRemoteSocketAddress().toString(),MainActivity.this);
                 }
             }catch (SocketTimeoutException e){
-                logStr="SocketTimeoutException: "+e.getMessage();
+                showLog("SocketTimeoutException: "+e.getMessage());
             }catch (IOException e){
-                logStr="IOException: "+e.getMessage();
+                showLog("IOException: "+e.getMessage());
             }finally {
                 if (serverSocket!=null){
                     try{
                         serverSocket.close();
                     }catch (IOException e){
-                        logStr="IOException: "+e.getMessage();
+                        showLog("IOException: "+e.getMessage());
                     }
                 }
             }
-            handler.post(addLog);
         }
     };
 

@@ -3,6 +3,7 @@ package org.wl.ll.protocol;
 import android.content.Context;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
@@ -21,21 +22,17 @@ public abstract class Response {
 
     public abstract String getData();
 
-    public void onResponse(PrintWriter writer){
-        String data=getData();
-        writer.write(getLength(data));
-        writer.write(data);
-        writer.flush();
+    public void onResponse(OutputStream writer){
+        byte[] data=getData().getBytes();
+        try {
+            writer.write(getLength(data),0,4);
+            writer.write(data,0,data.length);
+            writer.flush();
+        } catch (IOException e) {
+        }
     }
 
-    public void onResponse(OutputStreamWriter writer) throws IOException {
-        String data=getData();
-        writer.write(getLength(data));
-        writer.write(data);
-        writer.flush();
-    }
-
-    protected String getLength(String data){
-        return String.format("%04x",data.length());
+    protected byte[] getLength(byte[] data){
+        return String.format("%04x",data.length).getBytes();
     }
 }

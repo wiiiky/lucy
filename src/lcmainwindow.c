@@ -257,6 +257,24 @@ static const gchar *getAmaAPKPath()
     return NULL;
 }
 
+static void onApplications(GObject * source_object,
+                            GAsyncResult * res, gpointer user_data)
+{
+    gchar *data=lc_socket_send_command_async_finish (res);
+    g_message("%s",data);
+    g_free(data);
+}
+
+static void onSocketConnection(GObject * source_object,
+                            GAsyncResult * res, gpointer user_data)
+{
+    if(lc_socket_connect_async_finish (res)){
+        lc_socket_send_command_async (LC_SOCKET(source_object),"applicationS\n",onApplications,user_data);
+    }else{
+        g_error("connection failed!!");
+    }
+}
+
 static void onActivityStart(GObject * source_object,
                             GAsyncResult * res, gpointer user_data)
 {
@@ -268,6 +286,8 @@ static void onActivityStart(GObject * source_object,
         }
         lc_adb_install_app(apkpath, onInstallAma, user_data);
     } else {
+        LcSocket *socket=lc_socket_new ("127.0.0.1",ADB_FORWARD_LOCAL);
+        lc_socket_connect_async (socket,onSocketConnection,user_data);
     }
 }
 

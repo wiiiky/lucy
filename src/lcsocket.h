@@ -35,13 +35,18 @@ LcSocket *lc_socket_new(const gchar * addr, guint16 port);
 LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
                               guint16 port);
 
+void lc_socket_close(LcSocket *socket);
+
+/* 将四个字节的十六进制字符串转化为整数 */
+gssize lc_data_length(gchar buf[4]);
+
 /*
  * 发起链接
  */
 void lc_socket_connect_async(LcSocket * socket,
                              GAsyncReadyCallback callback,
                              gpointer user_data);
-gboolean lc_socket_connect_finish(GAsyncResult * res);
+gboolean lc_socket_connect_async_finish(GAsyncResult * res);
 
 /*
  * 发送/接收数据
@@ -63,7 +68,7 @@ void lc_socket_send_command_async(LcSocket * socket,
 /*
  * 正常则返回响应的数据，否则返回NULL。返回的数据需要手动释放
  */
-gchar *lc_socket_send_command_finish(GAsyncResult * result);
+gchar *lc_socket_send_command_async_finish(GAsyncResult * result);
 
 G_END_DECLS
 #endif

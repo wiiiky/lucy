@@ -2,11 +2,12 @@ package org.wl.ll;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.Socket;
 import org.wl.ll.protocol.*;
 
@@ -18,7 +19,7 @@ import org.wl.ll.protocol.*;
 public class ConnectionThread extends Thread {
     /* 处理一个链接的线程，目前只是echo */
     private Socket socket=null;
-    private PrintWriter printWriter=null;
+    private OutputStream outputStream =null;
     private BufferedReader bufferedReader=null;
     private Context mContext=null;
 
@@ -35,13 +36,15 @@ public class ConnectionThread extends Thread {
     }
 
     public void run(){
+        MainActivity ac=(MainActivity)mContext;
         try {
             InputStreamReader inputReader=new InputStreamReader(socket.getInputStream());
-            printWriter=new PrintWriter(socket.getOutputStream());
+            outputStream =socket.getOutputStream();
             bufferedReader=new BufferedReader(inputReader);
             String buf;
             while((buf=bufferedReader.readLine())!=null){
                 String lower=buf.toLowerCase();
+                ac.showLog(socket.getRemoteSocketAddress().toString() + ":" +buf );
                 if (lower.equals(REQUEST_PACKAGES)) {
                     onApplicationsResponse();
                 }else if(lower.startsWith(REQUEST_ICON)) {
@@ -52,17 +55,18 @@ public class ConnectionThread extends Thread {
                 }
             }
         } catch (IOException e) {
-            Log.e("IOException", e.getMessage() != null ? e.getMessage() : "!");
+            ac.showLog(e.getMessage() != null ? e.getMessage() : "!");
         }finally {
+            ac.showLog(socket.getRemoteSocketAddress().toString()+ " is disconnected");
             cleanup();
         }
     }
 
     private void cleanup(){
-        if (printWriter != null) {
-            printWriter.close();
-        }
         try{
+            if (outputStream != null) {
+                outputStream.close();
+            }
             if(bufferedReader!=null){
                 bufferedReader.close();
             }
@@ -75,11 +79,11 @@ public class ConnectionThread extends Thread {
     }
 
     private void onApplicationsResponse(){
-        new ApplicationsResponse(mContext).onResponse(printWriter);
+        new ApplicationsResponse(mContext).onResponse(outputStream);
     }
 
     private void onVersionResponse(){
-        new VersionResponse(mContext).onResponse(printWriter);
+        new VersionResponse(mContext).onResponse(outputStream);
     }
 
     /*
@@ -87,7 +91,6 @@ public class ConnectionThread extends Thread {
      * 直接返回该请求数据
      */
     private void onUnknownResponse(String buf){
-        printWriter.write(buf);
-        printWriter.flush();
+        new UnknownResponse(mContext,buf).onResponse(outputStream);
     }
 }
