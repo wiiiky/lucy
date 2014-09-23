@@ -42,7 +42,7 @@ void lc_application_view_update(LcApplicationView * self, GList * list);
  * 在应用列表中增加一项，不会检查是否重复
  */
 void lc_application_view_append(LcApplicationView * self,
-                                 LcProtocolApplication * data);
+                                LcProtocolApplication * data);
 
 
 G_END_DECLS

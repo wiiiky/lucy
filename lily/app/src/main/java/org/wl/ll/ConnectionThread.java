@@ -79,7 +79,7 @@ public class ConnectionThread extends Thread {
     }
 
     private void onVersionResponse(){
-
+        new VersionResponse(mContext).onResponse(printWriter);
     }
 
     /*

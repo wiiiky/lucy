@@ -33,34 +33,33 @@ struct _LcSocketClass {
 GType lc_socket_get_type(void) G_GNUC_CONST;
 LcSocket *lc_socket_new(const gchar * addr, guint16 port);
 LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
-                                guint16 port);
+                              guint16 port);
 
 /*
  * 发起链接
  */
 void lc_socket_connect_async(LcSocket * socket,
-                              GAsyncReadyCallback callback,
-                              gpointer user_data);
+                             GAsyncReadyCallback callback,
+                             gpointer user_data);
 gboolean lc_socket_connect_finish(GAsyncResult * res);
 
 /*
  * 发送/接收数据
  */
-gssize lc_socket_send(LcSocket * socket, const gchar * buffer,
-                       gsize size);
+gssize lc_socket_send(LcSocket * socket, const gchar * buffer, gsize size);
 gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size);
 /* 读取一行 */
 gssize lc_socket_receive_line(LcSocket * socket, gchar * buffer,
-                               gsize size);
+                              gsize size);
 
 /*
  * 该函数会发送一个协议请求，
  * 然后等待响应，直到接受到了完整的响应（一个空行结束）才回调
  */
 void lc_socket_send_command_async(LcSocket * socket,
-                                   const gchar * command,
-                                   GAsyncReadyCallback callback,
-                                   gpointer user_data);
+                                  const gchar * command,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data);
 /*
  * 正常则返回响应的数据，否则返回NULL。返回的数据需要手动释放
  */

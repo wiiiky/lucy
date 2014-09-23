@@ -22,12 +22,20 @@ public abstract class Response {
     public abstract String getData();
 
     public void onResponse(PrintWriter writer){
-        writer.write(getData());
+        String data=getData();
+        writer.write(getLength(data));
+        writer.write(data);
         writer.flush();
     }
 
     public void onResponse(OutputStreamWriter writer) throws IOException {
-        writer.write(getData()+"\n");
+        String data=getData();
+        writer.write(getLength(data));
+        writer.write(data);
         writer.flush();
+    }
+
+    protected String getLength(String data){
+        return String.format("%04x",data.length());
     }
 }

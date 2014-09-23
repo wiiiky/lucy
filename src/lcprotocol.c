@@ -19,16 +19,16 @@
 #include "lcprotocol.h"
 
 LcProtocolApplication *lc_protocol_application_new(const gchar *
-                                                     packageName,
-                                                     const gchar * appName,
-                                                     const gchar * version,
-                                                     const gchar * iconId,
-                                                     const gchar *
-                                                     installedTime,
-                                                     const gchar *
-                                                     installedLocation,
-                                                     const gchar *
-                                                     description)
+                                                   packageName,
+                                                   const gchar * appName,
+                                                   const gchar * version,
+                                                   const gchar * iconId,
+                                                   const gchar *
+                                                   installedTime,
+                                                   const gchar *
+                                                   installedLocation,
+                                                   const gchar *
+                                                   description)
 {
     LcProtocolApplication *p = (LcProtocolApplication *)
         g_slice_alloc0(sizeof(LcProtocolApplication));
@@ -64,12 +64,10 @@ void lc_protocol_application_free(LcProtocolApplication * p)
 }
 
 LcProtocolApplication *lc_protocol_application_find(GList * list,
-                                                      const gchar *
-                                                      package)
+                                                    const gchar * package)
 {
     while (list) {
-        LcProtocolApplication *app =
-            (LcProtocolApplication *) list->data;
+        LcProtocolApplication *app = (LcProtocolApplication *) list->data;
         if (g_strcmp0(app->packageName, package) == 0) {
             return app;
         }

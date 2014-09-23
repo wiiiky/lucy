@@ -24,14 +24,14 @@ enum {
 static void lc_application_view_finalize(GObject * obj);
 
 typedef enum {
-    LC_APPLICATION_VIEW_COL_ICON,  /*图标 */
-    LC_APPLICATION_VIEW_COL_NAME,  /*应用名 */
-    LC_APPLICATION_VIEW_COL_VERSION,   /*版本号 */
-    LC_APPLICATION_VIEW_COL_PACKAGE,   /* 包名 */
+    LC_APPLICATION_VIEW_COL_ICON,   /*图标 */
+    LC_APPLICATION_VIEW_COL_NAME,   /*应用名 */
+    LC_APPLICATION_VIEW_COL_VERSION,    /*版本号 */
+    LC_APPLICATION_VIEW_COL_PACKAGE,    /* 包名 */
 
     LC_APPLICATION_VIEW_COL_XALIGN,
 
-    LC_APPLICATION_VIEW_COL_FLAG,  /* 标记位, used in lc_application_view_update */
+    LC_APPLICATION_VIEW_COL_FLAG,   /* 标记位, used in lc_application_view_update */
     LC_APPLICATION_VIEW_COL_NUMBER
 } LcApplicationViewColumns;
 
@@ -57,8 +57,7 @@ LcApplicationView *lc_application_view_new(void)
 }
 
 
-static void lc_application_view_class_init(LcApplicationViewClass *
-                                            klass)
+static void lc_application_view_class_init(LcApplicationViewClass * klass)
 {
     lc_application_view_parent_class = g_type_class_peek_parent(klass);
     g_type_class_add_private(klass, sizeof(LcApplicationViewPrivate));
@@ -167,7 +166,7 @@ void lc_application_view_update(LcApplicationView * self, GList * list)
  * 在应用列表中增加一项，不会检查是否重复
  */
 void lc_application_view_append(LcApplicationView * self,
-                                 LcProtocolApplication * data)
+                                LcProtocolApplication * data)
 {
     GtkListStore *store = self->priv->appStore;
     GtkTreeIter iter;

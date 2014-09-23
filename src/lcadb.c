@@ -47,9 +47,9 @@ static void lc_task_data_free(LcTaskData * data)
 /***********************lc_adb_command****************************/
 
 static void lc_adb_command_thread(GTask * task,
-                                   gpointer source_object,
-                                   gpointer task_data,
-                                   GCancellable * cancellable)
+                                  gpointer source_object,
+                                  gpointer task_data,
+                                  GCancellable * cancellable)
 {
     LcTaskData *data = (LcTaskData *) task_data;
     int ret = adb_command(data->buf);
@@ -57,7 +57,7 @@ static void lc_adb_command_thread(GTask * task,
 }
 
 void lc_adb_command(const gchar * buf, GAsyncReadyCallback callback,
-                     gpointer data)
+                    gpointer data)
 {
     GTask *task = g_task_new(NULL, NULL, callback, data);
     LcTaskData *task_data = lc_task_data_new(buf);
@@ -74,8 +74,8 @@ int lc_adb_command_finish(GAsyncResult * result)
 /**********************lc_adb_connect***************************/
 
 static void lc_adb_connect_thread(GTask * task, gpointer source_object,
-                                   gpointer task_data,
-                                   GCancellable * cancellable)
+                                  gpointer task_data,
+                                  GCancellable * cancellable)
 {
     LcTaskData *data = (LcTaskData *) task_data;
     int ret = adb_connect(data->buf);
@@ -83,7 +83,7 @@ static void lc_adb_connect_thread(GTask * task, gpointer source_object,
 }
 
 void lc_adb_connect(const gchar * buf, GAsyncReadyCallback callback,
-                     gpointer data)
+                    gpointer data)
 {
     GTask *task = g_task_new(NULL, NULL, callback, data);
     LcTaskData *task_data = lc_task_data_new(buf);
@@ -106,7 +106,7 @@ void lc_adb_start_server(GAsyncReadyCallback callback, gpointer data)
 
 
 void lc_adb_forward(guint local, guint remote,
-                     GAsyncReadyCallback callback, gpointer data)
+                    GAsyncReadyCallback callback, gpointer data)
 {
     gchar buf[64];
     g_snprintf(buf, sizeof(buf), "host-usb:forward:tcp:%u;tcp:%u", local,
@@ -116,8 +116,8 @@ void lc_adb_forward(guint local, guint remote,
 
 
 static void lc_adb_am_start_thread(GTask * task, gpointer source_object,
-                                    gpointer task_data,
-                                    GCancellable * cancellable)
+                                   gpointer task_data,
+                                   GCancellable * cancellable)
 {
     LcTaskData *data = (LcTaskData *) task_data;
     int fd = adb_connect(data->buf);
@@ -139,7 +139,7 @@ static void lc_adb_am_start_thread(GTask * task, gpointer source_object,
 }
 
 void lc_adb_am_start(const gchar * activity,
-                      GAsyncReadyCallback callback, gpointer data)
+                     GAsyncReadyCallback callback, gpointer data)
 {
     gchar buf[64];
     g_snprintf(buf, sizeof(buf), "shell:am start -n %s", activity);
@@ -151,9 +151,9 @@ void lc_adb_am_start(const gchar * activity,
 }
 
 static void lc_adb_install_app_thread(GTask * task,
-                                       gpointer source_object,
-                                       gpointer task_data,
-                                       GCancellable * cancellable)
+                                      gpointer source_object,
+                                      gpointer task_data,
+                                      GCancellable * cancellable)
 {
     gchar *argv[2] = { "install", NULL };
     LcTaskData *data = (LcTaskData *) task_data;
@@ -167,7 +167,7 @@ static void lc_adb_install_app_thread(GTask * task,
  * 安装apk到android手机
  */
 void lc_adb_install_app(const gchar * filepath,
-                         GAsyncReadyCallback callback, gpointer data)
+                        GAsyncReadyCallback callback, gpointer data)
 {
     GTask *task = g_task_new(NULL, NULL, callback, data);
     LcTaskData *task_data = lc_task_data_new(filepath);

@@ -34,8 +34,7 @@ static void lc_main_window_finalize(GObject * obj);
 /* 创建菜单栏 */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
 /* 创建主界面上的GtkStack */
-static GtkWidget *lc_main_window_stack_with_switcher(LcMainWindow *
-                                                      self);
+static GtkWidget *lc_main_window_stack_with_switcher(LcMainWindow * self);
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
 /* 界面切换 */
 static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
@@ -166,7 +165,7 @@ static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
         lc_application_view_update(appView, NULL);
         LcProtocolApplication *info =
             lc_protocol_application_new("org.wl.lc", "lc", "0.01",
-                                         "123", "12345", "sdcard", "what");
+                                        "123", "12345", "sdcard", "what");
         lc_application_view_append(appView, info);
         lc_protocol_application_free(info);
     } else if (g_strcmp0(name, SMS_VIEW_NAME) == 0) {
@@ -290,7 +289,7 @@ static void onStartServer(GObject * source_object,
     if (ret == 0) {
         /* OK */
         lc_adb_forward(ADB_FORWARD_LOCAL, ADB_FORWARD_REMOTE,
-                        onForward, user_data);
+                       onForward, user_data);
         lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStart, user_data);
     } else {
         /* ERROR, failed to start(or connect to) adb server */

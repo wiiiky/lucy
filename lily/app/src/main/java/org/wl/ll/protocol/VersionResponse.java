@@ -22,6 +22,6 @@ public class VersionResponse extends Response {
         } catch (PackageManager.NameNotFoundException e) {
             return "unknown\n";
         }
-        return Integer.toString(info.versionCode)+"\n";
+        return "OKAY"+Integer.toString(info.versionCode);
     }
 }

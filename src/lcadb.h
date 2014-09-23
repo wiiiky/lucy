@@ -32,14 +32,14 @@
  * XXX：这里的buf不是adb命令行的参数，而是adb源代码中adb_command函数的参数
  */
 void lc_adb_command(const gchar * buf, GAsyncReadyCallback callback,
-                     gpointer data);
+                    gpointer data);
 int lc_adb_command_finish(GAsyncResult * result);
 
 /*
  * 异步执行adb_connect
  */
 void lc_adb_connect(const gchar * buf, GAsyncReadyCallback callback,
-                     gpointer data);
+                    gpointer data);
 int lc_adb_connect_finish(GAsyncResult * result);
 
 
@@ -54,21 +54,21 @@ void lc_adb_start_server(GAsyncReadyCallback callback, gpointer data);
  * lc_adb_command的简单封装
  */
 void lc_adb_forward(guint local, guint remote,
-                     GAsyncReadyCallback callback, gpointer data);
+                    GAsyncReadyCallback callback, gpointer data);
 #define lc_adb_forward_finish(result) lc_adb_command_finish(result)
 
 /*
  * 启动android机器上的指定程序
  */
 void lc_adb_am_start(const gchar * activity,
-                      GAsyncReadyCallback callback, gpointer data);
+                     GAsyncReadyCallback callback, gpointer data);
 #define lc_adb_am_start_finish(result) lc_adb_connect_finish(result)
 
 /*
  * 安装指定apk到android手机
  */
 void lc_adb_install_app(const gchar * filepath,
-                         GAsyncReadyCallback callback, gpointer data);
+                        GAsyncReadyCallback callback, gpointer data);
 int lc_adb_install_app_finish(GAsyncResult * result);
 
 #endif

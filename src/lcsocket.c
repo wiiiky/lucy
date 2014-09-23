@@ -43,7 +43,7 @@ static void lc_socket_finalize(GObject * obj);
 
 
 LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
-                                guint16 port)
+                              guint16 port)
 {
     LcSocket *self = NULL;
     g_return_val_if_fail(addr != NULL, NULL);
@@ -94,26 +94,25 @@ GType lc_socket_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(LcSocketClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) lc_socket_class_init,
-                (GClassFinalizeFunc) NULL, NULL,
+            (GClassInitFunc) lc_socket_class_init,
+            (GClassFinalizeFunc) NULL, NULL,
             sizeof(LcSocket), 0,
-                (GInstanceInitFunc) lc_socket_instance_init, NULL
+            (GInstanceInitFunc) lc_socket_instance_init, NULL
         };
         GType lc_socket_type_id;
         lc_socket_type_id =
             g_type_register_static(g_socket_get_type(), "LcSocket",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_socket_type_id__volatile,
-                          lc_socket_type_id);
+        g_once_init_leave(&lc_socket_type_id__volatile, lc_socket_type_id);
     }
     return lc_socket_type_id__volatile;
 }
 
 
 static void lc_socket_connect_thread(GTask * task,
-                                      gpointer source_object,
-                                      gpointer task_data,
-                                      GCancellable * cancellable)
+                                     gpointer source_object,
+                                     gpointer task_data,
+                                     GCancellable * cancellable)
 {
     LcSocket *socket = LC_SOCKET(source_object);
     struct sockaddr_in addr;
@@ -128,8 +127,8 @@ static void lc_socket_connect_thread(GTask * task,
 }
 
 void lc_socket_connect_async(LcSocket * socket,
-                              GAsyncReadyCallback callback,
-                              gpointer user_data)
+                             GAsyncReadyCallback callback,
+                             gpointer user_data)
 {
     GTask *task = g_task_new(socket, NULL, callback, user_data);
     g_task_run_in_thread(task, lc_socket_connect_thread);
@@ -140,8 +139,7 @@ gboolean lc_socket_connect_finish(GAsyncResult * res)
     return g_task_propagate_boolean(G_TASK(res), NULL);
 }
 
-gssize lc_socket_send(LcSocket * socket, const gchar * buffer,
-                       gsize size)
+gssize lc_socket_send(LcSocket * socket, const gchar * buffer, gsize size)
 {
     return g_socket_send(G_SOCKET(socket), buffer, size, NULL, NULL);
 }
@@ -153,7 +151,7 @@ gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size)
 
 /* 读取一行 TODO */
 gssize lc_socket_receive_line(LcSocket * socket, gchar * buffer,
-                               gsize size)
+                              gsize size)
 {
     return 0;
 }
@@ -163,9 +161,9 @@ gssize lc_socket_receive_line(LcSocket * socket, gchar * buffer,
  * 然后等待响应，直到接受到了完整的响应（一个空行结束）才回调
  */
 static void lc_socket_send_command_thread(GTask * task,
-                                           gpointer source_object,
-                                           gpointer task_data,
-                                           GCancellable * cancellable)
+                                          gpointer source_object,
+                                          gpointer task_data,
+                                          GCancellable * cancellable)
 {
     LcSocket *socket = LC_SOCKET(source_object);
     const gchar *command = (gchar *) g_task_get_task_data(task);
@@ -181,9 +179,9 @@ static void lc_socket_send_command_thread(GTask * task,
 }
 
 void lc_socket_send_command_async(LcSocket * socket,
-                                   const gchar * command,
-                                   GAsyncReadyCallback callback,
-                                   gpointer user_data)
+                                  const gchar * command,
+                                  GAsyncReadyCallback callback,
+                                  gpointer user_data)
 {
     GTask *task = g_task_new(socket, NULL, callback, user_data);
     g_task_set_task_data(task, g_strdup(command), (GDestroyNotify) g_free);
