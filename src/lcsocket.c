@@ -19,12 +19,12 @@ struct _LcSocketPrivate {
     guint16 port;
 };
 
-static void lc_socket_set_busy(LcSocket * socket, gboolean busy)
+void lc_socket_set_busy(LcSocket * socket, gboolean busy)
 {
     socket->priv->busy = busy;
 }
 
-static gboolean lc_socket_is_busy(LcSocket * socket)
+gboolean lc_socket_is_busy(LcSocket * socket)
 {
     return socket->priv->busy;
 }

@@ -67,5 +67,11 @@ void lc_socket_send_command_async(LcSocket * socket,
  */
 GByteArray *lc_socket_send_command_async_finish(GAsyncResult * result);
 
+
+void lc_socket_set_busy(LcSocket * socket, gboolean busy);
+gboolean lc_socket_is_busy(LcSocket * socket);
+#define lc_socket_is_closed(socket) g_socket_is_closed (G_SOCKET(socket))
+#define lc_socket_is_connected(socket) g_socket_is_connected (G_SOCKET(socket))
+
 G_END_DECLS
 #endif

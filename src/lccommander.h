@@ -1,5 +1,5 @@
 /*
- * lcutil.h
+ * lccommander.h
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -16,24 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef __LC_UTIL_H__
-#define __LC_UTIL_H__
+#ifndef __LC_COMMANDER_H__
+#define __LC_COMMANDER_H__
+#include <gtk/gtk.h>
 
-#include <glib-2.0/glib.h>
-#include "lcprotocol.h"
 
-/*
- * 从字节数组中提取出字符串，添加末尾\0
- */
-gchar *lc_util_get_string_from_byte_array(GByteArray * array,
-                                          gsize * size);
+void lc_commander_send_command(const gchar * cmd,
+                               GAsyncReadyCallback callback,
+                               gpointer data);
 
-typedef gboolean(*GListElementNotify) (gconstpointer data,
-                                       gpointer user_data);
-/*
- * 从列表中移除满足指定条件的元素
- */
-GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
-                             gpointer user_data, GDestroyNotify destroy);
 
 #endif

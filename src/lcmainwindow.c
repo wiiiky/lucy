@@ -10,6 +10,7 @@
 #include "lcadb.h"
 #include "lcsocket.h"
 #include "lcutil.h"
+#include "lccommander.h"
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
 
@@ -294,8 +295,10 @@ static void onActivityStart(GObject * source_object,
         }
         lc_adb_install_app(apkpath, onInstallAma, user_data);
     } else {
-        LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
-        lc_socket_connect_async(socket, onSocketConnection, user_data);
+        lc_commander_send_command("applications", onApplications,
+                                  user_data);
+        //LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
+        //lc_socket_connect_async(socket, onSocketConnection, user_data);
     }
 }
 

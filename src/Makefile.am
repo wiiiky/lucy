@@ -34,7 +34,9 @@ lucy_SOURCES =  \
 	lcsocket.h \
 	lcsocket.c \
 	lcutil.c \
-	lcutil.h
+	lcutil.h \
+	lccommander.c \
+	lccommander.h
 
 lucy_LDADD = \
 	libadb/libadb.a \

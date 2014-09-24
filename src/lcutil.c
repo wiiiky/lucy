@@ -33,3 +33,27 @@ gchar *lc_util_get_string_from_byte_array(GByteArray * array, gsize * size)
     }
     return g_bytes_unref_to_data(bytes, size);
 }
+
+GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
+                             gpointer user_data, GDestroyNotify destroy)
+{
+    GList *lp = list;
+    while (lp) {
+        GList *next = g_list_next(lp);
+        if (judge(lp->data, user_data)) {
+            if (lp == list) {   /* first element */
+                list = next;
+                list->prev = NULL;
+                destroy(lp->data);
+                g_list_free_1(lp);
+            } else {
+                lp->prev->next = next;
+                next->prev = lp->prev;
+                destroy(lp->data);
+                g_list_free_1(lp);
+            }
+        }
+        lp = next;
+    }
+    return list;
+}
