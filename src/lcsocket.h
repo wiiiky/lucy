@@ -9,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define ADB_FORWARD_LOCAL   (37859)
+#define ADB_FORWARD_REMOTE  (37859)
+
 G_BEGIN_DECLS
 #define TYPE_LC_SOCKET (lc_socket_get_type ())
 #define LC_SOCKET(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_LC_SOCKET, LcSocket))

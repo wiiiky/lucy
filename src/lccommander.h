@@ -24,6 +24,7 @@
 void lc_commander_send_command(const gchar * cmd,
                                GAsyncReadyCallback callback,
                                gpointer data);
+GByteArray *lc_commander_send_command_finish(GAsyncResult * res);
 
 
 #endif

@@ -15,8 +15,6 @@
 #include "libadb/adb_client.h"
 
 #define MAINWINDOW_TITLE "Android Manager"
-#define ADB_FORWARD_LOCAL   (37859)
-#define ADB_FORWARD_REMOTE  (37859)
 #define LILY_ACTIVITY_NAME   "org.wl.ll/.MainActivity"
 #define LILY_APK_NAME    "app-debug.apk"
 
@@ -236,8 +234,8 @@ static void onActivityStartFinal(GObject * source_object,
     }
 }
 
-static void onInstallAma(GObject * source_object,
-                         GAsyncResult * res, gpointer user_data)
+static void onInstallLily(GObject * source_object,
+                          GAsyncResult * res, gpointer user_data)
 {
     int ret = lc_adb_install_app_finish(res);
     if (ret) {
@@ -247,7 +245,7 @@ static void onInstallAma(GObject * source_object,
     lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStartFinal, user_data);
 }
 
-static const gchar *getAmaAPKPath()
+static const gchar *getLilyAPKPath()
 {
     const gchar *pkgdata = PACKAGE_DATA_DIR "/apk/" LILY_APK_NAME;
     const gchar *srcdata = PACKAGE_SRC_DIR "/../res/apk/" LILY_APK_NAME;
@@ -257,13 +255,15 @@ static const gchar *getAmaAPKPath()
     } else if (g_file_test(srcdata, G_FILE_TEST_EXISTS)) {
         return srcdata;
     }
+    g_warning(PACKAGE_DATA_DIR "/apk/" LILY_APK_NAME);
+    g_warning(PACKAGE_SRC_DIR "/../res/apk/" LILY_APK_NAME);
     return NULL;
 }
 
 static void onApplications(GObject * source_object,
                            GAsyncResult * res, gpointer user_data)
 {
-    GByteArray *array = lc_socket_send_command_async_finish(res);
+    GByteArray *array = lc_commander_send_command_finish(res);
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL) {
         g_error("command failed!");
@@ -272,30 +272,19 @@ static void onApplications(GObject * source_object,
     g_free(result);
 }
 
-static void onSocketConnection(GObject * source_object,
-                               GAsyncResult * res, gpointer user_data)
-{
-    if (lc_socket_connect_async_finish(res)) {
-        lc_socket_send_command_async(LC_SOCKET(source_object),
-                                     "applicationS\n", onApplications,
-                                     user_data);
-    } else {
-        g_error("connection failed!!");
-    }
-}
 
 static void onActivityStart(GObject * source_object,
                             GAsyncResult * res, gpointer user_data)
 {
     if (lc_adb_am_start_finish(res)) {
-        g_message("Failed to start ama!");
-        const gchar *apkpath = getAmaAPKPath();
+        g_message("Failed to start Lily!");
+        const gchar *apkpath = getLilyAPKPath();
         if (apkpath == NULL) {
-            g_error("AMA apk file is missing!!");
+            g_error("Lily apk file is missing!!");
         }
-        lc_adb_install_app(apkpath, onInstallAma, user_data);
+        lc_adb_install_app(apkpath, onInstallLily, user_data);
     } else {
-        lc_commander_send_command("applications", onApplications,
+        lc_commander_send_command("applications\n", onApplications,
                                   user_data);
         //LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
         //lc_socket_connect_async(socket, onSocketConnection, user_data);

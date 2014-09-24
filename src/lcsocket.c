@@ -48,7 +48,7 @@ LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
                                        "protocol", G_SOCKET_PROTOCOL_TCP,
                                        "type", G_SOCKET_TYPE_STREAM,
                                        "family", G_SOCKET_FAMILY_IPV4,
-                                       "timeout", 10, NULL);
+                                       "timeout", 15, NULL);
     self->priv->busy = FALSE;
     self->priv->addr = g_strdup(addr);
     self->priv->port = port;
@@ -125,12 +125,8 @@ static void lc_socket_connect_async_thread(GTask * task,
     GSocketAddress *address =
         g_socket_address_new_from_native((gpointer) & addr,
                                          sizeof(struct sockaddr_in));
-    GError *error = NULL;
-    gboolean ret =
-        g_socket_connect(G_SOCKET(socket), address, NULL, &error);
-    if (error) {
-        g_message("%s", error->message);
-    }
+
+    gboolean ret = g_socket_connect(G_SOCKET(socket), address, NULL, NULL);
     g_task_return_boolean(task, ret);
 }
 
@@ -139,11 +135,14 @@ void lc_socket_connect_async(LcSocket * socket,
                              gpointer user_data)
 {
     GTask *task = g_task_new(socket, NULL, callback, user_data);
+    lc_socket_set_busy(socket, TRUE);
     g_task_run_in_thread(task, lc_socket_connect_async_thread);
 }
 
 gboolean lc_socket_connect_async_finish(GAsyncResult * res)
 {
+    LcSocket *socket = (LcSocket *) g_task_get_source_object(G_TASK(res));
+    lc_socket_set_busy(socket, FALSE);
     return g_task_propagate_boolean(G_TASK(res), NULL);
 }
 
@@ -154,7 +153,14 @@ gssize lc_socket_send(LcSocket * socket, const gchar * buffer, gsize size)
 
 gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size)
 {
-    return g_socket_receive(G_SOCKET(socket), buffer, size, NULL, NULL);
+    GError *error = NULL;
+    gssize ret =
+        g_socket_receive(G_SOCKET(socket), buffer, size, NULL, &error);
+    if (error) {
+        g_message("Receive From Socket Error:%s", error->message);
+        g_error_free(error);
+    }
+    return ret;
 }
 
 gssize lc_data_length(gchar buf[4])
@@ -196,7 +202,7 @@ static void lc_socket_send_command_async_thread(GTask * task,
      */
     LcSocket *socket = LC_SOCKET(source_object);
     const gchar *command = (gchar *) g_task_get_task_data(task);
-    GByteArray *bytes = NULL;
+    GByteArray *array = NULL;
 
     if (lc_socket_send(socket, command, strlen(command)) <= 0) {
         goto ERROR;
@@ -211,21 +217,21 @@ static void lc_socket_send_command_async_thread(GTask * task,
     if (length < 4) {           /* 长度至少为4 */
         goto ERROR;
     }
-    bytes = g_byte_array_sized_new(4096);
-    while ((n = lc_socket_receive(socket, buf, sizeof(buf))) > 0
-           && length > 0) {
-        g_byte_array_append(bytes, (guint8 *) buf, n);
+    array = g_byte_array_sized_new(4096);
+    while (length > 0
+           && (n = lc_socket_receive(socket, buf, sizeof(buf))) > 0) {
+        g_byte_array_append(array, (guint8 *) buf, n);
         length -= n;
     }
     if (length != 0) {
         goto ERROR;
     }
-    g_task_return_pointer(task, bytes,
+    g_task_return_pointer(task, array,
                           (GDestroyNotify) g_byte_array_unref);
     return;
   ERROR:
-    if (bytes) {
-        g_byte_array_free(bytes, TRUE);
+    if (array) {
+        g_byte_array_free(array, TRUE);
     }
     g_task_return_pointer(task, NULL, NULL);
     lc_socket_close(socket);
