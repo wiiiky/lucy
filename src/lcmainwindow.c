@@ -9,6 +9,7 @@
 #include "lcaboutdialog.h"
 #include "lcadb.h"
 #include "lcsocket.h"
+#include "lcutil.h"
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
 
@@ -39,6 +40,7 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
 /* 界面切换 */
 static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
                                   gpointer data);
+
 
 enum {
     LC_MAIN_WINDOW_DUMMY_PROPERTY
@@ -258,19 +260,25 @@ static const gchar *getAmaAPKPath()
 }
 
 static void onApplications(GObject * source_object,
-                            GAsyncResult * res, gpointer user_data)
+                           GAsyncResult * res, gpointer user_data)
 {
-    gchar *data=lc_socket_send_command_async_finish (res);
-    g_message("%s",data);
-    g_free(data);
+    GByteArray *array = lc_socket_send_command_async_finish(res);
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL) {
+        g_error("command failed!");
+    }
+    g_message("%s", result);
+    g_free(result);
 }
 
 static void onSocketConnection(GObject * source_object,
-                            GAsyncResult * res, gpointer user_data)
+                               GAsyncResult * res, gpointer user_data)
 {
-    if(lc_socket_connect_async_finish (res)){
-        lc_socket_send_command_async (LC_SOCKET(source_object),"applicationS\n",onApplications,user_data);
-    }else{
+    if (lc_socket_connect_async_finish(res)) {
+        lc_socket_send_command_async(LC_SOCKET(source_object),
+                                     "applicationS\n", onApplications,
+                                     user_data);
+    } else {
         g_error("connection failed!!");
     }
 }
@@ -286,8 +294,8 @@ static void onActivityStart(GObject * source_object,
         }
         lc_adb_install_app(apkpath, onInstallAma, user_data);
     } else {
-        LcSocket *socket=lc_socket_new ("127.0.0.1",ADB_FORWARD_LOCAL);
-        lc_socket_connect_async (socket,onSocketConnection,user_data);
+        LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
+        lc_socket_connect_async(socket, onSocketConnection, user_data);
     }
 }
 

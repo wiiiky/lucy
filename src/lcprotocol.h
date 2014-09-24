@@ -21,6 +21,11 @@
 #define __LC_DATA_MODEL_H__
 #include <glib-2.0/glib.h>
 
+typedef enum {
+    LC_PROTOCOL_RESULT_OKAY,
+    LC_PROTOCOL_RESULT_FAIL,
+} LcProtocolResult;
+
 typedef struct {
     gchar *packageName;
     gchar *appName;

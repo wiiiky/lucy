@@ -13,10 +13,6 @@
 
 #define _g_free0(var) (var = (g_free (var), NULL))
 
-/****************保存所有已存在的LcSocket**********************/
-static GList *sockets_container = NULL;
-/***************************************************************/
-
 struct _LcSocketPrivate {
     gboolean busy;
     gchar *addr;
@@ -48,18 +44,14 @@ LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
     LcSocket *self = NULL;
     g_return_val_if_fail(addr != NULL, NULL);
     self = (LcSocket *) g_initable_new(object_type,
-                                     NULL,NULL,
-                                     "protocol",G_SOCKET_PROTOCOL_TCP,
-                                     "type",G_SOCKET_TYPE_STREAM,
-                                     "family",G_SOCKET_FAMILY_IPV4,
-                                     "timeout",10,
-                                     NULL);
+                                       NULL, NULL,
+                                       "protocol", G_SOCKET_PROTOCOL_TCP,
+                                       "type", G_SOCKET_TYPE_STREAM,
+                                       "family", G_SOCKET_FAMILY_IPV4,
+                                       "timeout", 10, NULL);
     self->priv->busy = FALSE;
     self->priv->addr = g_strdup(addr);
     self->priv->port = port;
-
-    /* 新创建的LcSocket放到链表末尾 */
-    sockets_container = g_list_append(sockets_container, self);
     return self;
 }
 
@@ -114,16 +106,16 @@ GType lc_socket_get_type(void)
     return lc_socket_type_id__volatile;
 }
 
-void lc_socket_close(LcSocket *socket)
+void lc_socket_close(LcSocket * socket)
 {
-    g_socket_close (G_SOCKET(socket),NULL);
+    g_socket_close(G_SOCKET(socket), NULL);
 }
 
 
 static void lc_socket_connect_async_thread(GTask * task,
-                                     gpointer source_object,
-                                     gpointer task_data,
-                                     GCancellable * cancellable)
+                                           gpointer source_object,
+                                           gpointer task_data,
+                                           GCancellable * cancellable)
 {
     LcSocket *socket = LC_SOCKET(source_object);
     struct sockaddr_in addr;
@@ -133,10 +125,11 @@ static void lc_socket_connect_async_thread(GTask * task,
     GSocketAddress *address =
         g_socket_address_new_from_native((gpointer) & addr,
                                          sizeof(struct sockaddr_in));
-    GError *error=NULL;
-    gboolean ret = g_socket_connect(G_SOCKET(socket), address, NULL, &error);
-    if(error){
-        g_message("%s",error->message);
+    GError *error = NULL;
+    gboolean ret =
+        g_socket_connect(G_SOCKET(socket), address, NULL, &error);
+    if (error) {
+        g_message("%s", error->message);
     }
     g_task_return_boolean(task, ret);
 }
@@ -166,25 +159,25 @@ gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size)
 
 gssize lc_data_length(gchar buf[4])
 {
-    int i,j;
-    int ret=0;
-    for(i=0;i<4;i++){
-        int power=3-i;
-        int base=1;
-        for (j=0;j<power;j++){
-            base=base*16;
+    int i, j;
+    int ret = 0;
+    for (i = 0; i < 4; i++) {
+        int power = 3 - i;
+        int base = 1;
+        for (j = 0; j < power; j++) {
+            base = base * 16;
         }
-        int times=0;
-        if(buf[i]>='0' && buf[i]<='9'){
-            times=buf[i]-'0';
-        }else if(buf[i]>='a' && buf[i]<='f'){
-            times=buf[i]-'a'+10;
-        }else if(buf[i]>='A' && buf[i]<='F'){
-            times=buf[i]-'A'+10;
-        }else{
+        int times = 0;
+        if (buf[i] >= '0' && buf[i] <= '9') {
+            times = buf[i] - '0';
+        } else if (buf[i] >= 'a' && buf[i] <= 'f') {
+            times = buf[i] - 'a' + 10;
+        } else if (buf[i] >= 'A' && buf[i] <= 'F') {
+            times = buf[i] - 'A' + 10;
+        } else {
             return -1;
         }
-        ret+=times*base;
+        ret += times * base;
     }
     return ret;
 }
@@ -194,46 +187,51 @@ gssize lc_data_length(gchar buf[4])
  * 然后等待响应，直到接受到了完整的响应（一个空行结束）才回调
  */
 static void lc_socket_send_command_async_thread(GTask * task,
-                                          gpointer source_object,
-                                          gpointer task_data,
-                                          GCancellable * cancellable)
+                                                gpointer source_object,
+                                                gpointer task_data,
+                                                GCancellable * cancellable)
 {
     /*
      * 如果是链接错误则返回NULL，否则返回接受到的数据（不包括长度）
      */
     LcSocket *socket = LC_SOCKET(source_object);
     const gchar *command = (gchar *) g_task_get_task_data(task);
-    GString *string = g_string_new("");
+    GByteArray *bytes = NULL;
 
     if (lc_socket_send(socket, command, strlen(command)) <= 0) {
         goto ERROR;
     }
     gchar buf[4096];
     gssize n;
-    n=lc_socket_receive (socket,buf,4);
-    if(n!=4){
+    n = lc_socket_receive(socket, buf, 4);
+    if (n != 4) {
         goto ERROR;
     }
-    gssize length=lc_data_length (buf);
-    if(length<4){   /* 长度至少为4 */
+    gssize length = lc_data_length(buf);
+    if (length < 4) {           /* 长度至少为4 */
         goto ERROR;
     }
-    while ((n=lc_socket_receive(socket, buf, sizeof(buf))) > 0 && length>0) {
-        g_string_append_len (string,buf,n);
-        length-=n;
+    bytes = g_byte_array_sized_new(4096);
+    while ((n = lc_socket_receive(socket, buf, sizeof(buf))) > 0
+           && length > 0) {
+        g_byte_array_append(bytes, (guint8 *) buf, n);
+        length -= n;
     }
-    if(length!=0){
+    if (length != 0) {
         goto ERROR;
     }
-    g_task_return_pointer (task,g_string_free (string,FALSE),g_free);
+    g_task_return_pointer(task, bytes,
+                          (GDestroyNotify) g_byte_array_unref);
     return;
-ERROR:
-    g_string_free (string,TRUE);
+  ERROR:
+    if (bytes) {
+        g_byte_array_free(bytes, TRUE);
+    }
     g_task_return_pointer(task, NULL, NULL);
     lc_socket_close(socket);
 }
 
-void lc_socket_send_command_async (LcSocket * socket,
+void lc_socket_send_command_async(LcSocket * socket,
                                   const gchar * command,
                                   GAsyncReadyCallback callback,
                                   gpointer user_data)
@@ -244,11 +242,10 @@ void lc_socket_send_command_async (LcSocket * socket,
     g_task_run_in_thread(task, lc_socket_send_command_async_thread);
 }
 
-gchar *lc_socket_send_command_async_finish(GAsyncResult * result)
+GByteArray *lc_socket_send_command_async_finish(GAsyncResult * result)
 {
-    gchar *data = (gchar *) g_task_propagate_pointer(G_TASK(result), NULL);
     LcSocket *socket =
         (LcSocket *) g_task_get_source_object(G_TASK(result));
     lc_socket_set_busy(socket, FALSE);
-    return data;
+    return (GByteArray *) g_task_propagate_pointer(G_TASK(result), NULL);
 }
