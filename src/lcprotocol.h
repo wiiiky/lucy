@@ -26,6 +26,8 @@ typedef enum {
     LC_PROTOCOL_RESULT_FAIL,
 } LcProtocolResult;
 
+LcProtocolResult lc_protocol_get_result_from_string(const gchar * str);
+
 typedef struct {
     gchar *packageName;
     gchar *appName;
@@ -48,6 +50,20 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    const gchar *
                                                    description);
 void lc_protocol_application_free(LcProtocolApplication * p);
+
+
+/*
+ * 从一行数据中解析出一个应用信息
+ */
+LcProtocolApplication *lc_protocol_get_application(const gchar * data);
+/*
+ * 解析lily返回的结果，生成一个包含应用信息的列表
+ */
+GList *lc_protocol_create_application_list(const gchar * data);
+/*
+ * 释放一个应用信息列表
+ */
+void lc_protocol_free_application_list(GList * list);
 
 /*
  * 从一个列表中找出包名为package的项，未找到返回NULL

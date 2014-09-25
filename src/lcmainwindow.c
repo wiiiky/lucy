@@ -162,13 +162,6 @@ static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
     LcMainWindow *self = (LcMainWindow *) data;
     const gchar *name = gtk_stack_get_visible_child_name(stack);
     if (g_strcmp0(name, APPLICATION_VIEW_NAME) == 0) {
-        LcApplicationView *appView = self->priv->appView;
-        lc_application_view_update(appView, NULL);
-        LcProtocolApplication *info =
-            lc_protocol_application_new("org.wl.lc", "lc", "0.01",
-                                        "123", "12345", "sdcard", "what");
-        lc_application_view_append(appView, info);
-        lc_protocol_application_free(info);
     } else if (g_strcmp0(name, SMS_VIEW_NAME) == 0) {
     }
 }
@@ -266,9 +259,26 @@ static void onApplications(GObject * source_object,
     GByteArray *array = lc_commander_send_command_finish(res);
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL) {
-        g_error("command failed!");
+        g_warning("Connection Problem while 'applications'");
+        return;
     }
-    g_message("%s", result);
+    if (lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Command 'applications' Failed:%s", result);
+    } else {
+        LcMainWindow *self = (LcMainWindow *) user_data;
+        LcApplicationView *appView = self->priv->appView;
+        GList *list = lc_protocol_create_application_list(result + 4);
+        GList *lp = list;
+        while (lp) {
+            LcProtocolApplication *info =
+                (LcProtocolApplication *) lp->data;
+            lc_application_view_append(appView, info);
+            g_message("%s", info->appName);
+            lp = g_list_next(lp);
+        }
+        lc_protocol_free_application_list(list);
+    }
     g_free(result);
 }
 
@@ -286,8 +296,6 @@ static void onActivityStart(GObject * source_object,
     } else {
         lc_commander_send_command("applications\n", onApplications,
                                   user_data);
-        //LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
-        //lc_socket_connect_async(socket, onSocketConnection, user_data);
     }
 }
 

@@ -85,11 +85,13 @@ static void onSocketConnection(GObject * source_object,
         lc_socket_send_command_async(LC_SOCKET(source_object),
                                      data->buf, data->callback,
                                      data->user_data);
+        sockets = g_list_append(sockets, source_object);
         g_message("Sending Command: %s", data->buf);
     } else {
         data->callback(NULL, NULL, data->user_data);
         g_message("Connection is not Established!");
     }
+    g_object_unref(source_object);
     lc_commander_data_free(data);
 }
 
@@ -107,7 +109,6 @@ void lc_commander_send_command(const gchar * cmd,
     LcCommanderData *data =
         lc_commander_data_new(cmd, callback, user_data);
     lc_socket_connect_async(socket, onSocketConnection, data);
-    sockets = g_list_append(sockets, socket);
 }
 
 GByteArray *lc_commander_send_command_finish(GAsyncResult * res)

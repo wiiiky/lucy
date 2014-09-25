@@ -18,6 +18,18 @@
  */
 #include "lcprotocol.h"
 
+
+LcProtocolResult lc_protocol_get_result_from_string(const gchar * str)
+{
+    if (g_ascii_tolower(str[0]) == 'o' &&
+        g_ascii_tolower(str[1]) == 'k' &&
+        g_ascii_tolower(str[2]) == 'a' && g_ascii_tolower(str[3]) == 'y') {
+        return LC_PROTOCOL_RESULT_OKAY;
+    }
+    return LC_PROTOCOL_RESULT_FAIL;
+}
+
+
 LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,
                                                    const gchar * appName,
@@ -74,4 +86,47 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
         list = g_list_next(list);
     }
     return NULL;
+}
+
+LcProtocolApplication *lc_protocol_get_application(const gchar * data)
+{
+    gchar **elements = g_strsplit(data, ":", -1);
+    if (g_strv_length(elements) < 7) {
+        g_strfreev(elements);
+        return NULL;
+    }
+    LcProtocolApplication *app = lc_protocol_application_new(elements[0],
+                                                             elements[1],
+                                                             elements[2],
+                                                             elements[3],
+                                                             elements[4],
+                                                             elements[5],
+                                                             elements[6]);
+    g_strfreev(elements);
+    return app;
+}
+
+GList *lc_protocol_create_application_list(const gchar * data)
+{
+    if (data == NULL) {
+        return NULL;
+    }
+    GList *apps = NULL;
+    gchar **strarray = g_strsplit(data, "\n", -1);
+    gint i = 0;
+    while (strarray[i]) {
+        gchar *line = strarray[i];
+        if (line[0]) {
+            LcProtocolApplication *app = lc_protocol_get_application(line);
+            apps = g_list_append(apps, app);
+        }
+        i++;
+    }
+    g_strfreev(strarray);
+    return apps;
+}
+
+void lc_protocol_free_application_list(GList * list)
+{
+    g_list_free_full(list, (GDestroyNotify) lc_protocol_application_free);
 }

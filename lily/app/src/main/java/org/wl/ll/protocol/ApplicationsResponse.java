@@ -44,8 +44,8 @@ public class ApplicationsResponse extends Response {
      * 获取要返回的所有包相关数据
      */
     private String getApplicationInfoData(PackageInfo info){
-        String data=getApplicationPackageName(info) +
-                getApplicationName(info) +
+        String data=getApplicationPackageName(info) +":"+
+                getApplicationName(info) +":"+
                 getApplicationVersionName(info) + ":" +
                 getApplicationIconId(info)+":"+
                 getApplicationInstalledTime(info)+":"+
