@@ -76,7 +76,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = lucy$(EXEEXT)
+bin_PROGRAMS = $(top_builddir)/lucy$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
@@ -90,14 +90,17 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_lucy_OBJECTS = lucy.$(OBJEXT) lcapplicationview.$(OBJEXT) \
-	lcprotocol.$(OBJEXT) lcaboutdialog.$(OBJEXT) \
-	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT) \
-	lcutil.$(OBJEXT) lccommander.$(OBJEXT) lctoolstack.$(OBJEXT)
-lucy_OBJECTS = $(am_lucy_OBJECTS)
+am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
+	lcapplicationview.$(OBJEXT) lcprotocol.$(OBJEXT) \
+	lcaboutdialog.$(OBJEXT) lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) \
+	lcsocket.$(OBJEXT) lcutil.$(OBJEXT) lccommander.$(OBJEXT) \
+	lctoolstack.$(OBJEXT) lcmyphone.$(OBJEXT)
+__top_builddir__lucy_OBJECTS = $(am___top_builddir__lucy_OBJECTS)
 am__DEPENDENCIES_1 =
-lucy_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
-	libadb/libcutils/libcutils.a $(am__DEPENDENCIES_1)
+__top_builddir__lucy_DEPENDENCIES = libadb/libadb.a \
+	libadb/libzipfile/libzipfile.a libadb/libcutils/libcutils.a \
+	$(am__DEPENDENCIES_1)
+am__dirstamp = $(am__leading_dot)dirstamp
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -126,8 +129,8 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(lucy_SOURCES)
-DIST_SOURCES = $(lucy_SOURCES)
+SOURCES = $(__top_builddir__lucy_SOURCES)
+DIST_SOURCES = $(__top_builddir__lucy_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -287,7 +290,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(abs_top_srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
 	-DADB_HOST=1 \
 	-DHAVE_FORKEXEC=1 \
@@ -300,7 +303,30 @@ AM_CFLAGS = \
 	 -Wall \
 	 -g
 
-lucy_SOURCES = \
+______lucy_lucy_SOURCES = \
+	lucy.c \
+	lcutil.h \
+	lcutil.c \
+	lctoolstack.h \
+	lctoolstack.c \
+	lcsocket.h \
+	lcsocket.c \
+	lcprotocol.h \
+	lcprotocol.c \
+	lcmyphone.h \
+	lcmyphone.c \
+	lcmainwindow.h \
+	lcmainwindow.c \
+	lccommander.h \
+	lccommander.c \
+	lcapplicationview.h \
+	lcapplicationview.c \
+	lcadb.h \
+	lcadb.c \
+	lcaboutdialog.h \
+	lcaboutdialog.c
+
+__top_builddir__lucy_SOURCES = \
 	lucy.c \
 	lcapplicationview.h \
 	lcapplicationview.c \
@@ -319,9 +345,11 @@ lucy_SOURCES = \
 	lccommander.c \
 	lccommander.h \
 	lctoolstack.h \
-	lctoolstack.c
+	lctoolstack.c \
+	lcmyphone.h \
+	lcmyphone.c
 
-lucy_LDADD = \
+__top_builddir__lucy_LDADD = \
 	libadb/libadb.a \
 	libadb/libzipfile/libzipfile.a \
 	libadb/libcutils/libcutils.a \
@@ -406,10 +434,13 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+$(top_builddir)/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)
+	@: > $(top_builddir)/$(am__dirstamp)
 
-lucy$(EXEEXT): $(lucy_OBJECTS) $(lucy_DEPENDENCIES) $(EXTRA_lucy_DEPENDENCIES) 
-	@rm -f lucy$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(lucy_OBJECTS) $(lucy_LDADD) $(LIBS)
+$(top_builddir)/lucy$(EXEEXT): $(__top_builddir__lucy_OBJECTS) $(__top_builddir__lucy_DEPENDENCIES) $(EXTRA___top_builddir__lucy_DEPENDENCIES) $(top_builddir)/$(am__dirstamp)
+	@rm -f $(top_builddir)/lucy$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(__top_builddir__lucy_OBJECTS) $(__top_builddir__lucy_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -422,6 +453,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcapplicationview.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lccommander.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmainwindow.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmyphone.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lctoolstack.Po@am__quote@
@@ -630,6 +662,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(top_builddir)/$(am__dirstamp)" || rm -f $(top_builddir)/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

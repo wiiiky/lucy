@@ -19,14 +19,28 @@
 #ifndef __LC_UTIL_H__
 #define __LC_UTIL_H__
 
-#include <glib-2.0/glib.h>
+#include <gtk/gtk.h>
 #include "lcprotocol.h"
+
+void lc_init(int argc, char *argv[]);
 
 /*
  * 从字节数组中提取出字符串，添加末尾\0
  */
 gchar *lc_util_get_string_from_byte_array(GByteArray * array,
                                           gsize * size);
+
+/*
+ * 载入指定的CSS资源
+ */
+void lc_util_load_css(GtkWidget * widget, const gchar * name);
+
+/*
+ * 该函数返回指定的资源的完整路径
+ * 返回的数据保存在静态缓冲区，非线程安全
+ */
+const gchar *lc_util_get_resource_by_name(const gchar * name);
+
 
 typedef gboolean(*GListElementNotify) (gconstpointer data,
                                        gpointer user_data);

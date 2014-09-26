@@ -35,6 +35,7 @@
 #include "libadb/usb_vendors.h"
 
 #include "lcmainwindow.h"
+#include "lcutil.h"
 
 
 int main(int argc, char **argv)
@@ -50,6 +51,7 @@ int main(int argc, char **argv)
          */
         return adb_commandline(argc - 1, argv + 1);
     }
+    lc_init(argc, argv);
     gtk_init(&argc, &argv);
 
     LcMainWindow *window = lc_main_window_new();

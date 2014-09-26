@@ -4,7 +4,7 @@
 
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(abs_top_srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
 	-DADB_HOST=1 \
 	-DHAVE_FORKEXEC=1 \
@@ -17,9 +17,32 @@ AM_CFLAGS =\
 	 -Wall \
 	 -g
 
-bin_PROGRAMS = lucy
+bin_PROGRAMS = $(top_builddir)/lucy
 
-lucy_SOURCES =  \
+______lucy_lucy_SOURCES =  \
+	lucy.c \
+	lcutil.h \
+	lcutil.c \
+	lctoolstack.h \
+	lctoolstack.c \
+	lcsocket.h \
+	lcsocket.c \
+	lcprotocol.h \
+	lcprotocol.c \
+	lcmyphone.h \
+	lcmyphone.c \
+	lcmainwindow.h \
+	lcmainwindow.c \
+	lccommander.h \
+	lccommander.c \
+	lcapplicationview.h \
+	lcapplicationview.c \
+	lcadb.h \
+	lcadb.c \
+	lcaboutdialog.h \
+	lcaboutdialog.c
+
+__top_builddir__lucy_SOURCES =  \
 	lucy.c \
 	lcapplicationview.h \
 	lcapplicationview.c \
@@ -38,9 +61,11 @@ lucy_SOURCES =  \
 	lccommander.c \
 	lccommander.h \
 	lctoolstack.h \
-	lctoolstack.c
+	lctoolstack.c \
+	lcmyphone.h \
+	lcmyphone.c
 
-lucy_LDADD = \
+__top_builddir__lucy_LDADD = \
 	libadb/libadb.a \
 	libadb/libzipfile/libzipfile.a \
 	libadb/libcutils/libcutils.a \

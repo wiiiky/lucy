@@ -8,6 +8,7 @@
 #include "lctoolstack.h"
 #include "lcapplicationview.h"
 #include "lcaboutdialog.h"
+#include "lcmyphone.h"
 #include "lcadb.h"
 #include "lcsocket.h"
 #include "lcutil.h"
@@ -17,7 +18,7 @@
 
 #define MAINWINDOW_TITLE "Android Manager"
 #define LILY_ACTIVITY_NAME   "org.wl.ll/.MainActivity"
-#define LILY_APK_NAME    "app-debug.apk"
+#define LILY_APK_NAME    "apk/app-debug.apk"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -36,9 +37,6 @@ static void lc_main_window_finalize(GObject * obj);
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
 
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
-/* 界面切换 */
-static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
-                                  gpointer data);
 
 
 enum {
@@ -48,6 +46,7 @@ enum {
 struct _LcMainWindowPrivate {
     LcApplicationView *appView;
     LcToolStack *toolStack;
+    LcMyPhone *myPhone;
 };
 
 
@@ -83,6 +82,7 @@ static void lc_main_window_instance_init(LcMainWindow * self)
 {
     self->priv = LC_MAIN_WINDOW_GET_PRIVATE(self);
 
+    /*gtk_window_set_resizable(GTK_WINDOW(self), FALSE); */
     gtk_window_set_default_size(GTK_WINDOW(self), 960, 640);
     gtk_window_set_position(GTK_WINDOW(self), GTK_WIN_POS_CENTER);
     gtk_window_set_title(GTK_WINDOW(self), MAINWINDOW_TITLE);
@@ -100,17 +100,19 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                        GTK_WIDGET(self->priv->toolStack), TRUE, TRUE, 0);
     g_object_ref_sink(self->priv->toolStack);
 
+    self->priv->myPhone = lc_my_phone_new();
+    g_object_ref_sink(self->priv->myPhone);
+    lc_tool_stack_append(self->priv->toolStack,
+                         gtk_image_new_from_file
+                         (lc_util_get_resource_by_name("smartphone.svg")),
+                         "My Phone", GTK_WIDGET(self->priv->myPhone),
+                         onMyPhonePageVisible, self);
+
     self->priv->appView = lc_application_view_new();
     g_object_ref_sink(self->priv->appView);
-
     lc_tool_stack_append(self->priv->toolStack,
                          gtk_image_new_from_file
-                         ("/home/wiky/Documents/CODE/Git/lucy/res/smartphone.svg"),
-                         "My Phone", gtk_label_new("My Phone"),
-                         onMyPhonePageVisible, self);
-    lc_tool_stack_append(self->priv->toolStack,
-                         gtk_image_new_from_file
-                         ("/home/wiky/Documents/CODE/Git/lucy/res/computer.svg"),
+                         (lc_util_get_resource_by_name("computer.svg")),
                          "Applications", GTK_WIDGET(self->priv->appView),
                          NULL, NULL);
 }
@@ -122,6 +124,7 @@ static void lc_main_window_finalize(GObject * obj)
                                    LcMainWindow);
     _g_object_unref0(self->priv->appView);
     _g_object_unref0(self->priv->toolStack);
+    _g_object_unref0(self->priv->myPhone);
     G_OBJECT_CLASS(lc_main_window_parent_class)->finalize(obj);
 }
 
@@ -200,21 +203,6 @@ static void onInstallLily(GObject * source_object,
     lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStartFinal, user_data);
 }
 
-static const gchar *getLilyAPKPath()
-{
-    const gchar *pkgdata = PACKAGE_DATA_DIR "/apk/" LILY_APK_NAME;
-    const gchar *srcdata = PACKAGE_SRC_DIR "/../res/apk/" LILY_APK_NAME;
-
-    if (g_file_test(pkgdata, G_FILE_TEST_EXISTS)) {
-        return pkgdata;
-    } else if (g_file_test(srcdata, G_FILE_TEST_EXISTS)) {
-        return srcdata;
-    }
-    g_warning(PACKAGE_DATA_DIR "/apk/" LILY_APK_NAME);
-    g_warning(PACKAGE_SRC_DIR "/../res/apk/" LILY_APK_NAME);
-    return NULL;
-}
-
 static void onApplications(GObject * source_object,
                            GAsyncResult * res, gpointer user_data)
 {
@@ -250,7 +238,7 @@ static void onActivityStart(GObject * source_object,
 {
     if (lc_adb_am_start_finish(res)) {
         g_message("Failed to start Lily!");
-        const gchar *apkpath = getLilyAPKPath();
+        const gchar *apkpath = lc_util_get_resource_by_name(LILY_APK_NAME);
         if (apkpath == NULL) {
             g_error("Lily apk file is missing!!");
         }

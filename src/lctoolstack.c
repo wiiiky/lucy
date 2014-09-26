@@ -91,8 +91,12 @@ GType lc_tool_stack_get_type(void)
     if (g_once_init_enter(&lc_tool_stack_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(LcToolStackClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) lc_tool_stack_class_init, (GClassFinalizeFunc) NULL,
-NULL, sizeof(LcToolStack), 0, (GInstanceInitFunc) lc_tool_stack_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+            (GClassInitFunc) lc_tool_stack_class_init,
+            (GClassFinalizeFunc) NULL,
+            NULL, sizeof(LcToolStack), 0,
+            (GInstanceInitFunc) lc_tool_stack_instance_init, NULL
+        };
         GType lc_tool_stack_type_id;
         lc_tool_stack_type_id =
             g_type_register_static(GTK_TYPE_GRID, "LcToolStack",
@@ -110,9 +114,8 @@ static void onRadioToolButtonToggled(GtkRadioToolButton * radio,
     gboolean toggled =
         gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(radio));
 
-    const gchar *stack_name =
-        (gchar *) g_object_get_data(G_OBJECT(radio),
-                                    G_OBJECT_KEY_STACK_NAME);
+    const gchar *stack_name = (gchar *) g_object_get_data(G_OBJECT(radio),
+                                                          G_OBJECT_KEY_STACK_NAME);
     LcToolStackToggledNotify callback =
         (LcToolStackToggledNotify) g_object_get_data(G_OBJECT(radio),
                                                      G_OBJECT_KEY_CALLBACK);
