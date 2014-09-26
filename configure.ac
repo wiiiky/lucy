@@ -17,7 +17,6 @@ AC_PROG_RANLIB
 PKG_CHECK_MODULES(LUCY,
 				  [gtk+-3.0]
 				  [libssl]
-				  [libcrypto]
 				  [libzip])
 
 

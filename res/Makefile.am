@@ -3,4 +3,7 @@
 resdir= $(pkgdatadir)
 
 nobase_res_DATA=apk/app-debug.apk \
-	css/disconnected.css
+	css/disconnected.css \
+	smartphone.svg \
+	computer.svg \
+	android.jpeg

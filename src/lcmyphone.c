@@ -105,10 +105,10 @@ GType lc_my_phone_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(LcMyPhoneClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) lc_my_phone_class_init,
-                (GClassFinalizeFunc) NULL, NULL,
+            (GClassInitFunc) lc_my_phone_class_init,
+            (GClassFinalizeFunc) NULL, NULL,
             sizeof(LcMyPhone), 0,
-                (GInstanceInitFunc) lc_my_phone_instance_init, NULL
+            (GInstanceInitFunc) lc_my_phone_instance_init, NULL
         };
         GType lc_my_phone_type_id;
         lc_my_phone_type_id =

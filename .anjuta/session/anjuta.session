@@ -2,23 +2,20 @@
 Maximized=1
 Geometry=1301x744+65+24
 
-[File Loader]
-Files=../../src/lcmainwindow.c#115%%%../../src/lcutil.h#21%%%../../src/lccommander.c#94%%%../../src/lcsocket.h#13%%%../../src/lcprotocol.h#66%%%../../src/lcprotocol.c#73%%%../../src/lctoolstack.h#40%%%../../src/lctoolstack.c#44%%%../../src/lcadb.c#1%%%../../src/lcmyphone.h#1%%%../../src/lcmyphone.c#82%%%../../src/lcutil.c#86%%%../../src/lucy.c#38%%%../../res/css/disconnected.css#4
-
-[Document Manager]
-bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
-
 [Execution]
 Program uri=../../Debug/src/lucy
 Run in terminal=2
 Working directories=../../../lucy
 
+[File Loader]
+Files=../../src/lcmainwindow.c#115%%%../../src/lcutil.h#21%%%../../src/lccommander.c#94%%%../../src/lcsocket.h#13%%%../../src/lcprotocol.h#66%%%../../src/lcprotocol.c#73%%%../../src/lctoolstack.h#40%%%../../src/lctoolstack.c#44%%%../../src/lcadb.c#1%%%../../src/lcmyphone.h#1%%%../../src/lcmyphone.c#82%%%../../src/lcutil.c#86%%%../../src/lucy.c#38%%%../../res/css/disconnected.css#5
+
+[Document Manager]
+bookmarks=<?xml version="1.0" encoding="UTF-8"?>\n<bookmarks/>\n
+
 [Project Manager]
 Shortcut=lucy//src//libadb//libadb.a%%%lucy//src//libadb//libzipfile//libzipfile.a%%%lucy//src//libadb//libcutils//libcutils.a%%%lucy//src//../../lucy/lucy
 Expand=lucy%%%lucy//res%%%lucy//res//nobase_res%%%lucy//src%%%lucy//src//../../lucy/lucy%%%lucy//dist_doc%%%lucy//LUCY
-
-[Debugger]
-Stop at beginning=2
 
 [Build]
 Configuration list=1:Default:%%%1:Debug:Debug%%%1:Profiling:Profiling%%%1:Optimized:Optimized%%%1:MinGW32:MinGW32
@@ -27,3 +24,6 @@ BuildArgs/Default=--enable-maintainer-mode
 BuildArgs/Debug=--enable-maintainer-mode 'CFLAGS=-g -O0' 'CXXFLAGS=-g -O0' 'JFLAGS=-g -O0' 'FFLAGS=-g -O0'
 BuildArgs/Profiling=--enable-maintainer-mode 'CFLAGS=-g -pg' 'CXXFLAGS=-g -pg' 'JFLAGS=-g -pg' 'FFLAGS=-g -pg'
 BuildArgs/Optimized=--enable-maintainer-mode 'CFLAGS=-O2' 'CXXFLAGS=-O2' 'JFLAGS=-O2' 'FFLAGS=-O2'
+
+[Debugger]
+Stop at beginning=2
