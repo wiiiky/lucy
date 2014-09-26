@@ -8,7 +8,7 @@ libadb_a_CPPFLAGS = \
 	-DHAVE_FORKEXEC=1 \
 	-DHAVE_SYMLINKS \
 	-DHAVE_TERMIO_H \
-	$(AML_CFLAGS)
+	$(LUCY_CFLAGS)
 
 libadb_a_CFLAGS =\
 	 -Wall\
@@ -46,4 +46,5 @@ libadb_a_SOURCES =  \
 
 SUBDIRS = \
 	libzipfile \
-	libcutils
+	libcutils \
+	mincrypt 

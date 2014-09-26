@@ -321,6 +321,7 @@ dist_doc_DATA = \
 	INSTALL \
 	NEWS
 
+EXTRA_DIST = res
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

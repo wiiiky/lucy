@@ -290,12 +290,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""$(localedir)"\" \
-	-DPACKAGE_SRC_DIR=\""$(abs_top_srcdir)"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(pkgdatadir)"\" \
-	-DADB_HOST=1 \
-	-DHAVE_FORKEXEC=1 \
-	-DHAVE_SYMLINKS \
-	-DHAVE_TERMIO_H \
 	$(LUCY_CFLAGS)
 
 AM_CFLAGS = \

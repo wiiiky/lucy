@@ -2,19 +2,22 @@
 
 
 noinst_LIBRARIES =  \
-	libcutils.a
+					libcutils.a
 
-libcutils_a_SOURCES =  \
-	sockets.h \
-	socket_network_client.c \
-	socket_loopback_server.c \
-	socket_loopback_client.c \
-	socket_local_server.c \
-	socket_local_client.c \
-	socket_local.h \
-	socket_inaddr_any_server.c \
-	load_file.c \
-	list.h \
-	list.c \
-	abort_socket.h \
-	abort_socket.c
+libcutils_a_SOURCES = \
+		abort_socket.c \
+		misc.h \
+		socket_local_server.c \
+		abort_socket.h \
+		properties.h \
+		socket_loopback_client.c \
+		list.c \
+		socket_inaddr_any_server.c \
+		socket_loopback_server.c \
+		list.h \
+		socket_local_client.c \
+		socket_network_client.c \
+		load_file.c \
+		socket_local.h \
+		sockets.h
+

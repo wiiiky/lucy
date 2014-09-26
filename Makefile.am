@@ -12,6 +12,8 @@ dist_doc_DATA = \
 	INSTALL \
 	NEWS
 
+EXTRA_DIST = res
+
 # Remove doc directory on uninstall
 uninstall-local:
 	-rm -r $(docdir)

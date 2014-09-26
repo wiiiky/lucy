@@ -29,4 +29,5 @@ AC_OUTPUT([
 		   src/libadb/Makefile
 		   src/libadb/libzipfile/Makefile
 		   src/libadb/libcutils/Makefile
+src/libadb/mincrypt/Makefile
 		   ])
