@@ -5,6 +5,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "lcmainwindow.h"
+#include "lctoolstack.h"
 #include "lcapplicationview.h"
 #include "lcaboutdialog.h"
 #include "lcadb.h"
@@ -33,8 +34,7 @@ static void lc_main_window_finalize(GObject * obj);
 
 /* 创建菜单栏 */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
-/* 创建主界面上的GtkStack */
-static GtkWidget *lc_main_window_stack_with_switcher(LcMainWindow * self);
+
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
 /* 界面切换 */
 static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
@@ -47,9 +47,7 @@ enum {
 
 struct _LcMainWindowPrivate {
     LcApplicationView *appView;
-    GtkStack *rootStack;        /* 根容器，包括正常显示的界面以及，出错界面 */
-    GtkStack *contentStack;     /* 正常显示的界面容器 */
-    GtkStackSwitcher *contentStackSwitcher;
+    LcToolStack *toolStack;
 };
 
 
@@ -74,6 +72,12 @@ static void lc_main_window_class_init(LcMainWindowClass * klass)
     G_OBJECT_CLASS(klass)->finalize = lc_main_window_finalize;
 }
 
+static void onMyPhonePageVisible(gboolean visible, gpointer user_data)
+{
+    if (visible) {
+        g_message("Come on, My Android!");
+    }
+}
 
 static void lc_main_window_instance_init(LcMainWindow * self)
 {
@@ -90,9 +94,25 @@ static void lc_main_window_instance_init(LcMainWindow * self)
 
     gtk_box_pack_start(GTK_BOX(rootBox), lc_main_window_menu_bar(self),
                        FALSE, FALSE, 0);
+
+    self->priv->toolStack = lc_tool_stack_new();
     gtk_box_pack_start(GTK_BOX(rootBox),
-                       lc_main_window_stack_with_switcher(self), TRUE,
-                       TRUE, 0);
+                       GTK_WIDGET(self->priv->toolStack), TRUE, TRUE, 0);
+    g_object_ref_sink(self->priv->toolStack);
+
+    self->priv->appView = lc_application_view_new();
+    g_object_ref_sink(self->priv->appView);
+
+    lc_tool_stack_append(self->priv->toolStack,
+                         gtk_image_new_from_file
+                         ("/home/wiky/Documents/CODE/Git/lucy/res/smartphone.svg"),
+                         "My Phone", gtk_label_new("My Phone"),
+                         onMyPhonePageVisible, self);
+    lc_tool_stack_append(self->priv->toolStack,
+                         gtk_image_new_from_file
+                         ("/home/wiky/Documents/CODE/Git/lucy/res/computer.svg"),
+                         "Applications", GTK_WIDGET(self->priv->appView),
+                         NULL, NULL);
 }
 
 static void lc_main_window_finalize(GObject * obj)
@@ -101,9 +121,7 @@ static void lc_main_window_finalize(GObject * obj)
         G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_MAIN_WINDOW,
                                    LcMainWindow);
     _g_object_unref0(self->priv->appView);
-    _g_object_unref0(self->priv->rootStack);
-    _g_object_unref0(self->priv->contentStack);
-    _g_object_unref0(self->priv->contentStackSwitcher);
+    _g_object_unref0(self->priv->toolStack);
     G_OBJECT_CLASS(lc_main_window_parent_class)->finalize(obj);
 }
 
@@ -154,62 +172,6 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
     LcAboutDialog *dialog = lc_about_dialog_new();
     lc_about_dialog_run(dialog);
     lc_about_dialog_destroy(dialog);
-}
-
-static void onContentStackChanged(GtkStack * stack, GParamSpec * ps,
-                                  gpointer data)
-{
-    LcMainWindow *self = (LcMainWindow *) data;
-    const gchar *name = gtk_stack_get_visible_child_name(stack);
-    if (g_strcmp0(name, APPLICATION_VIEW_NAME) == 0) {
-    } else if (g_strcmp0(name, SMS_VIEW_NAME) == 0) {
-    }
-}
-
-static GtkWidget *lc_main_window_stack_with_switcher(LcMainWindow * self)
-{
-    LcMainWindowPrivate *priv = self->priv;
-    GtkWidget *box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 10);
-    priv->contentStack = (GtkStack *) gtk_stack_new();
-    g_signal_connect(priv->contentStack, "notify::visible-child-name",
-                     (GCallback) onContentStackChanged, self);
-    priv->contentStackSwitcher =
-        (GtkStackSwitcher *) gtk_stack_switcher_new();
-    gtk_stack_switcher_set_stack(priv->contentStackSwitcher,
-                                 priv->contentStack);
-
-    gtk_container_set_border_width(GTK_CONTAINER(box), 10);
-    gtk_box_pack_start(GTK_BOX(box),
-                       GTK_WIDGET(priv->contentStackSwitcher), FALSE,
-                       FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(box), GTK_WIDGET(priv->contentStack), TRUE,
-                       TRUE, 0);
-
-    gtk_stack_set_transition_duration(priv->contentStack, 500);
-    gtk_stack_set_transition_type(priv->contentStack,
-                                  GTK_STACK_TRANSITION_TYPE_SLIDE_LEFT_RIGHT);
-    /* TODO */
-    priv->appView = lc_application_view_new();
-    gtk_stack_add_titled(priv->contentStack, GTK_WIDGET(priv->appView),
-                         APPLICATION_VIEW_NAME, APPLICATION_VIEW_TITLE);
-    GtkWidget *sms = gtk_label_new("SMS");
-    gtk_stack_add_titled(priv->contentStack, sms, SMS_VIEW_NAME,
-                         SMS_VIEW_TITLE);
-
-    priv->rootStack = (GtkStack *) gtk_stack_new();
-    gtk_stack_add_named(priv->rootStack, box, "connected");
-    GtkWidget *dc = gtk_label_new("Disconnected");
-    gtk_stack_add_named(priv->rootStack, dc, "disconnected");
-
-    gtk_widget_show_all(box);
-    gtk_widget_show_all(dc);
-
-    g_object_ref_sink(priv->rootStack);
-    g_object_ref_sink(priv->contentStack);
-    g_object_ref_sink(priv->appView);
-    g_object_ref_sink(priv->contentStackSwitcher);
-
-    return (GtkWidget *) priv->rootStack;
 }
 
 void lc_main_window_show(LcMainWindow * window)

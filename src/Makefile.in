@@ -93,7 +93,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_lucy_OBJECTS = lucy.$(OBJEXT) lcapplicationview.$(OBJEXT) \
 	lcprotocol.$(OBJEXT) lcaboutdialog.$(OBJEXT) \
 	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT) \
-	lcutil.$(OBJEXT) lccommander.$(OBJEXT)
+	lcutil.$(OBJEXT) lccommander.$(OBJEXT) lctoolstack.$(OBJEXT)
 lucy_OBJECTS = $(am_lucy_OBJECTS)
 am__DEPENDENCIES_1 =
 lucy_DEPENDENCIES = libadb/libadb.a libadb/libzipfile/libzipfile.a \
@@ -317,7 +317,9 @@ lucy_SOURCES = \
 	lcutil.c \
 	lcutil.h \
 	lccommander.c \
-	lccommander.h
+	lccommander.h \
+	lctoolstack.h \
+	lctoolstack.c
 
 lucy_LDADD = \
 	libadb/libadb.a \
@@ -422,6 +424,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lctoolstack.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lucy.Po@am__quote@
 
