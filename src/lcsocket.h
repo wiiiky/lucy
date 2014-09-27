@@ -40,33 +40,33 @@ LcSocket *lc_socket_construct(GType object_type, const gchar * addr,
 
 void lc_socket_close(LcSocket * socket);
 
-/* 将四个字节的十六进制字符串转化为整数 */
+/* convert a 4-byte string that represents a HEX number to integer */
 gssize lc_data_length(gchar buf[4]);
 
 /*
- * 发起链接
+ * asynchronously connect connection
  */
 void lc_socket_connect_async(LcSocket * socket,
                              GAsyncReadyCallback callback,
                              gpointer user_data);
+/* get the result of lc_socket_connect_async call */
 gboolean lc_socket_connect_async_finish(GAsyncResult * res);
 
 /*
- * 发送/接收数据
+ * wrapper for g_socket_[send,receive]
  */
 gssize lc_socket_send(LcSocket * socket, const gchar * buffer, gsize size);
 gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size);
 
 /*
- * 该函数会发送一个协议请求，
- * 然后等待响应，直到接受到了完整的响应（一个空行结束）才回调
+ * send a command to lily asynchronously
  */
 void lc_socket_send_command_async(LcSocket * socket,
                                   const gchar * command,
                                   GAsyncReadyCallback callback,
                                   gpointer user_data);
 /*
- * 正常则返回响应的数据，否则返回NULL。返回的数据需要手动释放
+ * get the result of lc_socket_send_command_async call
  */
 GByteArray *lc_socket_send_command_async_finish(GAsyncResult * result);
 

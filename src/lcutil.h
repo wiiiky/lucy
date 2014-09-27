@@ -25,19 +25,24 @@
 void lc_init(int argc, char *argv[]);
 
 /*
- * 从字节数组中提取出字符串，添加末尾\0
+ * get the string data from GByteArray.
+ * '\0' is appended to the last of GByteArray to terminal the string
+ *
+ * return NULL if array is NULL.
+ * And if non-NULL is returned, it must be freed by g_free()
  */
 gchar *lc_util_get_string_from_byte_array(GByteArray * array,
                                           gsize * size);
 
 /*
- * 载入指定的CSS资源
+ * apply specified CSS resource file to widget.
  */
 void lc_util_load_css(GtkWidget * widget, const gchar * name);
 
 /*
- * 该函数返回指定的资源的完整路径
- * 返回的数据保存在静态缓冲区，非线程安全
+ * return the absolute path of resource file .
+ * if not found, NULL is returned.
+ * the return string is in static memory and should not be freed.
  */
 const gchar *lc_util_get_resource_by_name(const gchar * name);
 
@@ -45,7 +50,9 @@ const gchar *lc_util_get_resource_by_name(const gchar * name);
 typedef gboolean(*GListElementNotify) (gconstpointer data,
                                        gpointer user_data);
 /*
- * 从列表中移除满足指定条件的元素
+ * remove all elements in a list that meet specified condition.
+ * judge is used to decide if an element should be removed or not.
+ * if judge(element,user_data) returns TRUE then it is removed.
  */
 GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
                              gpointer user_data, GDestroyNotify destroy);

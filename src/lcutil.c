@@ -24,7 +24,7 @@ static char exedir[PATH_MAX + 1] = "./";
 
 void lc_init(int argc, char *argv[])
 {
-    /* 获取执行文件的绝对路径 */
+    /* get the running executable file's absolute path */
     ssize_t count = readlink("/proc/self/exe", exedir, PATH_MAX);
     if (count <= 0) {
         return;

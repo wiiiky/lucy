@@ -22,21 +22,21 @@
 #include <gtk/gtk.h>
 
 /*
- * adb 相关
+ * wrapper for adb functions
  */
 
 
 /*
- * 使用GTask异步执行adb_command
- * 执行完毕调用callback
- * XXX：这里的buf不是adb命令行的参数，而是adb源代码中adb_command函数的参数
+ * asynchronously execute adb_command() using GTask.
+ * buf is the parameters of adb_command()
  */
 void lc_adb_command(const gchar * buf, GAsyncReadyCallback callback,
                     gpointer data);
 int lc_adb_command_finish(GAsyncResult * result);
 
 /*
- * 异步执行adb_connect
+ * asynchronously execute adb_connect() using GTask.
+ * buf is the parameters of adb_connect().
  */
 void lc_adb_connect(const gchar * buf, GAsyncReadyCallback callback,
                     gpointer data);
@@ -44,28 +44,28 @@ int lc_adb_connect_finish(GAsyncResult * result);
 
 
 /*
- * 启动adb服务器
+ * start the adb server on host.
  */
 void lc_adb_start_server(GAsyncReadyCallback callback, gpointer data);
 #define lc_adb_start_server_finish(result) lc_adb_connect_finish(result)
 
 /*
- * 重定向tcp端口
- * lc_adb_command的简单封装
+ * forward socket connections asynchronously
  */
 void lc_adb_forward(guint local, guint remote,
                     GAsyncReadyCallback callback, gpointer data);
 #define lc_adb_forward_finish(result) lc_adb_command_finish(result)
 
 /*
- * 启动android机器上的指定程序
+ * start a specified Activity in Android asynchronously.
+ * activity should be something like 'org.wl.ll/.MainActivity'
  */
 void lc_adb_am_start(const gchar * activity,
                      GAsyncReadyCallback callback, gpointer data);
 #define lc_adb_am_start_finish(result) lc_adb_connect_finish(result)
 
 /*
- * 安装指定apk到android手机
+ * install an apk file in Android asynchronously.
  */
 void lc_adb_install_app(const gchar * filepath,
                         GAsyncReadyCallback callback, gpointer data);

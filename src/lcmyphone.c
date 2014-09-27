@@ -74,10 +74,28 @@ static void lc_my_phone_instance_init(LcMyPhone * self)
     lc_my_phone_connect_init(self);
 }
 
+static void onConnectClicked(GtkWidget * button, gpointer data)
+{
+    gtk_widget_set_sensitive(button, FALSE);
+    gtk_button_set_label(GTK_BUTTON(button), "Connecting......");
+}
+
 static void lc_my_phone_disconnect_init(LcMyPhone * self)
 {
     GtkGrid *dc = self->priv->disconnected;
     gtk_widget_show_all(GTK_WIDGET(dc));
+
+    gtk_widget_set_name(GTK_WIDGET(dc), "grid");
+
+    GtkWidget *button = gtk_button_new_with_label("Connect");
+    g_signal_connect(G_OBJECT(button), "clicked",
+                     G_CALLBACK(onConnectClicked), NULL);
+    gtk_widget_set_name(button, "connect");
+    gtk_grid_attach(dc, button, 0, 1, 1, 1);
+
+    gtk_widget_set_hexpand(button, TRUE);
+    gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
+    gtk_widget_set_margin_top(button, 300);
 
     lc_util_load_css(GTK_WIDGET(dc), "css/disconnected.css");
 }

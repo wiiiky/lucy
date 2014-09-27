@@ -82,8 +82,9 @@ static void lc_main_window_instance_init(LcMainWindow * self)
 {
     self->priv = LC_MAIN_WINDOW_GET_PRIVATE(self);
 
-    /*gtk_window_set_resizable(GTK_WINDOW(self), FALSE); */
-    gtk_window_set_default_size(GTK_WINDOW(self), 960, 640);
+    gtk_window_set_resizable(GTK_WINDOW(self), FALSE);
+    gtk_widget_set_size_request(GTK_WIDGET(self), 900, 600);
+    //gtk_window_set_default_size(GTK_WINDOW(self), 960, 640);
     gtk_window_set_position(GTK_WINDOW(self), GTK_WIN_POS_CENTER);
     gtk_window_set_title(GTK_WINDOW(self), MAINWINDOW_TITLE);
     g_signal_connect(G_OBJECT(self), "destroy",
