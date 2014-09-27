@@ -23,6 +23,7 @@
 /* all commands */
 #define LC_COMMAND_APPLICATIONS "applications\n"
 #define LC_COMMAND_VERSION      "version\n"
+#define LC_COMMAND_PHONE        "phone\n"
 
 typedef enum {
     LC_COMMANDER_INIT_OK,

@@ -108,12 +108,6 @@ static void lc_my_phone_connect_init(LcMyPhone * self)
 {
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
 
-    /* TODO */
-    GtkWidget *label = gtk_label_new("Connected");
-    gtk_grid_attach(cn, label, 0, 0, 1, 1);
-    gtk_grid_set_row_homogeneous(cn, TRUE);
-    gtk_grid_set_column_homogeneous(cn, TRUE);
-
     gtk_widget_show_all(GTK_WIDGET(cn));
 
     self->priv->connected = cn;

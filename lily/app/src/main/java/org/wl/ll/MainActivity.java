@@ -29,6 +29,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     /* 监听的端口号 */
     private static int listenPort=37859;
 
+    private static MainActivity instance=null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         handler=new Handler();
         startServer();
+
+        instance=this;
     }
 
     @Override
@@ -87,6 +91,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
             aqueue.add(log);
         }
         handler.post(addLog);
+    }
+
+    public static void LOG(String log){
+        if(instance!=null){
+            instance.showLog(log);
+        }
     }
 
     private static Thread serverThread=null;

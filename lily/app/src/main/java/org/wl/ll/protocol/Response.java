@@ -22,6 +22,14 @@ public abstract class Response {
 
     public abstract String getData();
 
+    protected String getOKAY(){
+        return "OKAY";
+    }
+
+    protected String getFAIL(){
+        return "FAIL";
+    }
+
     public void onResponse(OutputStream writer){
         byte[] data=getData().getBytes();
         try {

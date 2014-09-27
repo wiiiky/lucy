@@ -26,9 +26,10 @@ public class ConnectionThread extends Thread {
     /*
      * 请求数据
      */
-    private static String REQUEST_PACKAGES="applications";
-    private static String REQUEST_ICON="icon:";
-    private static String REQUEST_VERSION="version";
+    private static String REQUEST_PACKAGES="applications";  /* 应用列表 */
+    private static String REQUEST_ICON="icon:";     /* 应用图标 */
+    private static String REQUEST_VERSION="version";    /* 当前手机客户端的版本号 */
+    private static String REQUEST_PHONE="phone";    /* 手机的基本信息 */
 
     public ConnectionThread(Context ctx,Socket s){
         socket=s;
@@ -36,7 +37,6 @@ public class ConnectionThread extends Thread {
     }
 
     public void run(){
-        MainActivity ac=(MainActivity)mContext;
         try {
             InputStreamReader inputReader=new InputStreamReader(socket.getInputStream());
             outputStream =socket.getOutputStream();
@@ -44,20 +44,22 @@ public class ConnectionThread extends Thread {
             String buf;
             while((buf=bufferedReader.readLine())!=null){
                 String lower=buf.toLowerCase();
-                ac.showLog(socket.getRemoteSocketAddress().toString() + ":" +buf );
+                MainActivity.LOG(socket.getRemoteSocketAddress().toString() + ":" +buf );
                 if (lower.equals(REQUEST_PACKAGES)) {
                     onApplicationsResponse();
                 }else if(lower.startsWith(REQUEST_ICON)) {
-                }else if(lower.equals(REQUEST_VERSION)){
+                }else if(lower.equals(REQUEST_VERSION)) {
                     onVersionResponse();
+                }else if(lower.equals(REQUEST_PHONE)){
+                    onPhoneResponse();
                 }else {
                     onUnknownResponse(buf);
                 }
             }
         } catch (IOException e) {
-            ac.showLog(e.getMessage() != null ? e.getMessage() : "!");
+            MainActivity.LOG(e.getMessage() != null ? e.getMessage() : "!");
         }finally {
-            ac.showLog(socket.getRemoteSocketAddress().toString()+ " is disconnected");
+            MainActivity.LOG(socket.getRemoteSocketAddress().toString()+ " is disconnected");
             cleanup();
         }
     }
@@ -84,6 +86,10 @@ public class ConnectionThread extends Thread {
 
     private void onVersionResponse(){
         new VersionResponse(mContext).onResponse(outputStream);
+    }
+
+    private void onPhoneResponse(){
+        new PhoneResponse(mContext).onResponse(outputStream);
     }
 
     /*

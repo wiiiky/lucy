@@ -14,6 +14,6 @@ public class UnknownResponse extends Response {
 
     @Override
     public String getData() {
-        return data;
+        return getFAIL()+data;
     }
 }

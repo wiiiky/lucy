@@ -208,6 +208,8 @@ static void onApplications(GByteArray * array, gpointer user_data)
         g_warning("Command '%s' Failed:%s", LC_COMMAND_APPLICATIONS,
                   result);
     } else {
+        g_message("%s", result);
+        return;
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcApplicationView *appView = self->priv->appView;
         GList *list = lc_protocol_create_application_list(result + 4);
@@ -229,8 +231,7 @@ static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
-        lc_commander_send_command(LC_COMMAND_APPLICATIONS, onApplications,
-                                  data);
+        lc_commander_send_command(LC_COMMAND_PHONE, onApplications, data);
         lc_my_phone_show_connected(self->priv->myPhone);
     } else {
         lc_my_phone_show_disconnect(self->priv->myPhone);

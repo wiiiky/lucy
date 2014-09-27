@@ -37,7 +37,7 @@ public class ApplicationsResponse extends Response {
             PackageInfo info=packageInfos.get(i);
             data=data+getApplicationInfoData(info);
         }
-        return "OKAY"+data;
+        return getOKAY()+data;
     }
 
     /*
