@@ -2,3 +2,4 @@ Debug/
 *~
 test/
 nbproject/
+*.cache

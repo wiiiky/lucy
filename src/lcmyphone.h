@@ -32,6 +32,12 @@ GType lc_my_phone_get_type(void) G_GNUC_CONST;
 LcMyPhone *lc_my_phone_new(void);
 LcMyPhone *lc_my_phone_construct(GType object_type);
 
+void lc_my_phone_show_disconnect(LcMyPhone * self);
+void lc_my_phone_show_connecting(LcMyPhone * self);
+void lc_my_phone_show_connected(LcMyPhone * self);
+
+void lc_my_phone_set_connect_callback(LcMyPhone * self, GCallback callback,
+                                      gpointer user_data);
 
 G_END_DECLS
 #endif

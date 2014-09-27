@@ -7,12 +7,16 @@
 #include "lcmyphone.h"
 #include "lcutil.h"
 #include <gtk/gtk.h>
+#include <gtk-2.0/gtk/gtkbutton.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 struct _LcMyPhonePrivate {
     GtkGrid *disconnected;
     GtkGrid *connected;
+    GtkButton *connectButton;
+    guint connecting;
+    guint8 connectingIndex;
 };
 
 #define STACK_NAME_DISCONNECTED "disconnected"
@@ -31,7 +35,11 @@ static void lc_my_phone_finalize(GObject * obj);
 LcMyPhone *lc_my_phone_construct(GType object_type)
 {
     LcMyPhone *self = NULL;
-    self = (LcMyPhone *) g_object_new(object_type, NULL);
+    self = (LcMyPhone *) g_object_new(object_type,
+                                      "transition-duration", 1000,
+                                      "transition-type",
+                                      GTK_STACK_TRANSITION_TYPE_CROSSFADE,
+                                      NULL);
     return self;
 }
 
@@ -56,10 +64,8 @@ static void lc_my_phone_instance_init(LcMyPhone * self)
 {
     self->priv = LC_MY_PHONE_GET_PRIVATE(self);
 
-    self->priv->disconnected = (GtkGrid *) gtk_grid_new();
-    g_object_ref_sink(self->priv->disconnected);
-    self->priv->connected = (GtkGrid *) gtk_grid_new();
-    g_object_ref_sink(self->priv->connected);
+    lc_my_phone_disconnect_init(self);
+    lc_my_phone_connect_init(self);
 
     gtk_stack_add_named(GTK_STACK(self),
                         GTK_WIDGET(self->priv->disconnected),
@@ -70,26 +76,17 @@ static void lc_my_phone_instance_init(LcMyPhone * self)
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
 
-    lc_my_phone_disconnect_init(self);
-    lc_my_phone_connect_init(self);
+    self->priv->connecting = 0;
 }
 
-static void onConnectClicked(GtkWidget * button, gpointer data)
-{
-    gtk_widget_set_sensitive(button, FALSE);
-    gtk_button_set_label(GTK_BUTTON(button), "Connecting......");
-}
 
 static void lc_my_phone_disconnect_init(LcMyPhone * self)
 {
-    GtkGrid *dc = self->priv->disconnected;
-    gtk_widget_show_all(GTK_WIDGET(dc));
+    GtkGrid *dc = (GtkGrid *) gtk_grid_new();
 
     gtk_widget_set_name(GTK_WIDGET(dc), "grid");
 
     GtkWidget *button = gtk_button_new_with_label("Connect");
-    g_signal_connect(G_OBJECT(button), "clicked",
-                     G_CALLBACK(onConnectClicked), NULL);
     gtk_widget_set_name(button, "connect");
     gtk_grid_attach(dc, button, 0, 1, 1, 1);
 
@@ -98,12 +95,29 @@ static void lc_my_phone_disconnect_init(LcMyPhone * self)
     gtk_widget_set_margin_top(button, 300);
 
     lc_util_load_css(GTK_WIDGET(dc), "css/disconnected.css");
+
+    gtk_widget_show_all(GTK_WIDGET(dc));
+
+    self->priv->disconnected = dc;
+    g_object_ref_sink(self->priv->disconnected);
+    self->priv->connectButton = GTK_BUTTON(button);
+    g_object_ref_sink(self->priv->connectButton);
 }
 
 static void lc_my_phone_connect_init(LcMyPhone * self)
 {
-    GtkGrid *cn = self->priv->connected;
+    GtkGrid *cn = (GtkGrid *) gtk_grid_new();
+
+    /* TODO */
+    GtkWidget *label = gtk_label_new("Connected");
+    gtk_grid_attach(cn, label, 0, 0, 1, 1);
+    gtk_grid_set_row_homogeneous(cn, TRUE);
+    gtk_grid_set_column_homogeneous(cn, TRUE);
+
     gtk_widget_show_all(GTK_WIDGET(cn));
+
+    self->priv->connected = cn;
+    g_object_ref_sink(self->priv->connected);
 }
 
 static void lc_my_phone_finalize(GObject * obj)
@@ -112,6 +126,7 @@ static void lc_my_phone_finalize(GObject * obj)
     self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_MY_PHONE, LcMyPhone);
     _g_object_unref0(self->priv->disconnected);
     _g_object_unref0(self->priv->connected);
+    _g_object_unref0(self->priv->connectButton);
     G_OBJECT_CLASS(lc_my_phone_parent_class)->finalize(obj);
 }
 
@@ -136,4 +151,70 @@ GType lc_my_phone_get_type(void)
                           lc_my_phone_type_id);
     }
     return lc_my_phone_type_id__volatile;
+}
+
+static void lc_my_phone_remove_connecting_timeout(LcMyPhone * self)
+{
+    if (self->priv->connecting) {
+        g_source_remove(self->priv->connecting);
+        self->priv->connecting = 0;
+    }
+}
+
+static gboolean onConnectingTimeout(gpointer data)
+{
+    LcMyPhone *self = (LcMyPhone *) data;
+    GtkButton *btn = self->priv->connectButton;
+
+    if (self->priv->connectingIndex > 6) {
+        self->priv->connectingIndex = 1;
+    } else {
+        self->priv->connectingIndex++;
+    }
+    gchar buf[32] = "Connecting";
+    int i, len = 10;
+    for (i = 0; i < self->priv->connectingIndex; i++) {
+        buf[len++] = '.';
+    }
+    buf[len] = '\0';
+    gtk_button_set_label(btn, buf);
+
+    return TRUE;
+}
+
+static void lc_my_phone_set_connecting_timeout(LcMyPhone * self)
+{
+    lc_my_phone_remove_connecting_timeout(self);
+    self->priv->connectingIndex = 1;
+    self->priv->connecting = g_timeout_add(500, onConnectingTimeout, self);
+}
+
+void lc_my_phone_set_connect_callback(LcMyPhone * self, GCallback callback,
+                                      gpointer user_data)
+{
+    g_signal_connect(G_OBJECT(self->priv->connectButton), "clicked",
+                     callback, user_data);
+}
+
+void lc_my_phone_show_disconnect(LcMyPhone * self)
+{
+    lc_my_phone_remove_connecting_timeout(self);
+    gtk_stack_set_visible_child_name(GTK_STACK(self),
+                                     STACK_NAME_DISCONNECTED);
+}
+
+void lc_my_phone_show_connecting(LcMyPhone * self)
+{
+    //lc_my_phone_set_connecting_timeout(self);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->priv->connectButton), FALSE);
+    gtk_button_set_label(self->priv->connectButton, "Connecting");
+    gtk_stack_set_visible_child_name(GTK_STACK(self),
+                                     STACK_NAME_DISCONNECTED);
+}
+
+void lc_my_phone_show_connected(LcMyPhone * self)
+{
+    lc_my_phone_remove_connecting_timeout(self);
+    gtk_stack_set_visible_child_name(GTK_STACK(self),
+                                     STACK_NAME_CONNECTED);
 }

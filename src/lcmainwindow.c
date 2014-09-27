@@ -76,6 +76,8 @@ static void onMyPhonePageVisible(gboolean visible, gpointer user_data)
     }
 }
 
+static void lc_main_window_my_phone_init(LcMainWindow * self);
+
 static void lc_main_window_instance_init(LcMainWindow * self)
 {
     self->priv = LC_MAIN_WINDOW_GET_PRIVATE(self);
@@ -99,8 +101,7 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                        GTK_WIDGET(self->priv->toolStack), TRUE, TRUE, 0);
     g_object_ref_sink(self->priv->toolStack);
 
-    self->priv->myPhone = lc_my_phone_new();
-    g_object_ref_sink(self->priv->myPhone);
+    lc_main_window_my_phone_init(self);
     lc_tool_stack_append(self->priv->toolStack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("smartphone.svg")),
@@ -114,6 +115,23 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                          (lc_util_get_resource_by_name("computer.svg")),
                          "Applications", GTK_WIDGET(self->priv->appView),
                          NULL, NULL);
+}
+
+static void onConnectClicked(GtkWidget * button, gpointer data)
+{
+    LcMainWindow *self = (LcMainWindow *) data;
+    lc_my_phone_show_connecting(self->priv->myPhone);
+    lc_main_window_start_server(self);
+}
+
+static void lc_main_window_my_phone_init(LcMainWindow * self)
+{
+    LcMyPhone *phone = lc_my_phone_new();
+    lc_my_phone_set_connect_callback(phone, G_CALLBACK(onConnectClicked),
+                                     self);
+    g_object_ref_sink(phone);
+
+    self->priv->myPhone = phone;
 }
 
 static void lc_main_window_finalize(GObject * obj)
@@ -179,7 +197,6 @@ static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
 void lc_main_window_show(LcMainWindow * window)
 {
     gtk_widget_show_all(GTK_WIDGET(window));
-    lc_main_window_start_server(window);
     gtk_main();
 }
 
@@ -188,7 +205,8 @@ static void onApplications(GByteArray * array, gpointer user_data)
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command 'applications' Failed:%s", result);
+        g_warning("Command '%s' Failed:%s", LC_COMMAND_APPLICATIONS,
+                  result);
     } else {
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcApplicationView *appView = self->priv->appView;
@@ -209,9 +227,14 @@ static void onApplications(GByteArray * array, gpointer user_data)
 
 static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
+    LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
         lc_commander_send_command(LC_COMMAND_APPLICATIONS, onApplications,
                                   data);
+        lc_my_phone_show_connected(self->priv->myPhone);
+    } else {
+        lc_my_phone_show_disconnect(self->priv->myPhone);
+        /* Connection failed */
     }
 }
 

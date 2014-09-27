@@ -20,7 +20,7 @@ GtkButton#connect:insensitive{
   color: gray;
   border-radius: 10px;
   background: transparent;
-  transition: all 10000ms ease-in-out;
+  transition: all 0ms ease-in-out;
   border: 1px transparent solid;
 }
 
