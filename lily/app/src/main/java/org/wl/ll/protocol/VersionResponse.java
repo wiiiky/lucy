@@ -20,7 +20,7 @@ public class VersionResponse extends Response {
         try {
             info=mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
         } catch (PackageManager.NameNotFoundException e) {
-            return "unknown\n";
+            return "unknown";
         }
         return "OKAY"+Integer.toString(info.versionCode);
     }

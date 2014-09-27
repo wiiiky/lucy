@@ -31,7 +31,7 @@ static gpointer lc_main_window_parent_class = NULL;
 
 static void lc_main_window_finalize(GObject * obj);
 
-/* 创建菜单栏 */
+/* create the menu bar, of course along with all menus */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
 
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
@@ -183,16 +183,10 @@ void lc_main_window_show(LcMainWindow * window)
     gtk_main();
 }
 
-static void onApplications(GObject * source_object,
-                           GAsyncResult * res, gpointer user_data)
+static void onApplications(GByteArray * array, gpointer user_data)
 {
-    GByteArray *array = lc_commander_send_command_finish(res);
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
-    if (result == NULL) {
-        g_warning("Connection Problem while 'applications'");
-        return;
-    }
-    if (lc_protocol_get_result_from_string(result) !=
+    if (result == NULL || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
         g_warning("Command 'applications' Failed:%s", result);
     } else {
@@ -215,10 +209,9 @@ static void onApplications(GObject * source_object,
 
 static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
-    g_message("%d", result);
     if (result == LC_COMMANDER_INIT_OK) {
-        g_message("OK");
-        lc_commander_send_command("applications\n", onApplications, data);
+        lc_commander_send_command(LC_COMMAND_APPLICATIONS, onApplications,
+                                  data);
     }
 }
 

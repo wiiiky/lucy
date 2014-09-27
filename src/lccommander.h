@@ -20,12 +20,17 @@
 #define __LC_COMMANDER_H__
 #include <gtk/gtk.h>
 
+/* all commands */
+#define LC_COMMAND_APPLICATIONS "applications\n"
+#define LC_COMMAND_VERSION      "version\n"
+
 typedef enum {
     LC_COMMANDER_INIT_OK,
     LC_COMMANDER_INIT_FAILED_FORWARD,
     LC_COMMANDER_INIT_FAILED_SERVER,
     LC_COMMANDER_INIT_FAILED_INSTALL,
     LC_COMMANDER_INIT_FAILED_START,
+    LC_COMMANDER_INIT_FAILED_VERSION,
 } LcCommanderInitResult;
 /*
  * initialize all adb settings and connect to Android
@@ -35,10 +40,11 @@ typedef void (*LcCommanderInitCallback) (LcCommanderInitResult result,
 void lc_commander_init(LcCommanderInitCallback callback, gpointer data);
 
 
+typedef void (*LcCommanderCommandCallback) (GByteArray * result,
+                                            gpointer data);
 void lc_commander_send_command(const gchar * cmd,
-                               GAsyncReadyCallback callback,
+                               LcCommanderCommandCallback callback,
                                gpointer data);
-GByteArray *lc_commander_send_command_finish(GAsyncResult * res);
 
 
 #endif

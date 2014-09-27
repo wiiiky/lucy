@@ -23,6 +23,7 @@
 
 #define LILY_ACTIVITY_NAME   "org.wl.ll/.MainActivity"
 #define LILY_APK_NAME    "apk/app-debug.apk"
+#define LILY_VERSION    "1"
 
 static GList *sockets = NULL;
 
@@ -78,6 +79,15 @@ static LcSocket *lc_commander_find_idle_socket()
     return NULL;
 }
 
+static void onSocketCommand(GObject * source_object, GAsyncResult * result,
+                            gpointer user_data)
+{
+    LcCommanderData *data = (LcCommanderData *) user_data;
+    GByteArray *res = lc_socket_send_command_async_finish(result);
+    ((LcCommanderCommandCallback) data->callback) (res, data->user_data);
+    lc_commander_data_free(data);
+}
+
 static void onSocketConnection(GObject * source_object,
                                GAsyncResult * res, gpointer user_data)
 {
@@ -85,41 +95,54 @@ static void onSocketConnection(GObject * source_object,
     if (lc_socket_connect_async_finish(res)) {
         g_message("New Connection is Established!");
         lc_socket_send_command_async(LC_SOCKET(source_object),
-                                     data->buf, data->callback,
-                                     data->user_data);
+                                     data->buf, onSocketCommand, data);
         sockets = g_list_append(sockets, source_object);
         g_message("Sending Command: %s", data->buf);
-    } else {
-        ((GAsyncReadyCallback) data->callback) (NULL, NULL,
-                                                data->user_data);
-        g_message("Connection is not Established!");
+        return;
     }
+
+    ((LcCommanderCommandCallback) data->callback) (NULL, data->user_data);
+    g_message("Connection is not Established!");
     g_object_unref(source_object);
     lc_commander_data_free(data);
 }
 
 void lc_commander_send_command(const gchar * cmd,
-                               GAsyncReadyCallback callback,
+                               LcCommanderCommandCallback callback,
                                gpointer user_data)
 {
     LcSocket *s = lc_commander_find_idle_socket();
+    LcCommanderData *data =
+        lc_commander_data_new(cmd, callback, user_data);
     if (s) {
-        lc_socket_send_command_async(s, cmd, callback, user_data);
+        g_message("Using Old Socket Sonnection. Sending Command: %s", cmd);
+        lc_socket_send_command_async(s, cmd, onSocketCommand, data);
         return;
     }
     g_message("No Idle Socket is found,creating a new one!");
     LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
-    LcCommanderData *data =
-        lc_commander_data_new(cmd, callback, user_data);
     lc_socket_connect_async(socket, onSocketConnection, data);
 }
 
-GByteArray *lc_commander_send_command_finish(GAsyncResult * res)
+static void onVersionResponse(GByteArray * array, gpointer user_data)
 {
-    if (res == NULL) {
-        return NULL;
+    LcCommanderData *cdata = (LcCommanderData *) user_data;
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    LcCommanderInitResult ret = LC_COMMANDER_INIT_OK;
+    if (result == NULL || lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Failed to get lily version");
+        ret = LC_COMMANDER_INIT_FAILED_VERSION;
     }
-    return lc_socket_send_command_async_finish(res);
+    if (g_strcmp0(LILY_VERSION, result + 4)) {
+        /* Lily version not match */
+        g_warning("Lily version doesn't match!!");
+        ret = LC_COMMANDER_INIT_FAILED_VERSION;
+    }
+    g_message("Lily Version: %s", result + 4);
+    ((LcCommanderInitCallback) cdata->callback) (ret, cdata->user_data);
+    lc_commander_data_free(cdata);
+    g_free(result);
 }
 
 /****************************Initialize Connection***************************/
@@ -128,13 +151,14 @@ static void onActivityStartFinal(GObject * source_object,
 {
     LcCommanderData *cdata = (LcCommanderData *) user_data;
     if (lc_adb_am_start_finish(res)) {
-        ((LcCommanderInitCallback) cdata->
-         callback) (LC_COMMANDER_INIT_FAILED_START, cdata->user_data);
+        ((LcCommanderInitCallback)
+         cdata->callback) (LC_COMMANDER_INIT_FAILED_START,
+                           cdata->user_data);
+        lc_commander_data_free(cdata);
     } else {
-        ((LcCommanderInitCallback) cdata->callback) (LC_COMMANDER_INIT_OK,
-                                                     cdata->user_data);
+        lc_commander_send_command(LC_COMMAND_VERSION, onVersionResponse,
+                                  cdata);
     }
-    lc_commander_data_free(cdata);
 }
 
 static void onInstallLily(GObject * source_object,
@@ -143,8 +167,9 @@ static void onInstallLily(GObject * source_object,
     int ret = lc_adb_install_app_finish(res);
     if (ret) {
         LcCommanderData *cdata = (LcCommanderData *) user_data;
-        ((LcCommanderInitCallback) cdata->
-         callback) (LC_COMMANDER_INIT_FAILED_INSTALL, cdata->user_data);
+        ((LcCommanderInitCallback)
+         cdata->callback) (LC_COMMANDER_INIT_FAILED_INSTALL,
+                           cdata->user_data);
         lc_commander_data_free(cdata);
         return;
     }
@@ -158,17 +183,16 @@ static void onActivityStart(GObject * source_object,
     if (lc_adb_am_start_finish(res)) {
         const gchar *apkpath = lc_util_get_resource_by_name(LILY_APK_NAME);
         if (apkpath == NULL) {
-            ((LcCommanderInitCallback) cdata->
-             callback) (LC_COMMANDER_INIT_FAILED_INSTALL,
-                        cdata->user_data);
+            ((LcCommanderInitCallback)
+             cdata->callback) (LC_COMMANDER_INIT_FAILED_INSTALL,
+                               cdata->user_data);
             lc_commander_data_free(cdata);
         } else {
             lc_adb_install_app(apkpath, onInstallLily, user_data);
         }
     } else {
-        ((LcCommanderInitCallback) cdata->callback) (LC_COMMANDER_INIT_OK,
-                                                     cdata->user_data);
-        lc_commander_data_free(cdata);
+        lc_commander_send_command(LC_COMMAND_VERSION, onVersionResponse,
+                                  cdata);
     }
 }
 
@@ -180,8 +204,9 @@ static void onForward(GObject * source_object,
         lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStart, user_data);
     } else {
         LcCommanderData *cdata = (LcCommanderData *) user_data;
-        ((LcCommanderInitCallback) cdata->
-         callback) (LC_COMMANDER_INIT_FAILED_FORWARD, cdata->user_data);
+        ((LcCommanderInitCallback)
+         cdata->callback) (LC_COMMANDER_INIT_FAILED_FORWARD,
+                           cdata->user_data);
         lc_commander_data_free(cdata);
     }
 }
@@ -196,8 +221,9 @@ static void onStartServer(GObject * source_object,
     } else {
         /* ERROR, failed to start(or connect to) adb server */
         LcCommanderData *cdata = (LcCommanderData *) data;
-        ((LcCommanderInitCallback) cdata->
-         callback) (LC_COMMANDER_INIT_FAILED_SERVER, cdata->user_data);
+        ((LcCommanderInitCallback)
+         cdata->callback) (LC_COMMANDER_INIT_FAILED_SERVER,
+                           cdata->user_data);
         lc_commander_data_free(cdata);
     }
 }

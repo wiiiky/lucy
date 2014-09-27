@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.LinkedList;
+import java.util.Queue;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
@@ -66,16 +69,23 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
-    private String logStr="";
     private Runnable addLog=new Runnable() {
         @Override
         public void run() {
-            tvLog.setText(tvLog.getText()+logStr+"\n");
+            String log="";
+            synchronized (aqueue) {
+                log = aqueue.remove();
+            }
+            tvLog.setText(tvLog.getText()+log+"\n");
         }
     };
 
+    private Queue<String> aqueue=new LinkedList<String>();
+
     public void showLog(String log){
-        logStr=log;
+        synchronized (aqueue){
+            aqueue.add(log);
+        }
         handler.post(addLog);
     }
 
