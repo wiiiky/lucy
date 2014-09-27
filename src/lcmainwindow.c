@@ -17,8 +17,6 @@
 #include "libadb/adb_client.h"
 
 #define MAINWINDOW_TITLE "Android Manager"
-#define LILY_ACTIVITY_NAME   "org.wl.ll/.MainActivity"
-#define LILY_APK_NAME    "apk/app-debug.apk"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -170,7 +168,7 @@ static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self)
     return menuBar;
 }
 
-/*About菜单项激活后的回调函数*/
+/* show LcAboutDialog */
 static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
 {
     LcAboutDialog *dialog = lc_about_dialog_new();
@@ -183,25 +181,6 @@ void lc_main_window_show(LcMainWindow * window)
     gtk_widget_show_all(GTK_WIDGET(window));
     lc_main_window_start_server(window);
     gtk_main();
-}
-
-static void onActivityStartFinal(GObject * source_object,
-                                 GAsyncResult * res, gpointer user_data)
-{
-    if (lc_adb_am_start_finish(res)) {
-        g_error("Failed to start lily final!");
-    }
-}
-
-static void onInstallLily(GObject * source_object,
-                          GAsyncResult * res, gpointer user_data)
-{
-    int ret = lc_adb_install_app_finish(res);
-    if (ret) {
-        g_error("Failed to install apk: %s", adb_error());
-        return;
-    }
-    lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStartFinal, user_data);
 }
 
 static void onApplications(GObject * source_object,
@@ -234,49 +213,16 @@ static void onApplications(GObject * source_object,
 }
 
 
-static void onActivityStart(GObject * source_object,
-                            GAsyncResult * res, gpointer user_data)
+static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
-    if (lc_adb_am_start_finish(res)) {
-        g_message("Failed to start Lily!");
-        const gchar *apkpath = lc_util_get_resource_by_name(LILY_APK_NAME);
-        if (apkpath == NULL) {
-            g_error("Lily apk file is missing!!");
-        }
-        lc_adb_install_app(apkpath, onInstallLily, user_data);
-    } else {
-        lc_commander_send_command("applications\n", onApplications,
-                                  user_data);
-    }
-}
-
-static void onForward(GObject * source_object,
-                      GAsyncResult * res, gpointer user_data)
-{
-    int ret = lc_adb_forward_finish(res);
-    if (ret == 0) {
-        /* OK */
-    } else {
-        g_error("Failed to forward tcp port! %s\n", adb_error());
-    }
-}
-
-static void onStartServer(GObject * source_object,
-                          GAsyncResult * res, gpointer user_data)
-{
-    int ret = lc_adb_start_server_finish(res);
-    if (ret == 0) {
-        /* OK */
-        lc_adb_forward(ADB_FORWARD_LOCAL, ADB_FORWARD_REMOTE,
-                       onForward, user_data);
-        lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStart, user_data);
-    } else {
-        /* ERROR, failed to start(or connect to) adb server */
-        g_error("Failed to start adb server! %s\n", adb_error());
+    g_message("%d", result);
+    if (result == LC_COMMANDER_INIT_OK) {
+        g_message("OK");
+        lc_commander_send_command("applications\n", onApplications, data);
     }
 }
 
 void lc_main_window_start_server(LcMainWindow * window)
 {
-    lc_adb_start_server(onStartServer, window);
+    lc_commander_init(onConnectionInit, window);
 }

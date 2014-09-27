@@ -19,19 +19,21 @@
 #include "lccommander.h"
 #include "lcsocket.h"
 #include "lcutil.h"
+#include "lcadb.h"
 
+#define LILY_ACTIVITY_NAME   "org.wl.ll/.MainActivity"
+#define LILY_APK_NAME    "apk/app-debug.apk"
 
 static GList *sockets = NULL;
 
 typedef struct {
     gchar *buf;
-    GAsyncReadyCallback callback;
+    gpointer callback;
     gpointer user_data;
 } LcCommanderData;
 
 static inline LcCommanderData *lc_commander_data_new(const gchar * buf,
-                                                     GAsyncReadyCallback
-                                                     callback,
+                                                     gpointer callback,
                                                      gpointer user_data)
 {
     LcCommanderData *data =
@@ -88,7 +90,8 @@ static void onSocketConnection(GObject * source_object,
         sockets = g_list_append(sockets, source_object);
         g_message("Sending Command: %s", data->buf);
     } else {
-        data->callback(NULL, NULL, data->user_data);
+        ((GAsyncReadyCallback) data->callback) (NULL, NULL,
+                                                data->user_data);
         g_message("Connection is not Established!");
     }
     g_object_unref(source_object);
@@ -117,4 +120,90 @@ GByteArray *lc_commander_send_command_finish(GAsyncResult * res)
         return NULL;
     }
     return lc_socket_send_command_async_finish(res);
+}
+
+/****************************Initialize Connection***************************/
+static void onActivityStartFinal(GObject * source_object,
+                                 GAsyncResult * res, gpointer user_data)
+{
+    LcCommanderData *cdata = (LcCommanderData *) user_data;
+    if (lc_adb_am_start_finish(res)) {
+        ((LcCommanderInitCallback) cdata->
+         callback) (LC_COMMANDER_INIT_FAILED_START, cdata->user_data);
+    } else {
+        ((LcCommanderInitCallback) cdata->callback) (LC_COMMANDER_INIT_OK,
+                                                     cdata->user_data);
+    }
+    lc_commander_data_free(cdata);
+}
+
+static void onInstallLily(GObject * source_object,
+                          GAsyncResult * res, gpointer user_data)
+{
+    int ret = lc_adb_install_app_finish(res);
+    if (ret) {
+        LcCommanderData *cdata = (LcCommanderData *) user_data;
+        ((LcCommanderInitCallback) cdata->
+         callback) (LC_COMMANDER_INIT_FAILED_INSTALL, cdata->user_data);
+        lc_commander_data_free(cdata);
+        return;
+    }
+    lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStartFinal, user_data);
+}
+
+static void onActivityStart(GObject * source_object,
+                            GAsyncResult * res, gpointer user_data)
+{
+    LcCommanderData *cdata = (LcCommanderData *) user_data;
+    if (lc_adb_am_start_finish(res)) {
+        const gchar *apkpath = lc_util_get_resource_by_name(LILY_APK_NAME);
+        if (apkpath == NULL) {
+            ((LcCommanderInitCallback) cdata->
+             callback) (LC_COMMANDER_INIT_FAILED_INSTALL,
+                        cdata->user_data);
+            lc_commander_data_free(cdata);
+        } else {
+            lc_adb_install_app(apkpath, onInstallLily, user_data);
+        }
+    } else {
+        ((LcCommanderInitCallback) cdata->callback) (LC_COMMANDER_INIT_OK,
+                                                     cdata->user_data);
+        lc_commander_data_free(cdata);
+    }
+}
+
+static void onForward(GObject * source_object,
+                      GAsyncResult * res, gpointer user_data)
+{
+    int ret = lc_adb_forward_finish(res);
+    if (ret == 0) {
+        lc_adb_am_start(LILY_ACTIVITY_NAME, onActivityStart, user_data);
+    } else {
+        LcCommanderData *cdata = (LcCommanderData *) user_data;
+        ((LcCommanderInitCallback) cdata->
+         callback) (LC_COMMANDER_INIT_FAILED_FORWARD, cdata->user_data);
+        lc_commander_data_free(cdata);
+    }
+}
+
+static void onStartServer(GObject * source_object,
+                          GAsyncResult * res, gpointer data)
+{
+    int ret = lc_adb_start_server_finish(res);
+    if (ret == 0) {
+        lc_adb_forward(ADB_FORWARD_LOCAL, ADB_FORWARD_REMOTE,
+                       onForward, data);
+    } else {
+        /* ERROR, failed to start(or connect to) adb server */
+        LcCommanderData *cdata = (LcCommanderData *) data;
+        ((LcCommanderInitCallback) cdata->
+         callback) (LC_COMMANDER_INIT_FAILED_SERVER, cdata->user_data);
+        lc_commander_data_free(cdata);
+    }
+}
+
+void lc_commander_init(LcCommanderInitCallback callback, gpointer data)
+{
+    LcCommanderData *cdata = lc_commander_data_new(NULL, callback, data);
+    lc_adb_start_server(onStartServer, cdata);
 }

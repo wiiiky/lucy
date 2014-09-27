@@ -20,6 +20,20 @@
 #define __LC_COMMANDER_H__
 #include <gtk/gtk.h>
 
+typedef enum {
+    LC_COMMANDER_INIT_OK,
+    LC_COMMANDER_INIT_FAILED_FORWARD,
+    LC_COMMANDER_INIT_FAILED_SERVER,
+    LC_COMMANDER_INIT_FAILED_INSTALL,
+    LC_COMMANDER_INIT_FAILED_START,
+} LcCommanderInitResult;
+/*
+ * initialize all adb settings and connect to Android
+ */
+typedef void (*LcCommanderInitCallback) (LcCommanderInitResult result,
+                                         gpointer user_data);
+void lc_commander_init(LcCommanderInitCallback callback, gpointer data);
+
 
 void lc_commander_send_command(const gchar * cmd,
                                GAsyncReadyCallback callback,
