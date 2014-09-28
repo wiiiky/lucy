@@ -41,12 +41,29 @@ enum {
     LC_MAIN_WINDOW_DUMMY_PROPERTY
 };
 
+typedef enum {
+    LC_PHONE_STATE_DISCONNECTED,
+    LC_PHONE_STATE_CONNECTED,
+    LC_PHONE_STATE_CONNECTING,
+} LcPhoneState;
+
 struct _LcMainWindowPrivate {
     LcApplicationView *appView;
     LcToolStack *toolStack;
     LcMyPhone *myPhone;
+
+    LcPhoneState state;
 };
 
+static inline void lc_main_window_set_phone_state(LcMainWindow * self,
+                                                  LcPhoneState state)
+{
+    self->priv->state = state;
+}
+
+#define lc_main_window_set_phone_connected(self)    lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTED)
+#define lc_main_window_set_phone_disconnected(self) lc_main_window_set_phone_state(self,LC_PHONE_STATE_DISCONNECTED)
+#define lc_main_window_set_phone_connecting(self)   lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTING)
 
 LcMainWindow *lc_main_window_construct(GType object_type)
 {
@@ -115,6 +132,8 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                          (lc_util_get_resource_by_name("computer.svg")),
                          "Applications", GTK_WIDGET(self->priv->appView),
                          NULL, NULL);
+
+    lc_main_window_set_phone_disconnected(self);
 }
 
 static void onConnectClicked(GtkWidget * button, gpointer data)
@@ -122,6 +141,7 @@ static void onConnectClicked(GtkWidget * button, gpointer data)
     LcMainWindow *self = (LcMainWindow *) data;
     lc_my_phone_show_connecting(self->priv->myPhone);
     lc_main_window_start_server(self);
+    lc_main_window_set_phone_connecting(self);
 }
 
 static void lc_main_window_my_phone_init(LcMainWindow * self)
@@ -208,8 +228,6 @@ static void onApplications(GByteArray * array, gpointer user_data)
         g_warning("Command '%s' Failed:%s", LC_COMMAND_APPLICATIONS,
                   result);
     } else {
-        g_message("%s", result);
-        return;
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcApplicationView *appView = self->priv->appView;
         GList *list = lc_protocol_create_application_list(result + 4);
@@ -226,16 +244,34 @@ static void onApplications(GByteArray * array, gpointer user_data)
     g_free(result);
 }
 
+static void onPhone(GByteArray * array, gpointer user_data)
+{
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL
+        || lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Command '%s' Failed:%s", LC_COMMAND_PHONE, result);
+    } else {
+        LcMainWindow *self = (LcMainWindow *) user_data;
+        LcProtocolPhone *phone = lc_protocol_create_phone(result + 4);
+        lc_my_phone_show_connected_with_info(self->priv->myPhone, phone);
+        lc_protocol_phone_free(phone);
+    }
+    g_free(result);
+}
+
 
 static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
-        lc_commander_send_command(LC_COMMAND_PHONE, onApplications, data);
+        lc_commander_send_command(LC_COMMAND_PHONE, onPhone, data);
         lc_my_phone_show_connected(self->priv->myPhone);
+        lc_main_window_set_phone_connected(self);
     } else {
-        lc_my_phone_show_disconnect(self->priv->myPhone);
         /* Connection failed */
+        lc_my_phone_show_disconnect(self->priv->myPhone);
+        lc_main_window_set_phone_disconnected(self);
     }
 }
 

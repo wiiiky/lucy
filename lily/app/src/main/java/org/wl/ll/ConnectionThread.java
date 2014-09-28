@@ -17,7 +17,7 @@ import org.wl.ll.protocol.*;
  * 处理单个链接的线程
  */
 public class ConnectionThread extends Thread {
-    /* 处理一个链接的线程，目前只是echo */
+    /* 处理一个链接的线程 */
     private Socket socket=null;
     private OutputStream outputStream =null;
     private BufferedReader bufferedReader=null;

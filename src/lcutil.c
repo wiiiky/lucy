@@ -58,12 +58,11 @@ const gchar *lc_util_get_resource_by_name(const gchar * name)
     if (g_file_test(buf, G_FILE_TEST_EXISTS)) {
         return buf;
     }
-    g_warning("%s not found", buf);
     g_snprintf(buf, sizeof(buf), "%s/res/%s", exedir, name);
     if (g_file_test(buf, G_FILE_TEST_EXISTS)) {
         return buf;
     }
-    g_warning("%s not found", buf);
+    g_warning("Resource '%s' not found", name);
     return NULL;
 }
 

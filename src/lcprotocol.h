@@ -17,6 +17,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * the communication protocol between LUCY and LILY
+ */
+
 #ifndef __LC_DATA_MODEL_H__
 #define __LC_DATA_MODEL_H__
 #include <glib-2.0/glib.h>
@@ -28,6 +32,8 @@ typedef enum {
 
 LcProtocolResult lc_protocol_get_result_from_string(const gchar * str);
 
+
+/******************************APPLICATIONS******************************/
 typedef struct {
     gchar *packageName;
     gchar *appName;
@@ -72,5 +78,49 @@ void lc_protocol_free_application_list(GList * list);
 LcProtocolApplication *lc_protocol_application_find(GList * list,
                                                     const gchar * package);
 
+
+/*******************************VERSION***********************************/
+typedef struct {
+    gchar *version;
+} LcProtocolVersion;
+
+LcProtocolVersion *lc_protocol_version_new(const gchar * v);
+void lc_protocol_version_free(LcProtocolVersion * v);
+
+/*
+ * parse the response of command 'version\n'
+ */
+LcProtocolVersion *lc_protocol_create_version(const gchar * data);
+
+/*******************************PHONE************************************/
+
+typedef struct {
+    gchar *model;
+    gchar *brand;
+    gchar *number;              /* phone number */
+    gchar *availableMemory;
+    gchar *totalMemory;
+    gchar *availableSdCard;
+    gchar *totalSdCard;
+    gchar *availabelInternal;
+    gchar *totalInternal;
+} LcProtocolPhone;
+
+LcProtocolPhone *lc_protocol_phone_new(const gchar * model,
+                                       const gchar * brand,
+                                       const gchar * number,
+                                       const gchar * availableMemory,
+                                       const gchar * totalMemory,
+                                       const gchar * availabelSdCard,
+                                       const gchar * totalSdCard,
+                                       const gchar * availabelInternal,
+                                       const gchar * totalInternal);
+
+void lc_protocol_phone_free(LcProtocolPhone * phone);
+
+/*
+ * parse the response of command 'phone\n'
+ */
+LcProtocolPhone *lc_protocol_create_phone(const gchar * data);
 
 #endif

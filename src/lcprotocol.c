@@ -130,3 +130,76 @@ void lc_protocol_free_application_list(GList * list)
 {
     g_list_free_full(list, (GDestroyNotify) lc_protocol_application_free);
 }
+
+LcProtocolVersion *lc_protocol_version_new(const gchar * v)
+{
+    LcProtocolVersion *version =
+        (LcProtocolVersion *) g_malloc(sizeof(LcProtocolVersion));
+    version->version = g_strdup(v);
+    return version;
+}
+
+void lc_protocol_version_free(LcProtocolVersion * v)
+{
+    g_free(v->version);
+    g_free(v);
+}
+
+LcProtocolVersion *lc_protocol_create_version(const gchar * data)
+{
+    return lc_protocol_version_new(data);
+}
+
+LcProtocolPhone *lc_protocol_phone_new(const gchar * model,
+                                       const gchar * brand,
+                                       const gchar * number,
+                                       const gchar * availableMemory,
+                                       const gchar * totalMemory,
+                                       const gchar * availabelSdCard,
+                                       const gchar * totalSdCard,
+                                       const gchar * availabelInternal,
+                                       const gchar * totalInternal)
+{
+    LcProtocolPhone *phone =
+        (LcProtocolPhone *) g_malloc(sizeof(LcProtocolPhone));
+    phone->model = g_strdup(model);
+    phone->brand = g_strdup(brand);
+    phone->number = g_strdup(number);
+    phone->availableMemory = g_strdup(availableMemory);
+    phone->totalMemory = g_strdup(totalMemory);
+    phone->availableSdCard = g_strdup(availabelSdCard);
+    phone->totalSdCard = g_strdup(totalSdCard);
+    phone->availabelInternal = g_strdup(availabelInternal);
+    phone->totalInternal = g_strdup(totalInternal);
+    return phone;
+}
+
+void lc_protocol_phone_free(LcProtocolPhone * phone)
+{
+    g_free(phone->model);
+    g_free(phone->brand);
+    g_free(phone->number);
+    g_free(phone->availableMemory);
+    g_free(phone->availableSdCard);
+    g_free(phone->availabelInternal);
+    g_free(phone->totalMemory);
+    g_free(phone->totalSdCard);
+    g_free(phone->totalInternal);
+
+    g_free(phone);
+}
+
+LcProtocolPhone *lc_protocol_create_phone(const gchar * data)
+{
+    gchar **array = g_strsplit(data, "\n", -1);
+    if (array == NULL || g_strv_length(array) <= 9) {
+        g_strfreev(array);
+        return NULL;
+    }
+    LcProtocolPhone *phone =
+        lc_protocol_phone_new(array[0], array[1], array[2], array[3],
+                              array[4], array[5], array[6], array[7],
+                              array[8]);
+    g_strfreev(array);
+    return phone;
+}

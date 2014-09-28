@@ -52,7 +52,6 @@ int main(int argc, char **argv)
     gtk_init(&argc, &argv);
 
     LcMainWindow *window = lc_main_window_new();
-
     lc_main_window_show(window);
 
     return 0;

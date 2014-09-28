@@ -7,6 +7,8 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "lcprotocol.h"
+
 G_BEGIN_DECLS
 #define TYPE_LC_MY_PHONE (lc_my_phone_get_type ())
 #define LC_MY_PHONE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_LC_MY_PHONE, LcMyPhone))
@@ -35,6 +37,8 @@ LcMyPhone *lc_my_phone_construct(GType object_type);
 void lc_my_phone_show_disconnect(LcMyPhone * self);
 void lc_my_phone_show_connecting(LcMyPhone * self);
 void lc_my_phone_show_connected(LcMyPhone * self);
+void lc_my_phone_show_connected_with_info(LcMyPhone * self,
+                                          LcProtocolPhone * phone);
 
 void lc_my_phone_set_connect_callback(LcMyPhone * self, GCallback callback,
                                       gpointer user_data);

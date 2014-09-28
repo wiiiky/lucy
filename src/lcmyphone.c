@@ -15,8 +15,10 @@ struct _LcMyPhonePrivate {
     GtkGrid *disconnected;
     GtkGrid *connected;
     GtkButton *connectButton;
-    guint connecting;
-    guint8 connectingIndex;
+
+    /* connected widget */
+    GtkLabel *phoneBrand;
+    GtkLabel *phoneModel;
 };
 
 #define STACK_NAME_DISCONNECTED "disconnected"
@@ -75,8 +77,6 @@ static void lc_my_phone_instance_init(LcMyPhone * self)
 
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
-
-    self->priv->connecting = 0;
 }
 
 
@@ -107,10 +107,18 @@ static void lc_my_phone_disconnect_init(LcMyPhone * self)
 static void lc_my_phone_connect_init(LcMyPhone * self)
 {
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
+    GtkWidget *brand = gtk_label_new("");
+    GtkWidget *model = gtk_label_new("");
+    gtk_grid_attach(cn, brand, 0, 0, 1, 1);
+    gtk_grid_attach(cn, model, 0, 1, 1, 1);
 
     gtk_widget_show_all(GTK_WIDGET(cn));
 
     self->priv->connected = cn;
+    self->priv->phoneBrand = (GtkLabel *) brand;
+    self->priv->phoneModel = (GtkLabel *) model;
+    g_object_ref_sink(self->priv->phoneBrand);
+    g_object_ref_sink(self->priv->phoneModel);
     g_object_ref_sink(self->priv->connected);
 }
 
@@ -147,41 +155,6 @@ GType lc_my_phone_get_type(void)
     return lc_my_phone_type_id__volatile;
 }
 
-static void lc_my_phone_remove_connecting_timeout(LcMyPhone * self)
-{
-    if (self->priv->connecting) {
-        g_source_remove(self->priv->connecting);
-        self->priv->connecting = 0;
-    }
-}
-
-static gboolean onConnectingTimeout(gpointer data)
-{
-    LcMyPhone *self = (LcMyPhone *) data;
-    GtkButton *btn = self->priv->connectButton;
-
-    if (self->priv->connectingIndex > 6) {
-        self->priv->connectingIndex = 1;
-    } else {
-        self->priv->connectingIndex++;
-    }
-    gchar buf[32] = "Connecting";
-    int i, len = 10;
-    for (i = 0; i < self->priv->connectingIndex; i++) {
-        buf[len++] = '.';
-    }
-    buf[len] = '\0';
-    gtk_button_set_label(btn, buf);
-
-    return TRUE;
-}
-
-static void lc_my_phone_set_connecting_timeout(LcMyPhone * self)
-{
-    lc_my_phone_remove_connecting_timeout(self);
-    self->priv->connectingIndex = 1;
-    self->priv->connecting = g_timeout_add(500, onConnectingTimeout, self);
-}
 
 void lc_my_phone_set_connect_callback(LcMyPhone * self, GCallback callback,
                                       gpointer user_data)
@@ -192,7 +165,6 @@ void lc_my_phone_set_connect_callback(LcMyPhone * self, GCallback callback,
 
 void lc_my_phone_show_disconnect(LcMyPhone * self)
 {
-    lc_my_phone_remove_connecting_timeout(self);
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
 }
@@ -208,7 +180,15 @@ void lc_my_phone_show_connecting(LcMyPhone * self)
 
 void lc_my_phone_show_connected(LcMyPhone * self)
 {
-    lc_my_phone_remove_connecting_timeout(self);
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_CONNECTED);
+}
+
+void lc_my_phone_show_connected_with_info(LcMyPhone * self,
+                                          LcProtocolPhone * phone)
+{
+    lc_my_phone_show_connected(self);
+
+    gtk_label_set_text(self->priv->phoneBrand, phone->brand);
+    gtk_label_set_text(self->priv->phoneModel, phone->model);
 }

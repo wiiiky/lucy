@@ -30,7 +30,7 @@ public class PhoneResponse extends Response {
     private String getPhoneInfo(){
         String mtype="unknown";
         String mtyb="unknown";
-        String number="unknown";
+        String number="0";
         try {
             TelephonyManager mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             mtype = android.os.Build.MODEL; // 手机型号
