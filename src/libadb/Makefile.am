@@ -2,6 +2,7 @@
 
 
 noinst_LIBRARIES =  libadb.a
+noinst_HEADERS = mincrypt/rsa.h mincrypt/sha.h
 
 libadb_a_CPPFLAGS = \
 	-DADB_HOST=1 \
@@ -46,5 +47,4 @@ libadb_a_SOURCES =  \
 
 SUBDIRS = \
 	libzipfile \
-	libcutils \
-	mincrypt 
+	libcutils

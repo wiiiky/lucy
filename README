@@ -6,6 +6,16 @@ Android Manager for Linux.
 ##Introduce
 I hack ADB source and try to create a Android Manger for Linux.
 
+###Build
+Lucy depends on gtk+-3.0, libssl and libzip. Install them before building lucy.
+
+		./configure
+		make
+		./lucy
+
+Please let me know, if you have problem to build or run lucy.
+		
+
 ##Contact
 Wiky L(wiiiky@yeah.net)
 
