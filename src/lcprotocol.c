@@ -17,6 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "lcprotocol.h"
+#include "lcutil.h"
 
 
 LcProtocolResult lc_protocol_get_result_from_string(const gchar * str)
@@ -141,13 +142,29 @@ LcProtocolVersion *lc_protocol_version_new(const gchar * v)
 
 void lc_protocol_version_free(LcProtocolVersion * v)
 {
-    g_free(v->version);
-    g_free(v);
+    if (v) {
+        g_free(v->version);
+        g_free(v);
+    }
 }
 
 LcProtocolVersion *lc_protocol_create_version(const gchar * data)
 {
     return lc_protocol_version_new(data);
+}
+
+LcProtocolVersion *lc_protocol_create_version_from_byte_array(GByteArray *
+                                                              array)
+{
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL || lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Failed to get lily version");
+        return NULL;
+    }
+    LcProtocolVersion *version = lc_protocol_create_version(result + 4);
+    g_free(result);
+    return version;
 }
 
 LcProtocolPhone *lc_protocol_phone_new(const gchar * model,

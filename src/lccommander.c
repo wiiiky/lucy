@@ -25,12 +25,15 @@
 #define LILY_APK_NAME    "apk/app-debug.apk"
 #define LILY_VERSION    "1"
 
+#define HOST_IP_ADDRESSS    "127.0.0.1"
+
 static GList *sockets = NULL;
 
 typedef struct {
     gchar *buf;
     gpointer callback;
     gpointer user_data;
+    guint n;
 } LcCommanderData;
 
 static inline LcCommanderData *lc_commander_data_new(const gchar * buf,
@@ -79,49 +82,76 @@ static LcSocket *lc_commander_find_idle_socket()
     return NULL;
 }
 
-static void onSocketCommand(GObject * source_object, GAsyncResult * result,
-                            gpointer user_data)
+void lc_commander_send_command_async(const gchar * cmd,
+                                     LcCommanderCommandCallback callback,
+                                     gpointer user_data)
 {
-    LcCommanderData *data = (LcCommanderData *) user_data;
-    GByteArray *res = lc_socket_send_command_async_finish(result);
-    ((LcCommanderCommandCallback) data->callback) (res, data->user_data);
-    lc_commander_data_free(data);
+    lc_commander_send_command_async_n(cmd, callback, user_data, 1);
 }
 
-static void onSocketConnection(GObject * source_object,
-                               GAsyncResult * res, gpointer user_data)
+static void lc_commander_send_command_thread(GTask * task,
+                                             gpointer source_object,
+                                             gpointer task_data,
+                                             GCancellable * cancellable)
 {
-    LcCommanderData *data = (LcCommanderData *) user_data;
-    if (lc_socket_connect_async_finish(res)) {
-        g_message("New Connection is Established!");
-        lc_socket_send_command_async(LC_SOCKET(source_object),
-                                     data->buf, onSocketCommand, data);
-        sockets = g_list_append(sockets, source_object);
-        g_message("Sending Command: %s", data->buf);
-        return;
-    }
-
-    ((LcCommanderCommandCallback) data->callback) (NULL, data->user_data);
-    g_message("Connection is not Established!");
-    g_object_unref(source_object);
-    lc_commander_data_free(data);
+    LcCommanderData *cdata = (LcCommanderData *) task_data;
+    const gchar *cmd = cdata->buf;
+    guint n = cdata->n;
+    GByteArray *array = lc_commander_send_command(cmd, n);
+    g_task_return_pointer(task, array,
+                          (GDestroyNotify) g_byte_array_unref);
 }
 
-void lc_commander_send_command(const gchar * cmd,
-                               LcCommanderCommandCallback callback,
-                               gpointer user_data)
+static void onCommandSend(GObject * source_object, GAsyncResult * result,
+                          gpointer user_data)
 {
-    LcSocket *s = lc_commander_find_idle_socket();
     LcCommanderData *data =
-        lc_commander_data_new(cmd, callback, user_data);
-    if (s) {
-        g_message("Using Old Socket Sonnection. Sending Command: %s", cmd);
-        lc_socket_send_command_async(s, cmd, onSocketCommand, data);
-        return;
+        (LcCommanderData *) g_task_get_task_data(G_TASK(result));
+    GByteArray *res =
+        (GByteArray *) g_task_propagate_pointer(G_TASK(result), NULL);
+    ((LcCommanderCommandCallback) data->callback) (res, data->user_data);
+}
+
+void lc_commander_send_command_async_n(const gchar * cmd,
+                                       LcCommanderCommandCallback callback,
+                                       gpointer data, guint n)
+{
+    LcCommanderData *cdata = lc_commander_data_new(cmd, callback, data);
+    cdata->n = n;
+    GTask *task = g_task_new(NULL, NULL, onCommandSend, NULL);
+    g_task_set_task_data(task, cdata,
+                         (GDestroyNotify) lc_commander_data_free);
+    g_task_run_in_thread(task, lc_commander_send_command_thread);
+}
+
+GByteArray *lc_commander_send_command(const gchar * cmd, guint n)
+{
+    int i;
+    for (i = 1; i <= n; i++) {
+        LcSocket *s = lc_commander_find_idle_socket();
+        if (s) {
+            g_message("Using Old Socket Sonnection. Sending Command: %s",
+                      cmd);
+            GByteArray *array = lc_socket_send_command(s, cmd);
+            if (array != NULL) {
+                return array;
+            }
+        } else {
+            g_message("No Idle Socket is found,creating a new one!");
+            LcSocket *socket =
+                lc_socket_new(HOST_IP_ADDRESSS, ADB_FORWARD_LOCAL);
+            gboolean ret = lc_socket_connect(socket);
+            if (ret == TRUE) {
+                GByteArray *array = lc_socket_send_command(socket, cmd);
+                if (array != NULL) {
+                    sockets = g_list_append(sockets, socket);
+                    return array;
+                }
+            }
+        }
+        sleep(i);
     }
-    g_message("No Idle Socket is found,creating a new one!");
-    LcSocket *socket = lc_socket_new("127.0.0.1", ADB_FORWARD_LOCAL);
-    lc_socket_connect_async(socket, onSocketConnection, data);
+    return NULL;
 }
 
 static void onVersionResponse(GByteArray * array, gpointer user_data)
@@ -158,8 +188,8 @@ static void onActivityStartFinal(GObject * source_object,
                            cdata->user_data);
         lc_commander_data_free(cdata);
     } else {
-        lc_commander_send_command(LC_COMMAND_VERSION, onVersionResponse,
-                                  cdata);
+        lc_commander_send_command_async_n(LC_COMMAND_VERSION,
+                                          onVersionResponse, cdata, 3);
     }
 }
 
@@ -193,8 +223,8 @@ static void onActivityStart(GObject * source_object,
             lc_adb_install_app(apkpath, onInstallLily, user_data);
         }
     } else {
-        lc_commander_send_command(LC_COMMAND_VERSION, onVersionResponse,
-                                  cdata);
+        lc_commander_send_command_async_n(LC_COMMAND_VERSION,
+                                          onVersionResponse, cdata, 3);
     }
 }
 
@@ -230,7 +260,8 @@ static void onStartServer(GObject * source_object,
     }
 }
 
-void lc_commander_init(LcCommanderInitCallback callback, gpointer data)
+void lc_commander_init_async(LcCommanderInitCallback callback,
+                             gpointer data)
 {
     LcCommanderData *cdata = lc_commander_data_new(NULL, callback, data);
     lc_adb_start_server(onStartServer, cdata);

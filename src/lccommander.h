@@ -38,14 +38,23 @@ typedef enum {
  */
 typedef void (*LcCommanderInitCallback) (LcCommanderInitResult result,
                                          gpointer user_data);
-void lc_commander_init(LcCommanderInitCallback callback, gpointer data);
+void lc_commander_init_async(LcCommanderInitCallback callback,
+                             gpointer data);
 
 
 typedef void (*LcCommanderCommandCallback) (GByteArray * result,
                                             gpointer data);
-void lc_commander_send_command(const gchar * cmd,
-                               LcCommanderCommandCallback callback,
-                               gpointer data);
+void lc_commander_send_command_async(const gchar * cmd,
+                                     LcCommanderCommandCallback callback,
+                                     gpointer data);
+void lc_commander_send_command_async_n(const gchar * cmd,
+                                       LcCommanderCommandCallback callback,
+                                       gpointer data, guint n);
+/*
+ * This function will try n times to send command.
+ * If all fail ,then callback with failure 
+ */
+GByteArray *lc_commander_send_command(const gchar * cmd, guint n);
 
 
 #endif

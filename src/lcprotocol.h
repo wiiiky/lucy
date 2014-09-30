@@ -92,6 +92,9 @@ void lc_protocol_version_free(LcProtocolVersion * v);
  */
 LcProtocolVersion *lc_protocol_create_version(const gchar * data);
 
+LcProtocolVersion *lc_protocol_create_version_from_byte_array(GByteArray *
+                                                              array);
+
 /*******************************PHONE************************************/
 
 typedef struct {

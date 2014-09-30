@@ -58,7 +58,7 @@ const gchar *lc_util_get_resource_by_name(const gchar * name)
     if (g_file_test(buf, G_FILE_TEST_EXISTS)) {
         return buf;
     }
-	g_snprintf(buf, sizeof(buf), "%s/res/%s", exedir, name);
+    g_snprintf(buf, sizeof(buf), "%s/res/%s", exedir, name);
     if (g_file_test(buf, G_FILE_TEST_EXISTS)) {
         return buf;
     }

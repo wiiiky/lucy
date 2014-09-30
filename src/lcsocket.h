@@ -44,6 +44,11 @@ void lc_socket_close(LcSocket * socket);
 gssize lc_data_length(gchar buf[4]);
 
 /*
+ * connect synchronously
+ */
+gboolean lc_socket_connect(LcSocket * socket);
+
+/*
  * asynchronously connect connection
  */
 void lc_socket_connect_async(LcSocket * socket,
@@ -57,6 +62,10 @@ gboolean lc_socket_connect_async_finish(GAsyncResult * res);
  */
 gssize lc_socket_send(LcSocket * socket, const gchar * buffer, gsize size);
 gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size);
+
+
+GByteArray *lc_socket_send_command(LcSocket * socket,
+                                   const gchar * command);
 
 /*
  * send a command to lily asynchronously

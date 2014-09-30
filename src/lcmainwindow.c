@@ -265,7 +265,7 @@ static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
-        lc_commander_send_command(LC_COMMAND_PHONE, onPhone, data);
+        lc_commander_send_command_async(LC_COMMAND_PHONE, onPhone, data);
         lc_my_phone_show_connected(self->priv->myPhone);
         lc_main_window_set_phone_connected(self);
     } else {
@@ -277,5 +277,5 @@ static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 
 void lc_main_window_start_server(LcMainWindow * window)
 {
-    lc_commander_init(onConnectionInit, window);
+    lc_commander_init_async(onConnectionInit, window);
 }
