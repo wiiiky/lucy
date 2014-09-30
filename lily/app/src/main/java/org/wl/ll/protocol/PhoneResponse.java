@@ -22,9 +22,14 @@ public class PhoneResponse extends Response {
     }
 
     @Override
-    public String getData() {
+    public String getString() {
         String data=getPhoneInfo()+ getMemorySize()+getExternalStorageSize()+ getDataStorageSize();
         return getOKAY()+data;
+    }
+
+    @Override
+    public ResponseType getType() {
+        return ResponseType.RESPONSE_TYPE_STRING;
     }
 
     private String getPhoneInfo(){

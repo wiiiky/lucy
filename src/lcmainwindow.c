@@ -244,6 +244,20 @@ static void onApplications(GByteArray * array, gpointer user_data)
     g_free(result);
 }
 
+static void onIcon(GByteArray * array, gpointer user_data)
+{
+    GBytes *bytes = lc_util_get_bytes_from_byte_array(array);
+    if (bytes == NULL) {
+        g_error("Failed to get icon");
+    }
+    /* TODO */
+    g_warning("%d!!!", g_bytes_get_size(bytes));
+    GFile *file = g_file_new_for_path("./icon.png");
+    g_file_replace_contents_bytes_async(file, bytes, NULL, FALSE,
+                                        G_FILE_CREATE_NONE, NULL, NULL,
+                                        NULL);
+}
+
 static void onPhone(GByteArray * array, gpointer user_data)
 {
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
@@ -257,6 +271,9 @@ static void onPhone(GByteArray * array, gpointer user_data)
         lc_my_phone_show_connected_with_info(self->priv->myPhone, phone);
         lc_protocol_phone_free(phone);
     }
+    gchar *cmd = g_strdup_printf(LC_COMMAND_ICON, "com.tencent.mm");
+    lc_commander_send_command_async(cmd, onIcon, NULL);
+    g_free(cmd);
     g_free(result);
 }
 

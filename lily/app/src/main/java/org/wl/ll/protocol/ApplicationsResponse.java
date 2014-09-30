@@ -29,7 +29,7 @@ public class ApplicationsResponse extends Response {
      * \n
      */
     @Override
-    public String getData() {
+    public String getString() {
         PackageManager pManager=mContext.getPackageManager();
         List<PackageInfo> packageInfos=pManager.getInstalledPackages(0);
         String data="";
@@ -38,6 +38,11 @@ public class ApplicationsResponse extends Response {
             data=data+getApplicationInfoData(info);
         }
         return getOKAY()+data;
+    }
+
+    @Override
+    public ResponseType getType() {
+        return ResponseType.RESPONSE_TYPE_STRING;
     }
 
     /*

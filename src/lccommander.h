@@ -24,6 +24,7 @@
 #define LC_COMMAND_APPLICATIONS "applications\n"
 #define LC_COMMAND_VERSION      "version\n"
 #define LC_COMMAND_PHONE        "phone\n"
+#define LC_COMMAND_ICON         "icon:%s\n"
 
 typedef enum {
     LC_COMMANDER_INIT_OK,

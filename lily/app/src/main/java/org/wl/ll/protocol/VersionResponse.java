@@ -15,7 +15,7 @@ public class VersionResponse extends Response {
     }
 
     @Override
-    public String getData() {
+    public String getString() {
         PackageInfo info;
         try {
             info=mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
@@ -23,5 +23,10 @@ public class VersionResponse extends Response {
             return "unknown";
         }
         return getOKAY()+Integer.toString(info.versionCode);
+    }
+
+    @Override
+    public ResponseType getType() {
+        return ResponseType.RESPONSE_TYPE_STRING;
     }
 }

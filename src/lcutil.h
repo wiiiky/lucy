@@ -34,6 +34,8 @@ void lc_init(int argc, char *argv[]);
 gchar *lc_util_get_string_from_byte_array(GByteArray * array,
                                           gsize * size);
 
+GBytes *lc_util_get_bytes_from_byte_array(GByteArray * array);
+
 /*
  * apply specified CSS resource file to widget.
  */

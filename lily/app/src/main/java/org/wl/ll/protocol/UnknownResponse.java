@@ -13,7 +13,12 @@ public class UnknownResponse extends Response {
     }
 
     @Override
-    public String getData() {
+    public String getString() {
         return getFAIL()+data;
+    }
+
+    @Override
+    public ResponseType getType() {
+        return ResponseType.RESPONSE_TYPE_STRING;
     }
 }

@@ -48,6 +48,7 @@ public class ConnectionThread extends Thread {
                 if (lower.equals(REQUEST_PACKAGES)) {
                     onApplicationsResponse();
                 }else if(lower.startsWith(REQUEST_ICON)) {
+                    onIconResponse(lower.substring(REQUEST_ICON.length()));
                 }else if(lower.equals(REQUEST_VERSION)) {
                     onVersionResponse();
                 }else if(lower.equals(REQUEST_PHONE)){
@@ -90,6 +91,10 @@ public class ConnectionThread extends Thread {
 
     private void onPhoneResponse(){
         new PhoneResponse(mContext).onResponse(outputStream);
+    }
+
+    private void onIconResponse(String packageName){
+        new IconResponse(mContext,packageName).onResponse(outputStream);
     }
 
     /*

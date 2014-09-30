@@ -2,6 +2,7 @@ package org.wl.ll;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -92,6 +94,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
         handler.post(addLog);
     }
+
 
     public static void LOG(String log){
         if(instance!=null){

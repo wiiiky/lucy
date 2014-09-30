@@ -51,6 +51,16 @@ gchar *lc_util_get_string_from_byte_array(GByteArray * array, gsize * size)
     return g_bytes_unref_to_data(bytes, size);
 }
 
+GBytes *lc_util_get_bytes_from_byte_array(GByteArray * array)
+{
+    if (array == NULL) {
+        return NULL;
+    }
+    GBytes *bytes = g_byte_array_free_to_bytes(array);
+
+    return bytes;
+}
+
 const gchar *lc_util_get_resource_by_name(const gchar * name)
 {
     static gchar buf[1024];
