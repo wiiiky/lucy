@@ -17,8 +17,4 @@ public class UnknownResponse extends Response {
         return getFAIL()+data;
     }
 
-    @Override
-    public ResponseType getType() {
-        return ResponseType.RESPONSE_TYPE_STRING;
-    }
 }

@@ -24,9 +24,4 @@ public class VersionResponse extends Response {
         }
         return getOKAY()+Integer.toString(info.versionCode);
     }
-
-    @Override
-    public ResponseType getType() {
-        return ResponseType.RESPONSE_TYPE_STRING;
-    }
 }

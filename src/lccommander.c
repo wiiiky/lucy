@@ -188,7 +188,7 @@ static void onActivityStartFinal(GObject * source_object,
                            cdata->user_data);
         lc_commander_data_free(cdata);
     } else {
-        lc_commander_send_command_async_n(LC_COMMAND_VERSION,
+        lc_commander_send_command_async_n(LC_PROTOCOL_VERSION,
                                           onVersionResponse, cdata, 3);
     }
 }
@@ -223,7 +223,7 @@ static void onActivityStart(GObject * source_object,
             lc_adb_install_app(apkpath, onInstallLily, user_data);
         }
     } else {
-        lc_commander_send_command_async_n(LC_COMMAND_VERSION,
+        lc_commander_send_command_async_n(LC_PROTOCOL_VERSION,
                                           onVersionResponse, cdata, 3);
     }
 }

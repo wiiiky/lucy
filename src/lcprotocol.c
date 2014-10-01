@@ -30,6 +30,18 @@ LcProtocolResult lc_protocol_get_result_from_string(const gchar * str)
     return LC_PROTOCOL_RESULT_FAIL;
 }
 
+LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes)
+{
+    gsize size;
+    const gchar *data = (const gchar *) g_bytes_get_data(bytes, &size);
+    if (size >= 4 && g_ascii_tolower(data[0]) == 'o' &&
+        g_ascii_tolower(data[1]) == 'k' &&
+        g_ascii_tolower(data[2]) == 'a' &&
+        g_ascii_tolower(data[3]) == 'y') {
+        return LC_PROTOCOL_RESULT_OKAY;
+    }
+    return LC_PROTOCOL_RESULT_FAIL;
+}
 
 LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,

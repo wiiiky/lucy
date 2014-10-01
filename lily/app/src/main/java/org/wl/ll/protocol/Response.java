@@ -23,7 +23,9 @@ public abstract class Response {
 
     protected String getString(){return null;};
     protected byte[] getByte(){return null;}
-    protected abstract ResponseType getType();
+    protected ResponseType getType(){
+        return ResponseType.RESPONSE_TYPE_STRING;
+    }
 
     protected String getOKAY(){
         return OKAY;

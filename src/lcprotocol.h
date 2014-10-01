@@ -25,12 +25,22 @@
 #define __LC_DATA_MODEL_H__
 #include <glib-2.0/glib.h>
 
+/* all commands */
+#define LC_PROTOCOL_APPLICATIONS "applications\n"
+#define LC_PROTOCOL_VERSION      "version\n"
+#define LC_PROTOCOL_PHONE        "phone\n"
+#define LC_PROTOCOL_ICON         "icon:%s\n"
+
+#define LC_PROTOCOL_HDR_LEN     (4)
+
+
 typedef enum {
     LC_PROTOCOL_RESULT_OKAY,
     LC_PROTOCOL_RESULT_FAIL,
 } LcProtocolResult;
 
 LcProtocolResult lc_protocol_get_result_from_string(const gchar * str);
+LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes);
 
 
 /******************************APPLICATIONS******************************/

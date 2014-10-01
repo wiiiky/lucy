@@ -225,12 +225,14 @@ static void onApplications(GByteArray * array, gpointer user_data)
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command '%s' Failed:%s", LC_COMMAND_APPLICATIONS,
+        g_warning("Command '%s' Failed:%s", LC_PROTOCOL_APPLICATIONS,
                   result);
     } else {
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcApplicationView *appView = self->priv->appView;
-        GList *list = lc_protocol_create_application_list(result + 4);
+        GList *list =
+            lc_protocol_create_application_list(result +
+                                                LC_PROTOCOL_HDR_LEN);
         GList *lp = list;
         while (lp) {
             LcProtocolApplication *info =
@@ -248,14 +250,20 @@ static void onIcon(GByteArray * array, gpointer user_data)
 {
     GBytes *bytes = lc_util_get_bytes_from_byte_array(array);
     if (bytes == NULL) {
-        g_error("Failed to get icon");
+        g_error("Connection Problem! Failed to get icon");
+    }
+    if (lc_protocol_get_result_from_bytes(bytes) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_error("Protocol Problem! Failed to get icon");
     }
     /* TODO */
-    g_warning("%d!!!", g_bytes_get_size(bytes));
+    gsize size;
+    gchar *content = (gchar *) g_bytes_unref_to_data(bytes, &size);
     GFile *file = g_file_new_for_path("./icon.png");
-    g_file_replace_contents_bytes_async(file, bytes, NULL, FALSE,
-                                        G_FILE_CREATE_NONE, NULL, NULL,
-                                        NULL);
+    g_file_replace_contents(file, content + LC_PROTOCOL_HDR_LEN,
+                            size - LC_PROTOCOL_HDR_LEN, NULL, FALSE,
+                            G_FILE_CREATE_NONE, NULL, NULL, NULL);
+    g_free(content);
 }
 
 static void onPhone(GByteArray * array, gpointer user_data)
@@ -264,14 +272,15 @@ static void onPhone(GByteArray * array, gpointer user_data)
     if (result == NULL
         || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command '%s' Failed:%s", LC_COMMAND_PHONE, result);
+        g_warning("Command '%s' Failed:%s", LC_PROTOCOL_PHONE, result);
     } else {
         LcMainWindow *self = (LcMainWindow *) user_data;
-        LcProtocolPhone *phone = lc_protocol_create_phone(result + 4);
+        LcProtocolPhone *phone =
+            lc_protocol_create_phone(result + LC_PROTOCOL_HDR_LEN);
         lc_my_phone_show_connected_with_info(self->priv->myPhone, phone);
         lc_protocol_phone_free(phone);
     }
-    gchar *cmd = g_strdup_printf(LC_COMMAND_ICON, "com.tencent.mm");
+    gchar *cmd = g_strdup_printf(LC_PROTOCOL_ICON, "com.tencent.mm");
     lc_commander_send_command_async(cmd, onIcon, NULL);
     g_free(cmd);
     g_free(result);
@@ -282,7 +291,7 @@ static void onConnectionInit(LcCommanderInitResult result, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
-        lc_commander_send_command_async(LC_COMMAND_PHONE, onPhone, data);
+        lc_commander_send_command_async(LC_PROTOCOL_PHONE, onPhone, data);
         lc_my_phone_show_connected(self->priv->myPhone);
         lc_main_window_set_phone_connected(self);
     } else {

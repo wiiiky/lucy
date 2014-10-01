@@ -27,10 +27,6 @@ public class PhoneResponse extends Response {
         return getOKAY()+data;
     }
 
-    @Override
-    public ResponseType getType() {
-        return ResponseType.RESPONSE_TYPE_STRING;
-    }
 
     private String getPhoneInfo(){
         String mtype="unknown";
