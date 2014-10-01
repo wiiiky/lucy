@@ -19,6 +19,7 @@ struct _LcMyPhonePrivate {
     /* connected widget */
     GtkLabel *phoneBrand;
     GtkLabel *phoneModel;
+    GtkLabel *phoneNum;
 };
 
 #define STACK_NAME_DISCONNECTED "disconnected"
@@ -109,16 +110,20 @@ static void lc_my_phone_connect_init(LcMyPhone * self)
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
     GtkWidget *brand = gtk_label_new("");
     GtkWidget *model = gtk_label_new("");
+    GtkWidget *number = gtk_label_new("");
     gtk_grid_attach(cn, brand, 0, 0, 1, 1);
     gtk_grid_attach(cn, model, 0, 1, 1, 1);
+    gtk_grid_attach(cn, number, 0, 2, 1, 1);
 
     gtk_widget_show_all(GTK_WIDGET(cn));
 
     self->priv->connected = cn;
     self->priv->phoneBrand = (GtkLabel *) brand;
     self->priv->phoneModel = (GtkLabel *) model;
+    self->priv->phoneNum = (GtkLabel *) number;
     g_object_ref_sink(self->priv->phoneBrand);
     g_object_ref_sink(self->priv->phoneModel);
+    g_object_ref_sink(self->priv->phoneNum);
     g_object_ref_sink(self->priv->connected);
 }
 
@@ -129,6 +134,9 @@ static void lc_my_phone_finalize(GObject * obj)
     _g_object_unref0(self->priv->disconnected);
     _g_object_unref0(self->priv->connected);
     _g_object_unref0(self->priv->connectButton);
+    _g_object_unref0(self->priv->phoneNum);
+    _g_object_unref0(self->priv->phoneBrand);
+    _g_object_unref0(self->priv->phoneModel);
     G_OBJECT_CLASS(lc_my_phone_parent_class)->finalize(obj);
 }
 
@@ -191,4 +199,5 @@ void lc_my_phone_show_connected_with_info(LcMyPhone * self,
 
     gtk_label_set_text(self->priv->phoneBrand, phone->brand);
     gtk_label_set_text(self->priv->phoneModel, phone->model);
+    gtk_label_set_text(self->priv->phoneNum, phone->number);
 }

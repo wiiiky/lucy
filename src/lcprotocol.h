@@ -48,17 +48,17 @@ typedef struct {
     gchar *packageName;
     gchar *appName;
     gchar *version;
-    gchar *iconId;
     gchar *installedTime;
     gchar *installedLocation;
     gchar *description;
 } LcProtocolApplication;
 
+#define LC_PROTOCOL_APPLICATION_SIZE    (6)
+
 LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,
                                                    const gchar * appName,
                                                    const gchar * version,
-                                                   const gchar * iconId,
                                                    const gchar *
                                                    installedTime,
                                                    const gchar *
@@ -119,6 +119,8 @@ typedef struct {
     gchar *totalInternal;
 } LcProtocolPhone;
 
+#define LC_PROTOCOL_PHONE_SIZE  (9)
+
 LcProtocolPhone *lc_protocol_phone_new(const gchar * model,
                                        const gchar * brand,
                                        const gchar * number,
@@ -135,5 +137,9 @@ void lc_protocol_phone_free(LcProtocolPhone * phone);
  * parse the response of command 'phone\n'
  */
 LcProtocolPhone *lc_protocol_create_phone(const gchar * data);
+
+/**********************************ICON*********************************/
+
+const gchar *lc_protocol_icon_command(const gchar * package);
 
 #endif

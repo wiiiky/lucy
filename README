@@ -13,7 +13,7 @@ Lucy depends on gtk+-3.0, libssl and libzip. Install them before building lucy.
 		make
 		./lucy
 
-Please let me know, if you have problem to build or run lucy.
+Please let me know, if you have problem building or running lucy.
 		
 
 ##Contact

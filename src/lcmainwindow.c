@@ -55,15 +55,17 @@ struct _LcMainWindowPrivate {
     LcPhoneState state;
 };
 
-static inline void lc_main_window_set_phone_state(LcMainWindow * self,
-                                                  LcPhoneState state)
-{
-    self->priv->state = state;
-}
+#define lc_main_window_get_application_view(self) ((self)->priv->appView)
+#define lc_main_window_get_tool_stack(self)     ((self)->priv->toolStack)
+#define lc_main_window_get_my_phone(self)       ((self)->priv->myPhone)
+
+#define lc_main_window_set_phone_state(self,_state)    ((self)->priv->state=_state)
 
 #define lc_main_window_set_phone_connected(self)    lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTED)
 #define lc_main_window_set_phone_disconnected(self) lc_main_window_set_phone_state(self,LC_PHONE_STATE_DISCONNECTED)
 #define lc_main_window_set_phone_connecting(self)   lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTING)
+
+#define lc_main_window_is_connected(self)   ((self)->priv->state==LC_PHONE_STATE_CONNECTED)
 
 LcMainWindow *lc_main_window_construct(GType object_type)
 {
@@ -93,6 +95,39 @@ static void onMyPhonePageVisible(gboolean visible, gpointer user_data)
     }
 }
 
+static void onApplications(const gchar * cmd, GByteArray * array,
+                           gpointer user_data)
+{
+    LcMainWindow *self = (LcMainWindow *) user_data;
+    LcApplicationView *appView = lc_main_window_get_application_view(self);
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL || lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Command '%s' Failed:%s", cmd, result);
+    } else {
+        GList *list =
+            lc_protocol_create_application_list(result +
+                                                LC_PROTOCOL_HDR_LEN);
+        lc_application_view_update(appView, list);
+        lc_protocol_free_application_list(list);
+    }
+    g_free(result);
+    lc_application_view_set_loading(appView, FALSE);
+}
+
+static void onApplicationPageVisible(gboolean visible, gpointer user_data)
+{
+    LcMainWindow *self = (LcMainWindow *) user_data;
+    LcApplicationView *appView = lc_main_window_get_application_view(self);
+
+    if (visible && lc_main_window_is_connected(self) &&
+        lc_application_view_is_loading(appView) == FALSE) {
+        lc_application_view_set_loading(appView, TRUE);
+        lc_commander_send_command_async(LC_PROTOCOL_APPLICATIONS,
+                                        onApplications, user_data);
+    }
+}
+
 static void lc_main_window_my_phone_init(LcMainWindow * self);
 
 static void lc_main_window_instance_init(LcMainWindow * self)
@@ -101,7 +136,6 @@ static void lc_main_window_instance_init(LcMainWindow * self)
 
     gtk_window_set_resizable(GTK_WINDOW(self), FALSE);
     gtk_widget_set_size_request(GTK_WIDGET(self), 900, 600);
-    //gtk_window_set_default_size(GTK_WINDOW(self), 960, 640);
     gtk_window_set_position(GTK_WINDOW(self), GTK_WIN_POS_CENTER);
     gtk_window_set_title(GTK_WINDOW(self), MAINWINDOW_TITLE);
     g_signal_connect(G_OBJECT(self), "destroy",
@@ -131,7 +165,7 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("computer.svg")),
                          "Applications", GTK_WIDGET(self->priv->appView),
-                         NULL, NULL);
+                         onApplicationPageVisible, self);
 
     lc_main_window_set_phone_disconnected(self);
 }
@@ -220,53 +254,8 @@ void lc_main_window_show(LcMainWindow * window)
     gtk_main();
 }
 
-static void onApplications(GByteArray * array, gpointer user_data)
-{
-    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
-    if (result == NULL || lc_protocol_get_result_from_string(result) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command '%s' Failed:%s", LC_PROTOCOL_APPLICATIONS,
-                  result);
-    } else {
-        LcMainWindow *self = (LcMainWindow *) user_data;
-        LcApplicationView *appView = self->priv->appView;
-        GList *list =
-            lc_protocol_create_application_list(result +
-                                                LC_PROTOCOL_HDR_LEN);
-        GList *lp = list;
-        while (lp) {
-            LcProtocolApplication *info =
-                (LcProtocolApplication *) lp->data;
-            lc_application_view_append(appView, info);
-            g_message("%s", info->appName);
-            lp = g_list_next(lp);
-        }
-        lc_protocol_free_application_list(list);
-    }
-    g_free(result);
-}
-
-static void onIcon(GByteArray * array, gpointer user_data)
-{
-    GBytes *bytes = lc_util_get_bytes_from_byte_array(array);
-    if (bytes == NULL) {
-        g_error("Connection Problem! Failed to get icon");
-    }
-    if (lc_protocol_get_result_from_bytes(bytes) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_error("Protocol Problem! Failed to get icon");
-    }
-    /* TODO */
-    gsize size;
-    gchar *content = (gchar *) g_bytes_unref_to_data(bytes, &size);
-    GFile *file = g_file_new_for_path("./icon.png");
-    g_file_replace_contents(file, content + LC_PROTOCOL_HDR_LEN,
-                            size - LC_PROTOCOL_HDR_LEN, NULL, FALSE,
-                            G_FILE_CREATE_NONE, NULL, NULL, NULL);
-    g_free(content);
-}
-
-static void onPhone(GByteArray * array, gpointer user_data)
+static void onPhone(const gchar * cmd, GByteArray * array,
+                    gpointer user_data)
 {
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL
@@ -280,9 +269,6 @@ static void onPhone(GByteArray * array, gpointer user_data)
         lc_my_phone_show_connected_with_info(self->priv->myPhone, phone);
         lc_protocol_phone_free(phone);
     }
-    gchar *cmd = g_strdup_printf(LC_PROTOCOL_ICON, "com.tencent.mm");
-    lc_commander_send_command_async(cmd, onIcon, NULL);
-    g_free(cmd);
     g_free(result);
 }
 

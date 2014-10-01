@@ -47,7 +47,6 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,
                                                    const gchar * appName,
                                                    const gchar * version,
-                                                   const gchar * iconId,
                                                    const gchar *
                                                    installedTime,
                                                    const gchar *
@@ -60,7 +59,6 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
     p->packageName = g_strdup(packageName);
     p->appName = g_strdup(appName);
     p->version = g_strdup(version);
-    p->iconId = g_strdup(iconId);
     p->installedTime = g_strdup(installedTime);
     p->installedLocation = g_strdup(installedLocation);
     p->description = g_strdup(description);
@@ -73,7 +71,6 @@ lc_protocol_application_free_internal(LcProtocolApplication * p)
     g_free(p->packageName);
     g_free(p->appName);
     g_free(p->version);
-    g_free(p->iconId);
     g_free(p->installedTime);
     g_free(p->installedLocation);
     g_free(p->description);
@@ -104,7 +101,7 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
 LcProtocolApplication *lc_protocol_get_application(const gchar * data)
 {
     gchar **elements = g_strsplit(data, ":", -1);
-    if (g_strv_length(elements) < 7) {
+    if (g_strv_length(elements) < LC_PROTOCOL_APPLICATION_SIZE) {
         g_strfreev(elements);
         return NULL;
     }
@@ -113,8 +110,7 @@ LcProtocolApplication *lc_protocol_get_application(const gchar * data)
                                                              elements[2],
                                                              elements[3],
                                                              elements[4],
-                                                             elements[5],
-                                                             elements[6]);
+                                                             elements[5]);
     g_strfreev(elements);
     return app;
 }
@@ -131,7 +127,9 @@ GList *lc_protocol_create_application_list(const gchar * data)
         gchar *line = strarray[i];
         if (line[0]) {
             LcProtocolApplication *app = lc_protocol_get_application(line);
-            apps = g_list_append(apps, app);
+            if (app) {
+                apps = g_list_append(apps, app);
+            }
         }
         i++;
     }
@@ -221,7 +219,7 @@ void lc_protocol_phone_free(LcProtocolPhone * phone)
 LcProtocolPhone *lc_protocol_create_phone(const gchar * data)
 {
     gchar **array = g_strsplit(data, "\n", -1);
-    if (array == NULL || g_strv_length(array) <= 9) {
+    if (array == NULL || g_strv_length(array) <= LC_PROTOCOL_PHONE_SIZE) {
         g_strfreev(array);
         return NULL;
     }
@@ -231,4 +229,11 @@ LcProtocolPhone *lc_protocol_create_phone(const gchar * data)
                               array[8]);
     g_strfreev(array);
     return phone;
+}
+
+const gchar *lc_protocol_icon_command(const gchar * package)
+{
+    static gchar buf[256];
+    g_snprintf(buf, sizeof(buf), LC_PROTOCOL_ICON, package);
+    return buf;
 }

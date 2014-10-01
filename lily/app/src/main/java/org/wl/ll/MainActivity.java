@@ -142,9 +142,10 @@ public class MainActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if(view.getId()==R.id.btnPackages){
-            Intent intent=new Intent(this,ApplicationActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+            tvLog.setText("");
+//            Intent intent=new Intent(this,ApplicationActivity.class);
+//            startActivity(intent);
+//            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
         }
     }
 }

@@ -48,6 +48,21 @@ void lc_util_load_css(GtkWidget * widget, const gchar * name);
  */
 const gchar *lc_util_get_resource_by_name(const gchar * name);
 
+/*
+ * get the absolute path of a cache file
+ * 
+ * return string is stored in static memory and should not be freed
+ */
+const gchar *lc_util_get_cache_path_by_name(const gchar * name);
+
+const gchar *lc_util_get_image_cache_path_by_name(const gchar * name);
+
+/*
+ *  load a image file with name from cache directory
+ *  return NULL if faield, not found or some what
+ */
+GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name);
+
 
 typedef gboolean(*GListElementNotify) (gconstpointer data,
                                        gpointer user_data);

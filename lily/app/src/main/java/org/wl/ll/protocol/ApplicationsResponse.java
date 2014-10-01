@@ -24,8 +24,8 @@ public class ApplicationsResponse extends Response {
 
     /*
      * 返回应用包列表
-     * packageName1:appName1:versionName1:icon1:installedtime1:installedLocation1:description1\n
-     * packageName2:appName2:versionName2:icon2:installedtime2:installedLocation2:description2\n
+     * packageName1:appName1:versionName1:installedtime1:installedLocation1:description1\n
+     * packageName2:appName2:versionName2:installedtime2:installedLocation2:description2\n
      * \n
      */
     @Override
@@ -47,7 +47,6 @@ public class ApplicationsResponse extends Response {
         String data=getApplicationPackageName(info) +":"+
                 getApplicationName(info) +":"+
                 getApplicationVersionName(info) + ":" +
-                getApplicationIconId(info)+":"+
                 getApplicationInstalledTime(info)+":"+
                 getApplicationInstalledLocation(info)+":"+
                 getApplicationDescription(info)+
@@ -82,14 +81,6 @@ public class ApplicationsResponse extends Response {
     private String getApplicationVersionName(PackageInfo info){
         String version=info.versionName;
         return version;
-    }
-
-    /*
-     * 获取图标id
-     */
-    private String getApplicationIconId(PackageInfo info){
-        String id=Integer.toString(info.applicationInfo.icon);
-        return id;
     }
 
     /*

@@ -5,14 +5,22 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "lcapplicationview.h"
+#include "lcutil.h"
+#include "lccommander.h"
 #include <gtk/gtk.h>
+#include <gtk-2.0/gtk/gtktreemodel.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 struct _LcApplicationViewPrivate {
     GtkTreeView *appView;
     GtkListStore *appStore;
+
+    gboolean loading;
 };
+
+#define lc_application_view_get_list_store(self)    ((self)->priv->appStore)
+#define lc_application_view_get_tree_view(self)     ((self)->priv->appView)
 
 
 static gpointer lc_application_view_parent_class = NULL;
@@ -70,6 +78,8 @@ static void lc_application_view_instance_init(LcApplicationView * self)
     self->priv = LC_APPLICATION_VIEW_GET_PRIVATE(self);
 
     LcApplicationViewPrivate *priv = self->priv;
+
+    priv->loading = FALSE;
     priv->appStore = (GtkListStore *)
         gtk_list_store_new(LC_APPLICATION_VIEW_COL_NUMBER,
                            GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING,
@@ -155,11 +165,111 @@ GType lc_application_view_get_type(void)
     return lc_application_view_type_id__volatile;
 }
 
+static void onIcon(const gchar * cmd, GByteArray * array,
+                   gpointer user_data)
+{
+    GBytes *bytes = lc_util_get_bytes_from_byte_array(array);
+    if (bytes == NULL) {
+        g_warning("Connection Problem! Failed to get icon");
+        return;
+    }
+    if (lc_protocol_get_result_from_bytes(bytes) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Protocol Problem! Failed to get icon");
+        g_bytes_unref(bytes);
+        return;
+    }
+    /* TODO */
+    gsize size;
+    gchar *content = (gchar *) g_bytes_unref_to_data(bytes, &size);
+    const gchar *path =
+        lc_util_get_image_cache_path_by_name((gchar *) user_data);
+    GFile *file = g_file_new_for_path(path);
+    g_file_replace_contents(file, content + LC_PROTOCOL_HDR_LEN,
+                            size - LC_PROTOCOL_HDR_LEN, NULL, FALSE,
+                            G_FILE_CREATE_NONE, NULL, NULL, NULL);
+    g_free(content);
+}
+
 /*
- * 彻底更新应用列表，该函数保证显示内容与list一致，不多不少
+ * update ALl application infomation
+ * 
+ * remove update and insert
  */
+typedef struct {
+    gchar *packageName;
+    GtkTreeIter *iter;
+    GtkListStore *store;
+} LcIconData;
+LcIconData *lc_icon_data_new(const gchar * packageName, GtkTreeIter * iter,
+                             GtkListStore * store)
+{
+    LcIconData *icon = (LcIconData *) g_malloc(sizeof(LcIconData));
+    icon->packageName = g_strdup(packageName);
+    icon->iter = gtk_tree_iter_copy(iter);
+    icon->store = store;
+
+    return icon;
+}
+
+void lc_icon_data_free(LcIconData * icon)
+{
+    g_free(icon->packageName);
+    gtk_tree_iter_free(icon->iter);
+    g_free(icon);
+}
+
 void lc_application_view_update(LcApplicationView * self, GList * list)
 {
+    if (list == NULL) {
+        return;
+    }
+    GtkTreeIter iter;
+    GtkTreeModel *model =
+        (GtkTreeModel *) lc_application_view_get_list_store(self);
+    GList *add = g_list_copy(list);
+    if (gtk_tree_model_get_iter_first(model, &iter)) {
+        while (gtk_list_store_iter_is_valid(GTK_LIST_STORE(model), &iter)) {
+            gchar *package = NULL;
+            gtk_tree_model_get(model, &iter,
+                               LC_APPLICATION_VIEW_COL_PACKAGE, &package,
+                               -1);
+            LcProtocolApplication *app =
+                lc_protocol_application_find(list, package);
+            g_free(package);
+            if (app == NULL) {
+                /* not found, delete */
+                gtk_list_store_remove(GTK_LIST_STORE(model), &iter);
+            } else {
+                /* found, update */
+                gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                                   LC_APPLICATION_VIEW_COL_NAME,
+                                   app->appName,
+                                   LC_APPLICATION_VIEW_COL_VERSION,
+                                   app->version,
+                                   LC_APPLICATION_VIEW_COL_PACKAGE,
+                                   app->packageName, -1);
+                gtk_tree_model_iter_next(model, &iter);
+                add = g_list_remove(add, app);
+            }
+        }
+    }
+
+    /* add the new elements */
+    GList *lp = add;
+    while (lp) {
+        LcProtocolApplication *app = lp->data;
+        gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+        gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+                           LC_APPLICATION_VIEW_COL_NAME,
+                           app->appName,
+                           LC_APPLICATION_VIEW_COL_VERSION,
+                           app->version,
+                           LC_APPLICATION_VIEW_COL_PACKAGE,
+                           app->packageName, -1);
+        lp = g_list_next(lp);
+    }
+    g_list_free(add);
 }
 
 /*
@@ -179,4 +289,15 @@ void lc_application_view_append(LcApplicationView * self,
                        data->version,
                        LC_APPLICATION_VIEW_COL_PACKAGE,
                        data->packageName, -1);
+}
+
+void lc_application_view_set_loading(LcApplicationView * self,
+                                     gboolean loading)
+{
+    self->priv->loading = loading;
+}
+
+gboolean lc_application_view_is_loading(LcApplicationView * self)
+{
+    return self->priv->loading;
 }

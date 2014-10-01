@@ -6,13 +6,6 @@
 #include <glib-object.h>
 #include "lcaboutdialog.h"
 
-
-#define PROGRAM_NAME "Lucy"
-#define LC_WEBSITE "https://github.com/wiiiky/lucy"
-#define LC_COMMENTS "Android Manager for Linux"
-#define LC_COPYRIGH "Copyright (c) Wiky L"
-#define LC_VERSION "0.1"
-
 const static gchar *LC_AUTHORS[] = {
     "Wiky L (wiiiky@yeah.net)",
     NULL

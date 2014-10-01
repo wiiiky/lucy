@@ -17,10 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "lcutil.h"
+#include "lcaboutdialog.h"
 #include <limits.h>
 #include <unistd.h>
 
-static char exedir[PATH_MAX + 1] = "./";
+static gchar exedir[PATH_MAX + 1] = "./";
+static gchar cachedir[PATH_MAX + 1];
+static gchar imgcachedir[PATH_MAX + 1];
 
 void lc_init(int argc, char *argv[])
 {
@@ -34,6 +37,12 @@ void lc_init(int argc, char *argv[])
     if (s) {
         *s = '\0';
     }
+
+    g_snprintf(cachedir, sizeof(cachedir), "%s/%s", g_get_user_cache_dir(),
+               PROGRAM_NAME);
+    g_snprintf(imgcachedir, sizeof(imgcachedir), "%s/img", cachedir);
+
+    g_mkdir_with_parents(imgcachedir, 0777);
 }
 
 gchar *lc_util_get_string_from_byte_array(GByteArray * array, gsize * size)
@@ -74,6 +83,33 @@ const gchar *lc_util_get_resource_by_name(const gchar * name)
     }
     g_warning("Resource '%s' not found", name);
     return NULL;
+}
+
+const gchar *lc_util_get_cache_path_by_name(const gchar * name)
+{
+    static gchar buf[PATH_MAX + 1];
+
+    g_snprintf(buf, sizeof(buf), "%s/%s", cachedir, name);
+
+    return buf;
+}
+
+const gchar *lc_util_get_image_cache_path_by_name(const gchar * name)
+{
+    static gchar buf[PATH_MAX + 1];
+
+    g_snprintf(buf, sizeof(buf), "%s/%s.png", imgcachedir, name);
+
+    return buf;
+}
+
+GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name)
+{
+    gchar buf[128];
+    g_snprintf(buf, sizeof(buf), "img/%s", name);
+    const gchar *path = lc_util_get_cache_path_by_name(buf);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(path, NULL);
+    return pixbuf;
 }
 
 static void apply_css_provider_forall(GtkWidget * widget, gpointer data)

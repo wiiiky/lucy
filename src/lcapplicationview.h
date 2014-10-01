@@ -44,6 +44,9 @@ void lc_application_view_update(LcApplicationView * self, GList * list);
 void lc_application_view_append(LcApplicationView * self,
                                 LcProtocolApplication * data);
 
+void lc_application_view_set_loading(LcApplicationView * self,
+                                     gboolean loading);
+gboolean lc_application_view_is_loading(LcApplicationView * self);
 
 G_END_DECLS
 #endif

@@ -27,6 +27,11 @@ struct _LcAboutDialogClass {
     GtkAboutDialogClass parent_class;
 };
 
+#define PROGRAM_NAME "Lucy"
+#define LC_WEBSITE "https://github.com/wiiiky/lucy"
+#define LC_COMMENTS "Android Manager for Linux"
+#define LC_COPYRIGH "Copyright (c) Wiky L"
+#define LC_VERSION "0.1"
 
 GType lc_about_dialog_get_type(void) G_GNUC_CONST;
 LcAboutDialog *lc_about_dialog_new(void);
