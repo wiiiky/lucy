@@ -22,7 +22,7 @@
 #include "libadb/adb_client.h"
 
 /*
- * install_app在commandline.c中定义，但没有在头文件中声明过
+ * install_app is impelemented in commandline.c, but not declared
  */
 int install_app(transport_type transport, char *serial, int argc,
                 char **argv);

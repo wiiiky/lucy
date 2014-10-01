@@ -21,9 +21,9 @@
 #include <limits.h>
 #include <unistd.h>
 
-static gchar exedir[PATH_MAX + 1] = "./";
-static gchar cachedir[PATH_MAX + 1];
-static gchar imgcachedir[PATH_MAX + 1];
+static gchar exedir[PATH_MAX] = "./";
+static gchar cachedir[PATH_MAX];
+static gchar imgcachedir[PATH_MAX];
 
 void lc_init(int argc, char *argv[])
 {

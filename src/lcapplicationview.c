@@ -8,19 +8,18 @@
 #include "lcutil.h"
 #include "lccommander.h"
 #include <gtk/gtk.h>
-#include <gtk-2.0/gtk/gtktreemodel.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 struct _LcApplicationViewPrivate {
-    GtkTreeView *appView;
-    GtkListStore *appStore;
+    GtkTreeView *view;
+    GtkListStore *store;
 
     gboolean loading;
 };
 
-#define lc_application_view_get_list_store(self)    ((self)->priv->appStore)
-#define lc_application_view_get_tree_view(self)     ((self)->priv->appView)
+#define _lc_application_view_get_list_store(self)    ((self)->priv->store)
+#define _lc_application_view_get_tree_view(self)     ((self)->priv->view)
 
 
 static gpointer lc_application_view_parent_class = NULL;
@@ -53,8 +52,7 @@ LcApplicationView *lc_application_view_construct(GType object_type)
 {
     LcApplicationView *self = NULL;
     self = (LcApplicationView *) g_object_new(object_type, NULL);
-    gtk_container_add(GTK_CONTAINER(self),
-                      GTK_WIDGET(self->priv->appView));
+    gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->priv->view));
     return self;
 }
 
@@ -80,14 +78,14 @@ static void lc_application_view_instance_init(LcApplicationView * self)
     LcApplicationViewPrivate *priv = self->priv;
 
     priv->loading = FALSE;
-    priv->appStore = (GtkListStore *)
+    priv->store = (GtkListStore *)
         gtk_list_store_new(LC_APPLICATION_VIEW_COL_NUMBER,
                            GDK_TYPE_PIXBUF, G_TYPE_STRING, G_TYPE_STRING,
                            G_TYPE_STRING, G_TYPE_FLOAT, G_TYPE_INT);
-    priv->appView = (GtkTreeView *)
-        gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->appStore));
-    g_object_ref_sink(priv->appStore);
-    g_object_ref_sink(priv->appView);
+    priv->view = (GtkTreeView *)
+        gtk_tree_view_new_with_model(GTK_TREE_MODEL(priv->store));
+    g_object_ref_sink(priv->store);
+    g_object_ref_sink(priv->view);
 
     GtkCellRenderer *renderer;
     GtkTreeViewColumn *column;
@@ -97,7 +95,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
                                                       LC_APPLICATION_VIEW_COL_ICON,
                                                       NULL);
     gtk_tree_view_column_set_fixed_width(column, COLUMN_ICON_WIDTH);
-    gtk_tree_view_append_column(priv->appView, column);
+    gtk_tree_view_append_column(priv->view, column);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes("NAME", renderer,
@@ -107,7 +105,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
                                                       LC_APPLICATION_VIEW_COL_XALIGN,
                                                       NULL);
     gtk_tree_view_column_set_fixed_width(column, COLUMN_NAME_WIDTH);
-    gtk_tree_view_append_column(priv->appView, column);
+    gtk_tree_view_append_column(priv->view, column);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes("VERSION", renderer,
@@ -117,7 +115,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
                                                       LC_APPLICATION_VIEW_COL_XALIGN,
                                                       NULL);
     gtk_tree_view_column_set_fixed_width(column, COLUMN_VERSION_WIDTH);
-    gtk_tree_view_append_column(priv->appView, column);
+    gtk_tree_view_append_column(priv->view, column);
 
     renderer = gtk_cell_renderer_text_new();
     column = gtk_tree_view_column_new_with_attributes("PACKAGE", renderer,
@@ -127,7 +125,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
                                                       LC_APPLICATION_VIEW_COL_XALIGN,
                                                       NULL);
     gtk_tree_view_column_set_fixed_width(column, COLUMN_PACKAGE_WIDTH);
-    gtk_tree_view_append_column(priv->appView, column);
+    gtk_tree_view_append_column(priv->view, column);
 }
 
 
@@ -137,8 +135,8 @@ static void lc_application_view_finalize(GObject * obj)
     self =
         G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_APPLICATION_VIEW,
                                    LcApplicationView);
-    _g_object_unref0(self->priv->appView);
-    _g_object_unref0(self->priv->appStore);
+    _g_object_unref0(self->priv->view);
+    _g_object_unref0(self->priv->store);
     G_OBJECT_CLASS(lc_application_view_parent_class)->finalize(obj);
 }
 
@@ -165,8 +163,8 @@ GType lc_application_view_get_type(void)
     return lc_application_view_type_id__volatile;
 }
 
-static void onIcon(const gchar * cmd, GByteArray * array,
-                   gpointer user_data)
+static void _on_command_icon(const gchar * cmd, GByteArray * array,
+                             gpointer user_data)
 {
     GBytes *bytes = lc_util_get_bytes_from_byte_array(array);
     if (bytes == NULL) {
@@ -201,11 +199,11 @@ typedef struct {
     GtkTreeIter *iter;
     GtkListStore *store;
 } LcIconData;
-LcIconData *lc_icon_data_new(const gchar * packageName, GtkTreeIter * iter,
+LcIconData *lc_icon_data_new(const gchar * name, GtkTreeIter * iter,
                              GtkListStore * store)
 {
     LcIconData *icon = (LcIconData *) g_malloc(sizeof(LcIconData));
-    icon->packageName = g_strdup(packageName);
+    icon->packageName = g_strdup(name);
     icon->iter = gtk_tree_iter_copy(iter);
     icon->store = store;
 
@@ -226,7 +224,7 @@ void lc_application_view_update(LcApplicationView * self, GList * list)
     }
     GtkTreeIter iter;
     GtkTreeModel *model =
-        (GtkTreeModel *) lc_application_view_get_list_store(self);
+        (GtkTreeModel *) _lc_application_view_get_list_store(self);
     GList *add = g_list_copy(list);
     if (gtk_tree_model_get_iter_first(model, &iter)) {
         while (gtk_list_store_iter_is_valid(GTK_LIST_STORE(model), &iter)) {
@@ -278,7 +276,7 @@ void lc_application_view_update(LcApplicationView * self, GList * list)
 void lc_application_view_append(LcApplicationView * self,
                                 LcProtocolApplication * data)
 {
-    GtkListStore *store = self->priv->appStore;
+    GtkListStore *store = self->priv->store;
     GtkTreeIter iter;
 
     gtk_list_store_append(store, &iter);

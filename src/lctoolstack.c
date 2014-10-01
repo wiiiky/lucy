@@ -107,8 +107,8 @@ GType lc_tool_stack_get_type(void)
     return lc_tool_stack_type_id__volatile;
 }
 
-static void onRadioToolButtonToggled(GtkRadioToolButton * radio,
-                                     gpointer user_data)
+static void _on_radio_tool_button_toggled(GtkRadioToolButton * radio,
+                                          gpointer user_data)
 {
     LcToolStack *self = LC_TOOL_STACK(user_data);
     gboolean toggled =
@@ -156,7 +156,7 @@ void lc_tool_stack_append(LcToolStack * self,
     g_object_set_data(G_OBJECT(button), G_OBJECT_KEY_USER_DATA, user_data);
 
     g_signal_connect(G_OBJECT(button), "toggled",
-                     G_CALLBACK(onRadioToolButtonToggled), self);
+                     G_CALLBACK(_on_radio_tool_button_toggled), self);
 }
 
 

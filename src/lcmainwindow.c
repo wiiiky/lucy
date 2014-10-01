@@ -34,7 +34,8 @@ static void lc_main_window_finalize(GObject * obj);
 /* create the menu bar, of course along with all menus */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
 
-static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data);
+static void _on_about_menu_item_activate(GtkMenuItem * item,
+                                         gpointer data);
 
 
 enum {
@@ -48,24 +49,24 @@ typedef enum {
 } LcPhoneState;
 
 struct _LcMainWindowPrivate {
-    LcApplicationView *appView;
-    LcToolStack *toolStack;
-    LcMyPhone *myPhone;
+    LcApplicationView *app_view;
+    LcToolStack *tool_stack;
+    LcMyPhone *phone;
 
     LcPhoneState state;
 };
 
-#define lc_main_window_get_application_view(self) ((self)->priv->appView)
-#define lc_main_window_get_tool_stack(self)     ((self)->priv->toolStack)
-#define lc_main_window_get_my_phone(self)       ((self)->priv->myPhone)
+#define _lc_main_window_get_application_view(self) ((self)->priv->app_view)
+#define _lc_main_window_get_tool_stack(self)     ((self)->priv->tool_stack)
+#define _lc_main_window_get_my_phone(self)       ((self)->priv->phone)
 
-#define lc_main_window_set_phone_state(self,_state)    ((self)->priv->state=_state)
+#define _lc_main_window_set_phone_state(self,_state)    ((self)->priv->state=_state)
 
-#define lc_main_window_set_phone_connected(self)    lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTED)
-#define lc_main_window_set_phone_disconnected(self) lc_main_window_set_phone_state(self,LC_PHONE_STATE_DISCONNECTED)
-#define lc_main_window_set_phone_connecting(self)   lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTING)
+#define _lc_main_window_set_phone_connected(self)    _lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTED)
+#define _lc_main_window_set_phone_disconnected(self) _lc_main_window_set_phone_state(self,LC_PHONE_STATE_DISCONNECTED)
+#define _lc_main_window_set_phone_connecting(self)   _lc_main_window_set_phone_state(self,LC_PHONE_STATE_CONNECTING)
 
-#define lc_main_window_is_connected(self)   ((self)->priv->state==LC_PHONE_STATE_CONNECTED)
+#define _lc_main_window_is_connected(self)   ((self)->priv->state==LC_PHONE_STATE_CONNECTED)
 
 LcMainWindow *lc_main_window_construct(GType object_type)
 {
@@ -88,18 +89,19 @@ static void lc_main_window_class_init(LcMainWindowClass * klass)
     G_OBJECT_CLASS(klass)->finalize = lc_main_window_finalize;
 }
 
-static void onMyPhonePageVisible(gboolean visible, gpointer user_data)
+static void _on_my_phone(gboolean visible, gpointer user_data)
 {
     if (visible) {
         g_message("Come on, My Android!");
     }
 }
 
-static void onApplications(const gchar * cmd, GByteArray * array,
-                           gpointer user_data)
+static void _on_command_applications(const gchar * cmd, GByteArray * array,
+                                     gpointer user_data)
 {
     LcMainWindow *self = (LcMainWindow *) user_data;
-    LcApplicationView *appView = lc_main_window_get_application_view(self);
+    LcApplicationView *appView =
+        _lc_main_window_get_application_view(self);
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     if (result == NULL || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
@@ -115,16 +117,18 @@ static void onApplications(const gchar * cmd, GByteArray * array,
     lc_application_view_set_loading(appView, FALSE);
 }
 
-static void onApplicationPageVisible(gboolean visible, gpointer user_data)
+static void _on_application(gboolean visible, gpointer user_data)
 {
     LcMainWindow *self = (LcMainWindow *) user_data;
-    LcApplicationView *appView = lc_main_window_get_application_view(self);
+    LcApplicationView *appView =
+        _lc_main_window_get_application_view(self);
 
-    if (visible && lc_main_window_is_connected(self) &&
+    if (visible && _lc_main_window_is_connected(self) &&
         lc_application_view_is_loading(appView) == FALSE) {
         lc_application_view_set_loading(appView, TRUE);
         lc_commander_send_command_async(LC_PROTOCOL_APPLICATIONS,
-                                        onApplications, user_data);
+                                        _on_command_applications,
+                                        user_data);
     }
 }
 
@@ -147,45 +151,46 @@ static void lc_main_window_instance_init(LcMainWindow * self)
     gtk_box_pack_start(GTK_BOX(rootBox), lc_main_window_menu_bar(self),
                        FALSE, FALSE, 0);
 
-    self->priv->toolStack = lc_tool_stack_new();
+    self->priv->tool_stack = lc_tool_stack_new();
     gtk_box_pack_start(GTK_BOX(rootBox),
-                       GTK_WIDGET(self->priv->toolStack), TRUE, TRUE, 0);
-    g_object_ref_sink(self->priv->toolStack);
+                       GTK_WIDGET(self->priv->tool_stack), TRUE, TRUE, 0);
+    g_object_ref_sink(self->priv->tool_stack);
 
     lc_main_window_my_phone_init(self);
-    lc_tool_stack_append(self->priv->toolStack,
+    lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("smartphone.svg")),
-                         "My Phone", GTK_WIDGET(self->priv->myPhone),
-                         onMyPhonePageVisible, self);
+                         "My Phone", GTK_WIDGET(self->priv->phone),
+                         _on_my_phone, self);
 
-    self->priv->appView = lc_application_view_new();
-    g_object_ref_sink(self->priv->appView);
-    lc_tool_stack_append(self->priv->toolStack,
+    self->priv->app_view = lc_application_view_new();
+    g_object_ref_sink(self->priv->app_view);
+    lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("computer.svg")),
-                         "Applications", GTK_WIDGET(self->priv->appView),
-                         onApplicationPageVisible, self);
+                         "Applications", GTK_WIDGET(self->priv->app_view),
+                         _on_application, self);
 
-    lc_main_window_set_phone_disconnected(self);
+    _lc_main_window_set_phone_disconnected(self);
 }
 
-static void onConnectClicked(GtkWidget * button, gpointer data)
+static void _on_connect_clicked(GtkWidget * button, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
-    lc_my_phone_show_connecting(self->priv->myPhone);
+    lc_my_phone_show_connecting(self->priv->phone);
     lc_main_window_start_server(self);
-    lc_main_window_set_phone_connecting(self);
+    _lc_main_window_set_phone_connecting(self);
 }
 
 static void lc_main_window_my_phone_init(LcMainWindow * self)
 {
     LcMyPhone *phone = lc_my_phone_new();
-    lc_my_phone_set_connect_callback(phone, G_CALLBACK(onConnectClicked),
+    lc_my_phone_set_connect_callback(phone,
+                                     G_CALLBACK(_on_connect_clicked),
                                      self);
     g_object_ref_sink(phone);
 
-    self->priv->myPhone = phone;
+    self->priv->phone = phone;
 }
 
 static void lc_main_window_finalize(GObject * obj)
@@ -193,9 +198,9 @@ static void lc_main_window_finalize(GObject * obj)
     LcMainWindow *self =
         G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_MAIN_WINDOW,
                                    LcMainWindow);
-    _g_object_unref0(self->priv->appView);
-    _g_object_unref0(self->priv->toolStack);
-    _g_object_unref0(self->priv->myPhone);
+    _g_object_unref0(self->priv->app_view);
+    _g_object_unref0(self->priv->tool_stack);
+    _g_object_unref0(self->priv->phone);
     G_OBJECT_CLASS(lc_main_window_parent_class)->finalize(obj);
 }
 
@@ -222,7 +227,7 @@ GType lc_main_window_get_type(void)
     return lc_main_window_type_id__volatile;
 }
 
-/*创建菜单栏*/
+/* create menu bar, along with all menus */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self)
 {
     GtkWidget *menuBar = gtk_menu_bar_new();
@@ -235,13 +240,13 @@ static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self)
     GtkWidget *_aboutItem = gtk_menu_item_new_with_mnemonic("_About");
     gtk_menu_shell_append(GTK_MENU_SHELL(aboutMenu), _aboutItem);
     g_signal_connect(G_OBJECT(_aboutItem), "activate",
-                     G_CALLBACK(onAboutMenuItemActivate), NULL);
+                     G_CALLBACK(_on_about_menu_item_activate), NULL);
 
     return menuBar;
 }
 
 /* show LcAboutDialog */
-static void onAboutMenuItemActivate(GtkMenuItem * item, gpointer data)
+static void _on_about_menu_item_activate(GtkMenuItem * item, gpointer data)
 {
     LcAboutDialog *dialog = lc_about_dialog_new();
     lc_about_dialog_run(dialog);
@@ -266,28 +271,29 @@ static void onPhone(const gchar * cmd, GByteArray * array,
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcProtocolPhone *phone =
             lc_protocol_create_phone(result + LC_PROTOCOL_HDR_LEN);
-        lc_my_phone_show_connected_with_info(self->priv->myPhone, phone);
+        lc_my_phone_show_connected_with_info(self->priv->phone, phone);
         lc_protocol_phone_free(phone);
     }
     g_free(result);
 }
 
 
-static void onConnectionInit(LcCommanderInitResult result, gpointer data)
+static void _on_connection_init(LcCommanderInitResult result,
+                                gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
     if (result == LC_COMMANDER_INIT_OK) {
         lc_commander_send_command_async(LC_PROTOCOL_PHONE, onPhone, data);
-        lc_my_phone_show_connected(self->priv->myPhone);
-        lc_main_window_set_phone_connected(self);
+        lc_my_phone_show_connected(self->priv->phone);
+        _lc_main_window_set_phone_connected(self);
     } else {
         /* Connection failed */
-        lc_my_phone_show_disconnect(self->priv->myPhone);
-        lc_main_window_set_phone_disconnected(self);
+        lc_my_phone_show_disconnect(self->priv->phone);
+        _lc_main_window_set_phone_disconnected(self);
     }
 }
 
 void lc_main_window_start_server(LcMainWindow * window)
 {
-    lc_commander_init_async(onConnectionInit, window);
+    lc_commander_init_async(_on_connection_init, window);
 }

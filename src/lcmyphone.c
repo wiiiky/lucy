@@ -17,9 +17,9 @@ struct _LcMyPhonePrivate {
     GtkButton *connectButton;
 
     /* connected widget */
-    GtkLabel *phoneBrand;
-    GtkLabel *phoneModel;
-    GtkLabel *phoneNum;
+    GtkLabel *brand;
+    GtkLabel *model;
+    GtkLabel *number;
 };
 
 #define STACK_NAME_DISCONNECTED "disconnected"
@@ -118,12 +118,12 @@ static void lc_my_phone_connect_init(LcMyPhone * self)
     gtk_widget_show_all(GTK_WIDGET(cn));
 
     self->priv->connected = cn;
-    self->priv->phoneBrand = (GtkLabel *) brand;
-    self->priv->phoneModel = (GtkLabel *) model;
-    self->priv->phoneNum = (GtkLabel *) number;
-    g_object_ref_sink(self->priv->phoneBrand);
-    g_object_ref_sink(self->priv->phoneModel);
-    g_object_ref_sink(self->priv->phoneNum);
+    self->priv->brand = (GtkLabel *) brand;
+    self->priv->model = (GtkLabel *) model;
+    self->priv->number = (GtkLabel *) number;
+    g_object_ref_sink(self->priv->brand);
+    g_object_ref_sink(self->priv->model);
+    g_object_ref_sink(self->priv->number);
     g_object_ref_sink(self->priv->connected);
 }
 
@@ -134,9 +134,9 @@ static void lc_my_phone_finalize(GObject * obj)
     _g_object_unref0(self->priv->disconnected);
     _g_object_unref0(self->priv->connected);
     _g_object_unref0(self->priv->connectButton);
-    _g_object_unref0(self->priv->phoneNum);
-    _g_object_unref0(self->priv->phoneBrand);
-    _g_object_unref0(self->priv->phoneModel);
+    _g_object_unref0(self->priv->number);
+    _g_object_unref0(self->priv->brand);
+    _g_object_unref0(self->priv->model);
     G_OBJECT_CLASS(lc_my_phone_parent_class)->finalize(obj);
 }
 
@@ -197,7 +197,7 @@ void lc_my_phone_show_connected_with_info(LcMyPhone * self,
 {
     lc_my_phone_show_connected(self);
 
-    gtk_label_set_text(self->priv->phoneBrand, phone->brand);
-    gtk_label_set_text(self->priv->phoneModel, phone->model);
-    gtk_label_set_text(self->priv->phoneNum, phone->number);
+    gtk_label_set_text(self->priv->brand, phone->brand);
+    gtk_label_set_text(self->priv->model, phone->model);
+    gtk_label_set_text(self->priv->number, phone->number);
 }
