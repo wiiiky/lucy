@@ -50,5 +50,8 @@ void lc_application_view_set_loading(LcApplicationView * self,
                                      gboolean loading);
 gboolean lc_application_view_is_loading(LcApplicationView * self);
 
+void lc_application_view_set_popmenu(LcApplicationView * self,
+                                     GtkMenu * menu);
+
 G_END_DECLS
 #endif

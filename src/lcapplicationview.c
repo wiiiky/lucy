@@ -18,13 +18,15 @@ struct _LcApplicationViewPrivate {
     GtkListStore *store;
 
     gboolean loading;
-
     guint64 update_time;
+
+    GtkMenu *popmenu;
 };
 
 #define _lc_application_view_get_list_store(self)    ((self)->priv->store)
 #define _lc_application_view_get_tree_view(self)     ((self)->priv->view)
 #define _lc_application_view_get_update_time(self)   ((self)->priv->update_time)
+#define _lc_application_view_get_popmenu(self)       ((self)->priv->popmenu)
 
 
 static gpointer lc_application_view_parent_class = NULL;
@@ -53,12 +55,17 @@ typedef enum {
 #define COLUMN_VERSION_WIDTH (120)
 #define COLUMN_PACKAGE_WIDTH (140)
 
+static gboolean _on_view_button_pressed(GtkWidget * widget,
+                                        GdkEventButton * event,
+                                        gpointer user_data);
 
 LcApplicationView *lc_application_view_construct(GType object_type)
 {
     LcApplicationView *self = NULL;
     self = (LcApplicationView *) g_object_new(object_type, NULL);
     gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(self->priv->view));
+    g_signal_connect(G_OBJECT(self->priv->view), "button-press-event",
+                     G_CALLBACK(_on_view_button_pressed), self);
     return self;
 }
 
@@ -83,6 +90,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
 
     LcApplicationViewPrivate *priv = self->priv;
 
+    priv->popmenu = NULL;
     priv->loading = FALSE;
     priv->update_time = (guint64) 0;
     priv->store = (GtkListStore *)
@@ -168,6 +176,25 @@ GType lc_application_view_get_type(void)
                           lc_application_view_type_id);
     }
     return lc_application_view_type_id__volatile;
+}
+
+/*
+ * Button Event of GtkTreeView 
+ * pop up a context menu
+ */
+static gboolean _on_view_button_pressed(GtkWidget * widget,
+                                        GdkEventButton * event,
+                                        gpointer user_data)
+{
+    LcApplicationView *self = (LcApplicationView *) user_data;
+    GtkMenu *menu = _lc_application_view_get_popmenu(self);
+    if (event->type == GDK_BUTTON_PRESS &&
+        event->button == 3 && menu != NULL) {
+        gtk_menu_popup(menu, NULL, NULL, NULL, NULL, 3,
+                       gdk_event_get_time((GdkEvent *) event));
+        gtk_widget_show_all(GTK_WIDGET(menu));
+    }
+    return FALSE;
 }
 
 guint64 lc_application_view_get_update_time(LcApplicationView * self)
@@ -333,4 +360,14 @@ void lc_application_view_set_loading(LcApplicationView * self,
 gboolean lc_application_view_is_loading(LcApplicationView * self)
 {
     return self->priv->loading;
+}
+
+void lc_application_view_set_popmenu(LcApplicationView * self,
+                                     GtkMenu * menu)
+{
+    GtkMenu *o = _lc_application_view_get_popmenu(self);
+    if (o) {
+        g_object_unref(o);
+    }
+    self->priv->popmenu = menu;
 }
