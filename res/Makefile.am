@@ -7,4 +7,5 @@ nobase_res_DATA=apk/app-debug.apk \
 	css/disconnected.css \
 	smartphone.svg \
 	computer.svg \
-	android.jpeg
+	android.jpeg \
+	default-icon.png

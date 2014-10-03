@@ -56,11 +56,11 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
 {
     LcProtocolApplication *p = (LcProtocolApplication *)
         g_slice_alloc0(sizeof(LcProtocolApplication));
-    p->packageName = g_strdup(packageName);
-    p->appName = g_strdup(appName);
+    p->package_name = g_strdup(packageName);
+    p->app_name = g_strdup(appName);
     p->version = g_strdup(version);
-    p->installedTime = g_strdup(installedTime);
-    p->installedLocation = g_strdup(installedLocation);
+    p->installed_time = g_strdup(installedTime);
+    p->location = g_strdup(installedLocation);
     p->description = g_strdup(description);
     return p;
 }
@@ -68,11 +68,11 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
 static inline void
 lc_protocol_application_free_internal(LcProtocolApplication * p)
 {
-    g_free(p->packageName);
-    g_free(p->appName);
+    g_free(p->package_name);
+    g_free(p->app_name);
     g_free(p->version);
-    g_free(p->installedTime);
-    g_free(p->installedLocation);
+    g_free(p->installed_time);
+    g_free(p->location);
     g_free(p->description);
 }
 
@@ -90,7 +90,7 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
 {
     while (list) {
         LcProtocolApplication *app = (LcProtocolApplication *) list->data;
-        if (g_strcmp0(app->packageName, package) == 0) {
+        if (g_strcmp0(app->package_name, package) == 0) {
             return app;
         }
         list = g_list_next(list);

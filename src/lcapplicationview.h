@@ -38,6 +38,8 @@ LcApplicationView *lc_application_view_construct(GType object_type);
  */
 void lc_application_view_update(LcApplicationView * self, GList * list);
 
+guint64 lc_application_view_get_update_time(LcApplicationView * self);
+
 /*
  * 在应用列表中增加一项，不会检查是否重复
  */

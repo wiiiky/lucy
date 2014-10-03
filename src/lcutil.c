@@ -103,12 +103,32 @@ const gchar *lc_util_get_image_cache_path_by_name(const gchar * name)
     return buf;
 }
 
-GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name)
+GdkPixbuf *lc_util_load_pixbuf_from_resouce(const gchar * name)
 {
     gchar buf[128];
-    g_snprintf(buf, sizeof(buf), "img/%s", name);
-    const gchar *path = lc_util_get_cache_path_by_name(buf);
+    g_snprintf(buf, sizeof(buf), "%s.png", name);
+    const gchar *path = lc_util_get_resource_by_name(buf);
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(path, NULL);
+    return pixbuf;
+}
+
+GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name)
+{
+    const gchar *path = lc_util_get_image_cache_path_by_name(name);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(path, NULL);
+    return pixbuf;
+}
+
+GdkPixbuf *lc_util_load_pixbuf_from_cache_with_size(const gchar * name,
+                                                    int width, int height)
+{
+    GdkPixbuf *pixbuf = lc_util_load_pixbuf_from_cache(name);
+    if (pixbuf) {
+        GdkPixbuf *new = gdk_pixbuf_scale_simple(pixbuf, width, height,
+                                                 GDK_INTERP_NEAREST);
+        g_object_unref(pixbuf);
+        return new;
+    }
     return pixbuf;
 }
 

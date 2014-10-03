@@ -57,11 +57,16 @@ const gchar *lc_util_get_cache_path_by_name(const gchar * name);
 
 const gchar *lc_util_get_image_cache_path_by_name(const gchar * name);
 
+
+GdkPixbuf *lc_util_load_pixbuf_from_resouce(const gchar * name);
 /*
  *  load a image file with name from cache directory
  *  return NULL if faield, not found or some what
  */
 GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name);
+
+GdkPixbuf *lc_util_load_pixbuf_from_cache_with_size(const gchar * name,
+                                                    int width, int height);
 
 
 typedef gboolean(*GListElementNotify) (gconstpointer data,

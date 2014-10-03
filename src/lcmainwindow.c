@@ -15,6 +15,7 @@
 #include "lccommander.h"
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
+#include <time.h>
 
 #define MAINWINDOW_TITLE "Android Manager"
 
@@ -120,12 +121,15 @@ static void _on_command_applications(const gchar * cmd, GByteArray * array,
 static void _on_application(gboolean visible, gpointer user_data)
 {
     LcMainWindow *self = (LcMainWindow *) user_data;
-    LcApplicationView *appView =
-        _lc_main_window_get_application_view(self);
+    LcApplicationView *view = _lc_main_window_get_application_view(self);
+
+    guint64 last = lc_application_view_get_update_time(view);
+    guint64 now = (guint64) time(NULL);
 
     if (visible && _lc_main_window_is_connected(self) &&
-        lc_application_view_is_loading(appView) == FALSE) {
-        lc_application_view_set_loading(appView, TRUE);
+        lc_application_view_is_loading(view) == FALSE &&
+        now - last >= 60) {
+        lc_application_view_set_loading(view, TRUE);
         lc_commander_send_command_async(LC_PROTOCOL_APPLICATIONS,
                                         _on_command_applications,
                                         user_data);

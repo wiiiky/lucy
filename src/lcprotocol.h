@@ -45,11 +45,11 @@ LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes);
 
 /******************************APPLICATIONS******************************/
 typedef struct {
-    gchar *packageName;
-    gchar *appName;
+    gchar *package_name;
+    gchar *app_name;
     gchar *version;
-    gchar *installedTime;
-    gchar *installedLocation;
+    gchar *installed_time;
+    gchar *location;
     gchar *description;
 } LcProtocolApplication;
 
