@@ -48,7 +48,7 @@ public class ConnectionThread extends Thread {
                 if (lower.equals(REQUEST_PACKAGES)) {
                     onApplicationsResponse();
                 }else if(lower.startsWith(REQUEST_ICON)) {
-                    onIconResponse(lower.substring(REQUEST_ICON.length()));
+                    onIconResponse(buf.substring(REQUEST_ICON.length()));
                 }else if(lower.equals(REQUEST_VERSION)) {
                     onVersionResponse();
                 }else if(lower.equals(REQUEST_PHONE)){

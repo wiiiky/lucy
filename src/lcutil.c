@@ -98,7 +98,11 @@ const gchar *lc_util_get_image_cache_path_by_name(const gchar * name)
 {
     static gchar buf[PATH_MAX + 1];
 
-    g_snprintf(buf, sizeof(buf), "%s/%s.png", imgcachedir, name);
+    const gchar *suffix = ".png";
+    if (g_strstr_len(name, -1, ".png")) {
+        suffix = "";
+    }
+    g_snprintf(buf, sizeof(buf), "%s/%s%s", imgcachedir, name, suffix);
 
     return buf;
 }

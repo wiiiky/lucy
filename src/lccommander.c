@@ -212,6 +212,7 @@ static void _on_tcp_port_forward(GObject * source_object,
         lc_adb_am_start(LILY_ACTIVITY_NAME, _on_lily_activity_start,
                         user_data);
     } else {
+        g_warning("Failed to set TCP port forward");
         LcCommanderData *cdata = (LcCommanderData *) user_data;
         ((LcCommanderInitCallback)
          cdata->callback) (LC_COMMANDER_INIT_FAILED_FORWARD,

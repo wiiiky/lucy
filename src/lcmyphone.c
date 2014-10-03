@@ -25,6 +25,8 @@ struct _LcMyPhonePrivate {
 #define STACK_NAME_DISCONNECTED "disconnected"
 #define STACK_NAME_CONNECTED	"connected"
 
+#define BUTTON_CONNECT_LABEL	"Connect"
+#define BUTTON_CONNECTING_LABEL	"Connecting"
 
 static gpointer lc_my_phone_parent_class = NULL;
 
@@ -87,7 +89,7 @@ static void lc_my_phone_disconnect_init(LcMyPhone * self)
 
     gtk_widget_set_name(GTK_WIDGET(dc), "grid");
 
-    GtkWidget *button = gtk_button_new_with_label("Connect");
+    GtkWidget *button = gtk_button_new_with_label(BUTTON_CONNECT_LABEL);
     gtk_widget_set_name(button, "connect");
     gtk_grid_attach(dc, button, 0, 1, 1, 1);
 
@@ -175,13 +177,16 @@ void lc_my_phone_show_disconnect(LcMyPhone * self)
 {
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
+    gtk_button_set_label(self->priv->connectButton, BUTTON_CONNECT_LABEL);
+    gtk_widget_set_sensitive(GTK_WIDGET(self->priv->connectButton), TRUE);
 }
 
 void lc_my_phone_show_connecting(LcMyPhone * self)
 {
     //lc_my_phone_set_connecting_timeout(self);
     gtk_widget_set_sensitive(GTK_WIDGET(self->priv->connectButton), FALSE);
-    gtk_button_set_label(self->priv->connectButton, "Connecting");
+    gtk_button_set_label(self->priv->connectButton,
+                         BUTTON_CONNECTING_LABEL);
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
 }
