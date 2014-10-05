@@ -104,9 +104,11 @@ GType lc_application_view_get_type(void)
     if (g_once_init_enter(&lc_application_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(LcApplicationViewClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) lc_application_view_class_init,
-(GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationView), 0,
-(GInstanceInitFunc) lc_application_view_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+                (GClassInitFunc) lc_application_view_class_init,
+            (GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationView), 0,
+            (GInstanceInitFunc) lc_application_view_instance_init, NULL
+        };
         GType lc_application_view_type_id;
         lc_application_view_type_id =
             g_type_register_static(GTK_TYPE_SCROLLED_WINDOW,
@@ -118,6 +120,12 @@ GType lc_application_view_get_type(void)
     return lc_application_view_type_id__volatile;
 }
 
+static gboolean on_row_button_pressed(GtkWidget * widget,
+                                      GdkEventButton * event,
+                                      gpointer user_data)
+{
+    /* TODO */
+}
 
 void lc_application_view_append_row(LcApplicationView * self,
                                     LcProtocolApplication * info)

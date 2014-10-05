@@ -35,6 +35,8 @@ struct _LcApplicationRowPrivate {
         lc_application_row_get_priv(self)->destroy
 #define lc_application_row_set_destroy(self,d) \
         lc_application_row_get_destroy(self)= d
+#define lc_application_row_get_grid(self) \
+        lc_application_row_get_priv(self)->grid
 
 
 static gpointer lc_application_row_parent_class = NULL;
@@ -130,9 +132,11 @@ GType lc_application_row_get_type(void)
     if (g_once_init_enter(&lc_application_row_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(LcApplicationRowClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) lc_application_row_class_init,
-(GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationRow), 0,
-(GInstanceInitFunc) lc_application_row_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+                (GClassInitFunc) lc_application_row_class_init,
+            (GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationRow), 0,
+            (GInstanceInitFunc) lc_application_row_instance_init, NULL
+        };
         GType lc_application_row_type_id;
         lc_application_row_type_id =
             g_type_register_static(GTK_TYPE_EVENT_BOX, "LcApplicationRow",
@@ -273,4 +277,31 @@ void lc_application_row_set_icon(LcApplicationRow * self,
 {
     GtkImage *image = lc_application_row_get_icon_image(self);
     gtk_image_set_from_pixbuf(image, pixbuf);
+}
+
+static GtkCssProvider *highlight_provider = NULL;
+void lc_application_row_highlight(LcApplicationRow * self)
+{
+    if (highlight_provider == NULL) {
+        highlight_provider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data(highlight_provider,
+                                        "GtkGrid{background-color:blue;}",
+                                        -1, NULL);
+    }
+    GtkStyleContext *style =
+        gtk_widget_get_style_context(GTK_WIDGET
+                                     (lc_application_row_get_grid(self)));
+    gtk_style_context_add_provider(style,
+                                   GTK_STYLE_PROVIDER(highlight_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void lc_application_row_unhighlight(LcApplicationRow * self)
+{
+    GtkStyleContext *style =
+        gtk_widget_get_style_context(GTK_WIDGET
+                                     (lc_application_row_get_grid(self)));
+    gtk_style_context_remove_provider(style,
+                                      GTK_STYLE_PROVIDER
+                                      (highlight_provider));
 }

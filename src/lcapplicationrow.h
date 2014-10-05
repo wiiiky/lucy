@@ -49,6 +49,8 @@ void lc_application_row_set_data(LcApplicationRow * self, gpointer data,
                                  GDestroyNotify destroy);
 gpointer lc_application_row_get_data(LcApplicationRow * self);
 
+void lc_application_row_highlight(LcApplicationRow * self);
+void lc_application_row_unhighlight(LcApplicationRow * self);
 
 G_END_DECLS
 #endif

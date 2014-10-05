@@ -122,9 +122,8 @@ GdkPixbuf *lc_util_load_pixbuf_from_resource_with_size(const gchar * name,
 {
     GdkPixbuf *pixbuf = lc_util_load_pixbuf_from_resouce(name);
     if (pixbuf) {
-        GdkPixbuf *sized =
-            gdk_pixbuf_scale_simple(pixbuf, width, height,
-                                    GDK_INTERP_TILES);
+        GdkPixbuf *sized = gdk_pixbuf_scale_simple(pixbuf, width, height,
+                                                   GDK_INTERP_TILES);
         g_object_unref(pixbuf);
         return sized;
     }
