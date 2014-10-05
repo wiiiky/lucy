@@ -66,6 +66,9 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    const gchar *
                                                    description);
 void lc_protocol_application_free(LcProtocolApplication * p);
+LcProtocolApplication *lc_protocol_application_copy(const
+                                                    LcProtocolApplication *
+                                                    info);
 
 
 /*

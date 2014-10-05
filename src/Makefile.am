@@ -24,6 +24,8 @@ __top_builddir__lucy_SOURCES =  \
 	lcprotocol.c \
 	lcaboutdialog.h \
 	lcaboutdialog.c \
+	lcapplicationrow.h \
+	lcapplicationrow.c \
 	lcmainwindow.h \
 	lcmainwindow.c \
 	lcadb.c \

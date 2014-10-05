@@ -44,24 +44,39 @@ LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes)
 }
 
 LcProtocolApplication *lc_protocol_application_new(const gchar *
-                                                   packageName,
-                                                   const gchar * appName,
+                                                   package_name,
+                                                   const gchar * app_name,
                                                    const gchar * version,
                                                    const gchar *
-                                                   installedTime,
+                                                   installed_time,
                                                    const gchar *
-                                                   installedLocation,
+                                                   installed_location,
                                                    const gchar *
                                                    description)
 {
     LcProtocolApplication *p = (LcProtocolApplication *)
         g_slice_alloc0(sizeof(LcProtocolApplication));
-    p->package_name = g_strdup(packageName);
-    p->app_name = g_strdup(appName);
+    p->package_name = g_strdup(package_name);
+    p->app_name = g_strdup(app_name);
     p->version = g_strdup(version);
-    p->installed_time = g_strdup(installedTime);
-    p->location = g_strdup(installedLocation);
+    p->installed_time = g_strdup(installed_time);
+    p->location = g_strdup(installed_location);
     p->description = g_strdup(description);
+    return p;
+}
+
+LcProtocolApplication *lc_protocol_application_copy(const
+                                                    LcProtocolApplication *
+                                                    info)
+{
+    LcProtocolApplication *p = (LcProtocolApplication *)
+        g_slice_alloc0(sizeof(LcProtocolApplication));
+    p->package_name = g_strdup(info->package_name);
+    p->app_name = g_strdup(info->app_name);
+    p->version = g_strdup(info->version);
+    p->installed_time = g_strdup(info->installed_time);
+    p->location = g_strdup(info->location);
+    p->description = g_strdup(info->description);
     return p;
 }
 

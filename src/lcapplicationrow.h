@@ -6,39 +6,49 @@
 
 #include <glib.h>
 #include <gtk/gtk.h>
+#include "lcprotocol.h"
 
 G_BEGIN_DECLS
-
-
 #define TYPE_LC_APPLICATION_ROW (lc_application_row_get_type ())
 #define LC_APPLICATION_ROW(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), TYPE_LC_APPLICATION_ROW, LcApplicationRow))
 #define LC_APPLICATION_ROW_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), TYPE_LC_APPLICATION_ROW, LcApplicationRowClass))
 #define IS_LC_APPLICATION_ROW(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), TYPE_LC_APPLICATION_ROW))
 #define IS_LC_APPLICATION_ROW_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), TYPE_LC_APPLICATION_ROW))
 #define LC_APPLICATION_ROW_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), TYPE_LC_APPLICATION_ROW, LcApplicationRowClass))
-
 typedef struct _LcApplicationRow LcApplicationRow;
 typedef struct _LcApplicationRowClass LcApplicationRowClass;
 typedef struct _LcApplicationRowPrivate LcApplicationRowPrivate;
 
 struct _LcApplicationRow {
-	GtkEventBox parent_instance;
-	LcApplicationRowPrivate * priv;
+    GtkEventBox parent_instance;
+    LcApplicationRowPrivate *priv;
 };
 
 struct _LcApplicationRowClass {
-	GtkEventBoxClass parent_class;
+    GtkEventBoxClass parent_class;
 };
 
 
-GType lc_application_row_get_type (void) G_GNUC_CONST;
-LcApplicationRow* lc_application_row_new (void);
-LcApplicationRow* lc_application_row_construct (GType object_type);
+GType lc_application_row_get_type(void) G_GNUC_CONST;
+LcApplicationRow *lc_application_row_new(void);
+LcApplicationRow *lc_application_row_construct(GType object_type);
 
-LcApplicationRow *lc_application_row_new_full(const gchar *icon_path,
-			const gchar *name,const gchar *version);
+void lc_application_row_set_icon(LcApplicationRow * self,
+                                 GdkPixbuf * pixbuf);
+
+LcApplicationRow *lc_application_row_new_full(GdkPixbuf * pixbuf,
+                                              const gchar * name,
+                                              const gchar * version);
+LcApplicationRow *lc_application_row_new_with_data(const
+                                                   LcProtocolApplication *
+                                                   info);
+void lc_application_row_update_data(LcApplicationRow * self,
+                                    const LcProtocolApplication * info);
+
+void lc_application_row_set_data(LcApplicationRow * self, gpointer data,
+                                 GDestroyNotify destroy);
+gpointer lc_application_row_get_data(LcApplicationRow * self);
 
 
 G_END_DECLS
-
 #endif

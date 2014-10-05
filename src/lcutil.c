@@ -116,6 +116,21 @@ GdkPixbuf *lc_util_load_pixbuf_from_resouce(const gchar * name)
     return pixbuf;
 }
 
+GdkPixbuf *lc_util_load_pixbuf_from_resource_with_size(const gchar * name,
+                                                       int width,
+                                                       int height)
+{
+    GdkPixbuf *pixbuf = lc_util_load_pixbuf_from_resouce(name);
+    if (pixbuf) {
+        GdkPixbuf *sized =
+            gdk_pixbuf_scale_simple(pixbuf, width, height,
+                                    GDK_INTERP_TILES);
+        g_object_unref(pixbuf);
+        return sized;
+    }
+    return NULL;
+}
+
 GdkPixbuf *lc_util_load_pixbuf_from_cache(const gchar * name)
 {
     const gchar *path = lc_util_get_image_cache_path_by_name(name);
@@ -132,6 +147,20 @@ GdkPixbuf *lc_util_load_pixbuf_from_cache_with_size(const gchar * name,
                                                  GDK_INTERP_NEAREST);
         g_object_unref(pixbuf);
         return new;
+    }
+    return pixbuf;
+}
+
+GdkPixbuf *lc_util_load_icon(const gchar * package_name, int width,
+                             int height)
+{
+    GdkPixbuf *pixbuf =
+        lc_util_load_pixbuf_from_cache_with_size(package_name, width,
+                                                 height);
+    if (pixbuf == NULL) {
+        pixbuf =
+            lc_util_load_pixbuf_from_resource_with_size(DEFAULT_ICON,
+                                                        width, height);
     }
     return pixbuf;
 }
