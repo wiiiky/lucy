@@ -71,4 +71,8 @@ void lc_adb_install_app(const gchar * filepath,
                         GAsyncReadyCallback callback, gpointer data);
 int lc_adb_install_app_finish(GAsyncResult * result);
 
+void lc_adb_uninstall_app(const gchar * package,
+                          GAsyncReadyCallback callback, gpointer data);
+int lc_adb_uninstall_app_finish(GAsyncResult * result);
+
 #endif

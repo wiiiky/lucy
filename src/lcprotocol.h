@@ -64,7 +64,7 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    installedTime,
                                                    const gchar *
                                                    installedLocation,
-        const gchar *type,
+                                                   const gchar * type,
                                                    const gchar *
                                                    description);
 void lc_protocol_application_free(LcProtocolApplication * p);

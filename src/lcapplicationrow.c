@@ -11,6 +11,8 @@
 #define ICON_SIZE       (48)
 #define NAME_LABEL_WIDTH (180)
 #define VERSION_LABEL_WIDTH (200)
+#define TYPE_LABEL_WIDTH (120)
+#define UNINSTALL_BUTTON_WIDTH  (100)
 
 struct _LcApplicationRowPrivate {
     GtkGrid *grid;
@@ -18,6 +20,7 @@ struct _LcApplicationRowPrivate {
     GtkLabel *name_label;
     GtkLabel *version_label;
     GtkLabel *type_label;
+    GtkButton *uninstall_button;
 
     gpointer user_data;
     GDestroyNotify destroy;
@@ -30,6 +33,8 @@ struct _LcApplicationRowPrivate {
 #define lc_application_row_get_name_label(self)	((self)->priv->name_label)
 #define lc_application_row_get_version_label(self) \
 	((self)->priv->version_label)
+#define lc_application_row_get_uninstallbutton(self) \
+        lc_application_row_get_priv(self)->uninstall_button
 #define lc_application_row_get_type_label(self) \
         lc_application_row_get_priv(self)->type_label
 #define lc_application_row_get_user_data(self) \
@@ -94,7 +99,8 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     gtk_misc_set_alignment(GTK_MISC(priv->name_label), 0.0, 0.5);
     gtk_widget_set_margin_left(GTK_WIDGET(priv->name_label), 10);
     gtk_label_set_max_width_chars(priv->name_label, 20);
-    gtk_widget_set_size_request(GTK_WIDGET(priv->name_label), NAME_LABEL_WIDTH, -1);
+    gtk_widget_set_size_request(GTK_WIDGET(priv->name_label),
+                                NAME_LABEL_WIDTH, -1);
     gtk_label_set_ellipsize(priv->name_label, PANGO_ELLIPSIZE_END);
     g_object_ref_sink(priv->name_label);
     /* VERSION */
@@ -103,12 +109,22 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     gtk_label_set_max_width_chars(priv->version_label, 20);
     gtk_label_set_ellipsize(priv->version_label, PANGO_ELLIPSIZE_END);
     gtk_widget_set_margin_left(GTK_WIDGET(priv->version_label), 20);
-    gtk_widget_set_size_request(GTK_WIDGET(priv->version_label), VERSION_LABEL_WIDTH, -1);
+    gtk_widget_set_size_request(GTK_WIDGET(priv->version_label),
+                                VERSION_LABEL_WIDTH, -1);
     g_object_ref_sink(priv->version_label);
     /* TYPE */
-    priv->type_label=(GtkLabel*)gtk_label_new("");
+    priv->type_label = (GtkLabel *) gtk_label_new("");
+    gtk_widget_set_size_request(GTK_WIDGET(priv->type_label),
+                                TYPE_LABEL_WIDTH, -1);
     gtk_widget_set_margin_left(GTK_WIDGET(priv->type_label), 15);
     g_object_ref_sink(priv->type_label);
+    /* UNINSTALL */
+    priv->uninstall_button =
+        (GtkButton *) gtk_button_new_with_label("卸载");
+    gtk_widget_set_size_request(GTK_WIDGET(priv->uninstall_button),
+                                UNINSTALL_BUTTON_WIDTH, -1);
+    gtk_widget_set_margin_left(GTK_WIDGET(priv->uninstall_button), 10);
+    g_object_ref_sink(priv->uninstall_button);
 
     gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(priv->grid));
 
@@ -116,7 +132,9 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->name_label), 1, 0, 1, 1);
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->version_label),
                     2, 0, 1, 1);
-    gtk_grid_attach(priv->grid, GTK_WIDGET(priv->type_label),3,0,1,1);
+    gtk_grid_attach(priv->grid, GTK_WIDGET(priv->type_label), 3, 0, 1, 1);
+    gtk_grid_attach(priv->grid, GTK_WIDGET(priv->uninstall_button), 4, 0,
+                    1, 1);
 
     priv->user_data = NULL;
     priv->destroy = NULL;
@@ -134,6 +152,7 @@ static void lc_application_row_finalize(GObject * obj)
     _g_object_unref0(self->priv->name_label);
     _g_object_unref0(self->priv->version_label);
     _g_object_unref0(self->priv->type_label);
+    _g_object_unref0(self->priv->uninstall_button);
     if (self->priv->user_data && self->priv->destroy) {
         self->priv->destroy(self->priv->user_data);
     }
@@ -148,7 +167,7 @@ GType lc_application_row_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(LcApplicationRowClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) lc_application_row_class_init,
+            (GClassInitFunc) lc_application_row_class_init,
             (GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationRow), 0,
             (GInstanceInitFunc) lc_application_row_instance_init, NULL
         };
@@ -162,23 +181,38 @@ GType lc_application_row_get_type(void)
     return lc_application_row_type_id__volatile;
 }
 
+static void
+lc_appliation_row_update_uninstall_button_visible(LcApplicationRow * self,
+                                                  const gchar * type)
+{
+    GtkButton *uninstall_button =
+        lc_application_row_get_uninstallbutton(self);
+    if (g_strcmp0(type, "系统应用") == 0) {
+        gtk_widget_set_visible(GTK_WIDGET(uninstall_button), FALSE);
+    } else {
+        gtk_widget_set_visible(GTK_WIDGET(uninstall_button), TRUE);
+    }
+}
+
 LcApplicationRow *lc_application_row_new_full(GdkPixbuf * icon,
                                               const gchar * name,
                                               const gchar * version,
-        const gchar *type)
+                                              const gchar * type)
 {
     LcApplicationRow *self = lc_application_row_new();
     GtkImage *icon_image = lc_application_row_get_icon_image(self);
     GtkLabel *name_label = lc_application_row_get_name_label(self);
     GtkLabel *version_label = lc_application_row_get_version_label(self);
-    GtkLabel *type_label=lc_application_row_get_type_label(self);
+    GtkLabel *type_label = lc_application_row_get_type_label(self);
 
     gtk_image_set_from_pixbuf(icon_image, icon);
     gtk_label_set_text(name_label, name);
-    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label),name);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label), name);
     gtk_label_set_text(version_label, version);
-    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label),version);
-    gtk_label_set_text(type_label,type);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label), version);
+    gtk_label_set_text(type_label, type);
+
+    lc_appliation_row_update_uninstall_button_visible(self, type);
 
     return self;
 }
@@ -248,7 +282,8 @@ LcApplicationRow *lc_application_row_new_with_data(const
                                                         ICON_SIZE);
     }
     LcApplicationRow *self =
-        lc_application_row_new_full(pixbuf, info->app_name, info->version,info->type);
+        lc_application_row_new_full(pixbuf, info->app_name, info->version,
+                                    info->type);
     lc_application_row_set_data(self, lc_protocol_application_copy(info),
                                 (GDestroyNotify)
                                 lc_protocol_application_free);
@@ -271,10 +306,12 @@ void lc_application_row_update_data(LcApplicationRow * self,
     GtkLabel *version_label = lc_application_row_get_version_label(self);
     GtkLabel *type_label = lc_application_row_get_type_label(self);
     gtk_label_set_label(name_label, info->app_name);
-    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label),info->app_name);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label), info->app_name);
     gtk_label_set_label(version_label, info->version);
-    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label),info->version);
-    gtk_label_set_label(type_label,info->type);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label), info->version);
+    gtk_label_set_label(type_label, info->type);
+
+    lc_appliation_row_update_uninstall_button_visible(self, info->type);
 }
 
 void lc_application_row_set_data(LcApplicationRow * self, gpointer data,
@@ -326,4 +363,9 @@ void lc_application_row_unhighlight(LcApplicationRow * self)
     gtk_style_context_remove_provider(style,
                                       GTK_STYLE_PROVIDER
                                       (highlight_provider));
+}
+
+GtkButton *lc_application_row_get_uninstall_button(LcApplicationRow * self)
+{
+    return lc_application_row_get_uninstallbutton(self);
 }

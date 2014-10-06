@@ -22,10 +22,13 @@
 #include "libadb/adb_client.h"
 
 /*
- * install_app is impelemented in commandline.c, but not declared
+ * install_app & uninstall_app is impelemented in commandline.c,
+ * but not declared
  */
 int install_app(transport_type transport, char *serial, int argc,
                 char **argv);
+int uninstall_app(transport_type transport, char *serial, int argc,
+                  char **argv);
 
 typedef struct {
     gchar *buf;
@@ -164,7 +167,7 @@ static void lc_adb_install_app_thread(GTask * task,
 }
 
 /*
- * 安装apk到android手机
+ * install an APK in Android
  */
 void lc_adb_install_app(const gchar * filepath,
                         GAsyncReadyCallback callback, gpointer data)
@@ -177,6 +180,35 @@ void lc_adb_install_app(const gchar * filepath,
 }
 
 int lc_adb_install_app_finish(GAsyncResult * result)
+{
+    return g_task_propagate_int(G_TASK(result), NULL);
+}
+
+
+static void lc_adb_uninstall_app_thread(GTask * task,
+                                        gpointer source_object,
+                                        gpointer task_data,
+                                        GCancellable * cancellable)
+{
+    gchar *argv[2] = { "uninstall", NULL };
+    LcTaskData *data = (LcTaskData *) task_data;
+    argv[1] = data->buf;
+    int ret = uninstall_app(kTransportAny, NULL, 2, argv);
+
+    g_task_return_int(task, ret);
+}
+
+void lc_adb_uninstall_app(const gchar * package,
+                          GAsyncReadyCallback callback, gpointer data)
+{
+    GTask *task = g_task_new(NULL, NULL, callback, data);
+    LcTaskData *task_data = lc_task_data_new(package);
+    g_task_set_task_data(task, task_data,
+                         (GDestroyNotify) lc_task_data_free);
+    g_task_run_in_thread(task, lc_adb_uninstall_app_thread);
+}
+
+int lc_adb_uninstall_app_finish(GAsyncResult * result)
 {
     return g_task_propagate_int(G_TASK(result), NULL);
 }

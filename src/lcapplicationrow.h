@@ -38,7 +38,7 @@ void lc_application_row_set_icon(LcApplicationRow * self,
 LcApplicationRow *lc_application_row_new_full(GdkPixbuf * pixbuf,
                                               const gchar * name,
                                               const gchar * version,
-        const gchar * type);
+                                              const gchar * type);
 LcApplicationRow *lc_application_row_new_with_data(const
                                                    LcProtocolApplication *
                                                    info);
@@ -51,6 +51,9 @@ gpointer lc_application_row_get_data(LcApplicationRow * self);
 
 void lc_application_row_highlight(LcApplicationRow * self);
 void lc_application_row_unhighlight(LcApplicationRow * self);
+
+GtkButton *lc_application_row_get_uninstall_button(LcApplicationRow *
+                                                   self);
 
 G_END_DECLS
 #endif
