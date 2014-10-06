@@ -9,12 +9,15 @@
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 #define ICON_SIZE       (48)
+#define NAME_LABEL_WIDTH (180)
+#define VERSION_LABEL_WIDTH (200)
 
 struct _LcApplicationRowPrivate {
     GtkGrid *grid;
     GtkImage *icon_image;
     GtkLabel *name_label;
     GtkLabel *version_label;
+    GtkLabel *type_label;
 
     gpointer user_data;
     GDestroyNotify destroy;
@@ -27,6 +30,8 @@ struct _LcApplicationRowPrivate {
 #define lc_application_row_get_name_label(self)	((self)->priv->name_label)
 #define lc_application_row_get_version_label(self) \
 	((self)->priv->version_label)
+#define lc_application_row_get_type_label(self) \
+        lc_application_row_get_priv(self)->type_label
 #define lc_application_row_get_user_data(self) \
         lc_application_row_get_priv(self)->user_data
 #define lc_application_row_set_user_data(self,data) \
@@ -81,21 +86,29 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     gtk_grid_set_column_spacing(priv->grid, 8);
     gtk_container_set_border_width(GTK_CONTAINER(priv->grid), 1);
     g_object_ref_sink(priv->grid);
+    /* ICON */
     priv->icon_image = (GtkImage *) gtk_image_new();
     g_object_ref_sink(priv->icon_image);
+    /* NAME */
     priv->name_label = (GtkLabel *) gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC(priv->name_label), 0.1, 0.5);
+    gtk_misc_set_alignment(GTK_MISC(priv->name_label), 0.0, 0.5);
+    gtk_widget_set_margin_left(GTK_WIDGET(priv->name_label), 10);
     gtk_label_set_max_width_chars(priv->name_label, 20);
-    gtk_widget_set_size_request(GTK_WIDGET(priv->name_label), 150, -1);
+    gtk_widget_set_size_request(GTK_WIDGET(priv->name_label), NAME_LABEL_WIDTH, -1);
     gtk_label_set_ellipsize(priv->name_label, PANGO_ELLIPSIZE_END);
     g_object_ref_sink(priv->name_label);
+    /* VERSION */
     priv->version_label = (GtkLabel *) gtk_label_new("");
-    gtk_misc_set_alignment(GTK_MISC(priv->version_label), 0.1, 0.5);
+    gtk_misc_set_alignment(GTK_MISC(priv->version_label), 0.0, 0.5);
     gtk_label_set_max_width_chars(priv->version_label, 20);
     gtk_label_set_ellipsize(priv->version_label, PANGO_ELLIPSIZE_END);
     gtk_widget_set_margin_left(GTK_WIDGET(priv->version_label), 20);
-    gtk_widget_set_size_request(GTK_WIDGET(priv->version_label), 150, -1);
+    gtk_widget_set_size_request(GTK_WIDGET(priv->version_label), VERSION_LABEL_WIDTH, -1);
     g_object_ref_sink(priv->version_label);
+    /* TYPE */
+    priv->type_label=(GtkLabel*)gtk_label_new("");
+    gtk_widget_set_margin_left(GTK_WIDGET(priv->type_label), 15);
+    g_object_ref_sink(priv->type_label);
 
     gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(priv->grid));
 
@@ -103,6 +116,7 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->name_label), 1, 0, 1, 1);
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->version_label),
                     2, 0, 1, 1);
+    gtk_grid_attach(priv->grid, GTK_WIDGET(priv->type_label),3,0,1,1);
 
     priv->user_data = NULL;
     priv->destroy = NULL;
@@ -119,6 +133,7 @@ static void lc_application_row_finalize(GObject * obj)
     _g_object_unref0(self->priv->icon_image);
     _g_object_unref0(self->priv->name_label);
     _g_object_unref0(self->priv->version_label);
+    _g_object_unref0(self->priv->type_label);
     if (self->priv->user_data && self->priv->destroy) {
         self->priv->destroy(self->priv->user_data);
     }
@@ -147,20 +162,23 @@ GType lc_application_row_get_type(void)
     return lc_application_row_type_id__volatile;
 }
 
-
-
 LcApplicationRow *lc_application_row_new_full(GdkPixbuf * icon,
                                               const gchar * name,
-                                              const gchar * version)
+                                              const gchar * version,
+        const gchar *type)
 {
     LcApplicationRow *self = lc_application_row_new();
     GtkImage *icon_image = lc_application_row_get_icon_image(self);
     GtkLabel *name_label = lc_application_row_get_name_label(self);
     GtkLabel *version_label = lc_application_row_get_version_label(self);
+    GtkLabel *type_label=lc_application_row_get_type_label(self);
 
     gtk_image_set_from_pixbuf(icon_image, icon);
     gtk_label_set_text(name_label, name);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label),name);
     gtk_label_set_text(version_label, version);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label),version);
+    gtk_label_set_text(type_label,type);
 
     return self;
 }
@@ -230,7 +248,7 @@ LcApplicationRow *lc_application_row_new_with_data(const
                                                         ICON_SIZE);
     }
     LcApplicationRow *self =
-        lc_application_row_new_full(pixbuf, info->app_name, info->version);
+        lc_application_row_new_full(pixbuf, info->app_name, info->version,info->type);
     lc_application_row_set_data(self, lc_protocol_application_copy(info),
                                 (GDestroyNotify)
                                 lc_protocol_application_free);
@@ -251,8 +269,12 @@ void lc_application_row_update_data(LcApplicationRow * self,
                                 lc_protocol_application_free);
     GtkLabel *name_label = lc_application_row_get_name_label(self);
     GtkLabel *version_label = lc_application_row_get_version_label(self);
+    GtkLabel *type_label = lc_application_row_get_type_label(self);
     gtk_label_set_label(name_label, info->app_name);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(name_label),info->app_name);
     gtk_label_set_label(version_label, info->version);
+    gtk_widget_set_tooltip_text(GTK_WIDGET(version_label),info->version);
+    gtk_label_set_label(type_label,info->type);
 }
 
 void lc_application_row_set_data(LcApplicationRow * self, gpointer data,
@@ -285,7 +307,7 @@ void lc_application_row_highlight(LcApplicationRow * self)
     if (highlight_provider == NULL) {
         highlight_provider = gtk_css_provider_new();
         gtk_css_provider_load_from_data(highlight_provider,
-                                        "GtkGrid{background-color:blue;}",
+                                        "GtkGrid{background-color:lightblue;}",
                                         -1, NULL);
     }
     GtkStyleContext *style =

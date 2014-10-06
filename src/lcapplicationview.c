@@ -15,9 +15,10 @@ struct _LcApplicationViewPrivate {
     GtkGrid *grid;
     gint row_count;
 
-    gboolean loading;
-
-    guint64 update_time;
+    gboolean loading;       /* loading data from LILY? */
+    guint64 update_time;    /* the time in second that list updated last time */
+    
+    LcApplicationRow *selected;    /* the pointer to the selected row */
 };
 #define lc_application_view_get_priv(self)	((self)->priv)
 #define lc_application_view_get_grid(self) \
@@ -38,6 +39,16 @@ struct _LcApplicationViewPrivate {
         lc_application_view_get_priv(self)->update_time
 #define lc_application_view_set_updatetime(self,time) \
         lc_application_view_get_updatetime(self)=time
+#define lc_application_view_get_selected(self) \
+        lc_application_view_get_priv(self)->selected
+#define lc_application_view_set_selected(self,row) \
+        do{ \
+        if(lc_application_view_get_selected(self)){ \
+            lc_application_row_unhighlight(lc_application_view_get_selected(self)); \
+        }   \
+        lc_application_view_get_selected(self)=(row); \
+        lc_application_row_highlight(row); \
+        }while(0)
 
 
 static gpointer lc_application_view_parent_class = NULL;
@@ -84,6 +95,7 @@ static void lc_application_view_instance_init(LcApplicationView * self)
     priv->row_count = 0;
     priv->loading = FALSE;
     priv->update_time = 0;
+    priv->selected=NULL;
 }
 
 
@@ -124,13 +136,18 @@ static gboolean on_row_button_pressed(GtkWidget * widget,
                                       GdkEventButton * event,
                                       gpointer user_data)
 {
-    /* TODO */
+    LcApplicationRow *row=(LcApplicationRow*)widget;
+    LcApplicationView *self=(LcApplicationView*)user_data;
+    lc_application_view_set_selected(self,row);
+    return FALSE;
 }
 
 void lc_application_view_append_row(LcApplicationView * self,
                                     LcProtocolApplication * info)
 {
     LcApplicationRow *row = lc_application_row_new_with_data(info);
+    g_signal_connect(G_OBJECT(row),"button-press-event",
+            G_CALLBACK(on_row_button_pressed),self);
     gtk_grid_attach(lc_application_view_get_grid(self),
                     GTK_WIDGET(row),
                     0, lc_application_view_get_row_count(self), 1, 1);

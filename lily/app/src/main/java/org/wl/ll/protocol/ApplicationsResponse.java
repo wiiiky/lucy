@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageStats;
+import android.os.RemoteException;
+import android.util.Log;
 
 import java.util.List;
 
@@ -24,8 +27,8 @@ public class ApplicationsResponse extends Response {
 
     /*
      * 返回应用包列表
-     * packageName1:appName1:versionName1:installedtime1:installedLocation1:description1\n
-     * packageName2:appName2:versionName2:installedtime2:installedLocation2:description2\n
+     * packageName1:appName1:versionName1:installedtime1:installedLocation1:sys:description1\n
+     * packageName2:appName2:versionName2:installedtime2:installedLocation2:sys:description2\n
      * \n
      */
     @Override
@@ -49,6 +52,7 @@ public class ApplicationsResponse extends Response {
                 getApplicationVersionName(info) + ":" +
                 getApplicationInstalledTime(info)+":"+
                 getApplicationInstalledLocation(info)+":"+
+                getApplicationType(info)+":"+
                 getApplicationDescription(info)+
                 "\n";
         return  data;
@@ -99,5 +103,20 @@ public class ApplicationsResponse extends Response {
     private String getApplicationInstalledTime(PackageInfo info){
         String time= Long.toString(info.firstInstallTime);
         return time;
+    }
+
+    private String getApplicationType(PackageInfo info){
+        if((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM)>0){
+            return "系统应用";    /* 系统应用 */
+        }
+        return "第三方应用";
+    }
+
+    private String getApplicationSize(PackageInfo info){
+        /* not work, FIXME */
+        PackageStats packageStats=new PackageStats(info.packageName);
+        String size=Long.toString(packageStats.cacheSize+packageStats.codeSize+packageStats.dataSize+
+                packageStats.externalCacheSize+packageStats.externalDataSize+packageStats.externalCodeSize);
+        return size;
     }
 }

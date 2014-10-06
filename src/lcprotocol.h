@@ -50,10 +50,11 @@ typedef struct {
     gchar *version;
     gchar *installed_time;
     gchar *location;
+    gchar *type;
     gchar *description;
 } LcProtocolApplication;
 
-#define LC_PROTOCOL_APPLICATION_SIZE    (6)
+#define LC_PROTOCOL_APPLICATION_SIZE    (7)
 
 LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,
@@ -63,6 +64,7 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    installedTime,
                                                    const gchar *
                                                    installedLocation,
+        const gchar *type,
                                                    const gchar *
                                                    description);
 void lc_protocol_application_free(LcProtocolApplication * p);

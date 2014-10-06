@@ -51,6 +51,7 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    installed_time,
                                                    const gchar *
                                                    installed_location,
+        const gchar *type,
                                                    const gchar *
                                                    description)
 {
@@ -61,6 +62,7 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
     p->version = g_strdup(version);
     p->installed_time = g_strdup(installed_time);
     p->location = g_strdup(installed_location);
+    p->type=g_strdup(type);
     p->description = g_strdup(description);
     return p;
 }
@@ -76,6 +78,7 @@ LcProtocolApplication *lc_protocol_application_copy(const
     p->version = g_strdup(info->version);
     p->installed_time = g_strdup(info->installed_time);
     p->location = g_strdup(info->location);
+    p->type=g_strdup(info->type);
     p->description = g_strdup(info->description);
     return p;
 }
@@ -88,6 +91,7 @@ lc_protocol_application_free_internal(LcProtocolApplication * p)
     g_free(p->version);
     g_free(p->installed_time);
     g_free(p->location);
+    g_free(p->type);
     g_free(p->description);
 }
 
@@ -125,7 +129,8 @@ LcProtocolApplication *lc_protocol_get_application(const gchar * data)
                                                              elements[2],
                                                              elements[3],
                                                              elements[4],
-                                                             elements[5]);
+                                                             elements[5],
+            elements[6]);
     g_strfreev(elements);
     return app;
 }

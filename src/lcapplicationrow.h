@@ -35,10 +35,10 @@ LcApplicationRow *lc_application_row_construct(GType object_type);
 
 void lc_application_row_set_icon(LcApplicationRow * self,
                                  GdkPixbuf * pixbuf);
-
 LcApplicationRow *lc_application_row_new_full(GdkPixbuf * pixbuf,
                                               const gchar * name,
-                                              const gchar * version);
+                                              const gchar * version,
+        const gchar * type);
 LcApplicationRow *lc_application_row_new_with_data(const
                                                    LcProtocolApplication *
                                                    info);
