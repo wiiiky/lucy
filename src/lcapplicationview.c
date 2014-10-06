@@ -161,15 +161,13 @@ static void on_uninstall_app(GObject * source_object, GAsyncResult * res,
     int ret = lc_adb_uninstall_app_finish(res);
     GtkButton *uninstall_button = (GtkButton *) user_data;
     if (ret) {
-        gtk_button_set_label(uninstall_button, "卸载");
+        gtk_button_set_label(uninstall_button, "uninstall");
         gtk_widget_set_sensitive(GTK_WIDGET(uninstall_button), TRUE);
     } else {
-        LcApplicationRow *row =
-            (LcApplicationRow *)
+        LcApplicationRow *row = (LcApplicationRow *)
             g_object_get_data(G_OBJECT(uninstall_button),
                               UNINSTALL_KEY_ROW);
-        LcApplicationView *self =
-            (LcApplicationView *)
+        LcApplicationView *self = (LcApplicationView *)
             g_object_get_data(G_OBJECT(uninstall_button),
                               UNINSTALL_KEY_SELF);
         gint count = lc_application_view_get_row_number(self, row);
@@ -180,7 +178,7 @@ static void on_uninstall_app(GObject * source_object, GAsyncResult * res,
 static void on_uninstall_button_clicked(GtkButton * button,
                                         gpointer user_data)
 {
-    gtk_button_set_label(button, "卸载中......");
+    gtk_button_set_label(button, "uninstalling...");
     gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
     LcApplicationRow *row =
         (LcApplicationRow *) g_object_get_data(G_OBJECT(button),

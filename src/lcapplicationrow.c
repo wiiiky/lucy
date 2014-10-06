@@ -120,7 +120,7 @@ static void lc_application_row_instance_init(LcApplicationRow * self)
     g_object_ref_sink(priv->type_label);
     /* UNINSTALL */
     priv->uninstall_button =
-        (GtkButton *) gtk_button_new_with_label("卸载");
+        (GtkButton *) gtk_button_new_with_label("uninstall");
     gtk_widget_set_size_request(GTK_WIDGET(priv->uninstall_button),
                                 UNINSTALL_BUTTON_WIDTH, -1);
     gtk_widget_set_margin_left(GTK_WIDGET(priv->uninstall_button), 10);
@@ -187,7 +187,7 @@ lc_appliation_row_update_uninstall_button_visible(LcApplicationRow * self,
 {
     GtkButton *uninstall_button =
         lc_application_row_get_uninstallbutton(self);
-    if (g_strcmp0(type, "系统应用") == 0) {
+    if (g_strcmp0(type, "system") == 0) {
         gtk_widget_set_visible(GTK_WIDGET(uninstall_button), FALSE);
     } else {
         gtk_widget_set_visible(GTK_WIDGET(uninstall_button), TRUE);

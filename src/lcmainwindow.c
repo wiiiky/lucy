@@ -35,8 +35,6 @@ static void lc_main_window_finalize(GObject * obj);
 /* create the menu bar, of course along with all menus */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self);
 
-static void on_about_menu_item_activate(GtkMenuItem * item, gpointer data);
-
 
 enum {
     LC_MAIN_WINDOW_DUMMY_PROPERTY
@@ -240,22 +238,37 @@ GType lc_main_window_get_type(void)
     return lc_main_window_type_id__volatile;
 }
 
+static void on_about_menu_item_activate(GtkMenuItem * item, gpointer data);
+static void on_app_install_menu_item_activate(GtkMenuItem * item,
+                                              gpointer data);
 /* create menu bar, along with all menus */
 static GtkWidget *lc_main_window_menu_bar(LcMainWindow * self)
 {
-    GtkWidget *menuBar = gtk_menu_bar_new();
-    GtkWidget *aboutItem = gtk_menu_item_new_with_mnemonic("_About");
-    gtk_menu_shell_append(GTK_MENU_SHELL(menuBar), aboutItem);
+    GtkWidget *menu_bar = gtk_menu_bar_new();
 
-    GtkWidget *aboutMenu = gtk_menu_new();
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(aboutItem), aboutMenu);
+    /* APP */
+    GtkWidget *app_item = gtk_menu_item_new_with_mnemonic("_APP");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), app_item);
+    GtkWidget *app_menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(app_item), app_menu);
+    app_item = gtk_menu_item_new_with_mnemonic("_Install");
+    gtk_menu_shell_append(GTK_MENU_SHELL(app_menu), app_item);
+    g_signal_connect(G_OBJECT(app_item), "activate",
+                     G_CALLBACK(on_app_install_menu_item_activate), self);
 
-    GtkWidget *_aboutItem = gtk_menu_item_new_with_mnemonic("_About");
-    gtk_menu_shell_append(GTK_MENU_SHELL(aboutMenu), _aboutItem);
-    g_signal_connect(G_OBJECT(_aboutItem), "activate",
+    /* ABOUT */
+    GtkWidget *about_item = gtk_menu_item_new_with_mnemonic("_About");
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), about_item);
+
+    GtkWidget *about_menu = gtk_menu_new();
+    gtk_menu_item_set_submenu(GTK_MENU_ITEM(about_item), about_menu);
+
+    GtkWidget *_about_item = gtk_menu_item_new_with_mnemonic("_About");
+    gtk_menu_shell_append(GTK_MENU_SHELL(about_menu), _about_item);
+    g_signal_connect(G_OBJECT(_about_item), "activate",
                      G_CALLBACK(on_about_menu_item_activate), NULL);
 
-    return menuBar;
+    return menu_bar;
 }
 
 /* show LcAboutDialog */
@@ -264,6 +277,12 @@ static void on_about_menu_item_activate(GtkMenuItem * item, gpointer data)
     LcAboutDialog *dialog = lc_about_dialog_new();
     lc_about_dialog_run(dialog);
     lc_about_dialog_destroy(dialog);
+}
+
+/* install a new app */
+static void on_app_install_menu_item_activate(GtkMenuItem * item,
+                                              gpointer data)
+{
 }
 
 void lc_main_window_show(LcMainWindow * window)

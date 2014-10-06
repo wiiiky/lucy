@@ -107,9 +107,9 @@ public class ApplicationsResponse extends Response {
 
     private String getApplicationType(PackageInfo info){
         if((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM)>0){
-            return "系统应用";    /* 系统应用 */
+            return "system";    /* 系统应用 */
         }
-        return "第三方应用";
+        return "user";
     }
 
     private String getApplicationSize(PackageInfo info){
