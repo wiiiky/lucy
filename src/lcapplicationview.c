@@ -133,6 +133,16 @@ GType lc_application_view_get_type(void)
     return lc_application_view_type_id__volatile;
 }
 
+static gint lc_application_view_get_row_number(LcApplicationView * self,
+                                               LcApplicationRow * row)
+{
+    GtkGrid *grid = lc_application_view_get_grid(self);
+    gint num = -1;
+    gtk_container_child_get(GTK_CONTAINER(grid), GTK_WIDGET(row),
+                            "top-attach", &num, NULL);
+    return num;
+}
+
 static gboolean on_row_button_pressed(GtkWidget * widget,
                                       GdkEventButton * event,
                                       gpointer user_data)
@@ -143,8 +153,7 @@ static gboolean on_row_button_pressed(GtkWidget * widget,
     return FALSE;
 }
 
-#define UNINSTALL_KEY_ROW   "uninstall-row"
-#define UNINSTALL_KEY_INFO  "uninstall-info"
+#define UNINSTALL_KEY_ROW  "uninstall-row"
 #define UNINSTALL_KEY_SELF  "uninstall-self"
 static void on_uninstall_app(GObject * source_object, GAsyncResult * res,
                              gpointer user_data)
@@ -155,13 +164,15 @@ static void on_uninstall_app(GObject * source_object, GAsyncResult * res,
         gtk_button_set_label(uninstall_button, "卸载");
         gtk_widget_set_sensitive(GTK_WIDGET(uninstall_button), TRUE);
     } else {
-        gint count =
-            (gint) (gulong) g_object_get_data(G_OBJECT(uninstall_button),
-                                              UNINSTALL_KEY_ROW);
+        LcApplicationRow *row =
+            (LcApplicationRow *)
+            g_object_get_data(G_OBJECT(uninstall_button),
+                              UNINSTALL_KEY_ROW);
         LcApplicationView *self =
             (LcApplicationView *)
             g_object_get_data(G_OBJECT(uninstall_button),
                               UNINSTALL_KEY_SELF);
+        gint count = lc_application_view_get_row_number(self, row);
         lc_application_view_remove_row(self, count);
     }
 }
@@ -173,7 +184,7 @@ static void on_uninstall_button_clicked(GtkButton * button,
     gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
     LcApplicationRow *row =
         (LcApplicationRow *) g_object_get_data(G_OBJECT(button),
-                                               UNINSTALL_KEY_INFO);
+                                               UNINSTALL_KEY_ROW);
     LcProtocolApplication *info =
         (LcProtocolApplication *) lc_application_row_get_data(row);
 
@@ -189,7 +200,7 @@ void lc_application_view_append_row(LcApplicationView * self,
         lc_application_row_get_uninstall_button(row);
     g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_ROW,
                       (gpointer) (gulong) count);
-    g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_INFO,
+    g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_ROW,
                       (gpointer) row);
     g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_SELF,
                       (gpointer) self);

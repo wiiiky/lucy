@@ -151,6 +151,18 @@ static void on_command_version(const gchar * cmd, GByteArray * array,
     lc_protocol_version_free(version);
 }
 
+static gboolean on_request_version_timeout(gpointer user_data)
+{
+    lc_commander_send_command_async(LC_PROTOCOL_VERSION,
+                                    on_command_version, user_data);
+    return FALSE;
+}
+
+static void lc_commander_request_version(gpointer user_data)
+{
+    g_timeout_add(1000, on_request_version_timeout, user_data);
+}
+
 /****************************Initialize Connection***************************/
 static void on_lily_activity_start_final(GObject * source_object,
                                          GAsyncResult * res,
@@ -163,8 +175,7 @@ static void on_lily_activity_start_final(GObject * source_object,
                            cdata->user_data);
         lc_commander_data_free(cdata);
     } else {
-        lc_commander_send_command_async(LC_PROTOCOL_VERSION,
-                                        on_command_version, cdata);
+        lc_commander_request_version(cdata);
     }
 }
 
@@ -199,8 +210,7 @@ static void on_lily_activity_start(GObject * source_object,
             lc_adb_install_app(apkpath, on_install_lily, user_data);
         }
     } else {
-        lc_commander_send_command_async(LC_PROTOCOL_VERSION,
-                                        on_command_version, cdata);
+        lc_commander_request_version(cdata);
     }
 }
 
