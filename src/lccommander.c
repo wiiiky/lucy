@@ -133,22 +133,25 @@ static void on_command_version(const gchar * cmd, GByteArray * array,
     LcCommanderData *cdata = (LcCommanderData *) user_data;
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     LcCommanderInitResult ret = LC_COMMANDER_INIT_OK;
-    if (result == NULL || lc_protocol_get_result_from_string(result) !=
+    if (result == NULL
+        || lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
         g_warning("Failed to get lily version");
         ret = LC_COMMANDER_INIT_FAILED_VERSION;
+    } else {
+        LcProtocolVersion *version =
+            lc_protocol_create_version(result + 4);
+        if (g_strcmp0(LILY_VERSION, version->version)) {
+            /* Lily version not match */
+            g_warning("Lily version doesn't match!!");
+            ret = LC_COMMANDER_INIT_FAILED_VERSION;
+        }
+        g_message("Lily Version: %s", result + 4);
+        lc_protocol_version_free(version);
     }
-    LcProtocolVersion *version = lc_protocol_create_version(result + 4);
-    if (g_strcmp0(LILY_VERSION, version->version)) {
-        /* Lily version not match */
-        g_warning("Lily version doesn't match!!");
-        ret = LC_COMMANDER_INIT_FAILED_VERSION;
-    }
-    g_message("Lily Version: %s", result + 4);
     ((LcCommanderInitCallback) cdata->callback) (ret, cdata->user_data);
     lc_commander_data_free(cdata);
     g_free(result);
-    lc_protocol_version_free(version);
 }
 
 static gboolean on_request_version_timeout(gpointer user_data)

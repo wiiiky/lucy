@@ -199,7 +199,9 @@ GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
         if (judge(lp->data, user_data)) {
             if (lp == list) {   /* first element */
                 list = next;
-                list->prev = NULL;
+                if (list) {
+                    list->prev = NULL;
+                }
                 destroy(lp->data);
                 g_list_free_1(lp);
             } else {
