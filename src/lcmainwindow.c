@@ -13,6 +13,7 @@
 #include "lcsocket.h"
 #include "lcutil.h"
 #include "lccommander.h"
+#include "lcinstalldialog.h"
 #include "libadb/sysdeps.h"
 #include "libadb/adb_client.h"
 #include <time.h>
@@ -283,6 +284,9 @@ static void on_about_menu_item_activate(GtkMenuItem * item, gpointer data)
 static void on_app_install_menu_item_activate(GtkMenuItem * item,
                                               gpointer data)
 {
+    LcMainWindow *self = (LcMainWindow *) data;
+    LcInstallDialog *dialog = lc_install_dialog_new(GTK_WINDOW(self));
+    lc_install_dialog_run(dialog);
 }
 
 void lc_main_window_show(LcMainWindow * window)

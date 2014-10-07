@@ -95,7 +95,7 @@ am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
 	lcaboutdialog.$(OBJEXT) lcapplicationrow.$(OBJEXT) \
 	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT) \
 	lcutil.$(OBJEXT) lccommander.$(OBJEXT) lctoolstack.$(OBJEXT) \
-	lcmyphone.$(OBJEXT)
+	lcmyphone.$(OBJEXT) lcinstalldialog.$(OBJEXT)
 __top_builddir__lucy_OBJECTS = $(am___top_builddir__lucy_OBJECTS)
 am__DEPENDENCIES_1 =
 __top_builddir__lucy_DEPENDENCIES = libadb/libadb.a \
@@ -332,7 +332,9 @@ __top_builddir__lucy_SOURCES = \
 	lctoolstack.h \
 	lctoolstack.c \
 	lcmyphone.h \
-	lcmyphone.c
+	lcmyphone.c \
+	lcinstalldialog.h \
+	lcinstalldialog.c 
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \
@@ -438,6 +440,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcapplicationrow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcapplicationview.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lccommander.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcinstalldialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmyphone.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@

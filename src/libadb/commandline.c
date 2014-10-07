@@ -641,10 +641,13 @@ static int send_shellcommand(transport_type transport, char *serial,
 {
     int fd, ret;
 
-    for (;;) {
+    for (;;){
         fd = adb_connect(buf);
-        if (fd >= 0)
+        if (fd >= 0){
             break;
+		}else{
+			return fd; 	/* MODIFIED NOT WAIT */
+		}
         fprintf(stderr, "- waiting for device -\n");
         adb_sleep_ms(1000);
         do_cmd(transport, serial, "wait-for-device", 0);
