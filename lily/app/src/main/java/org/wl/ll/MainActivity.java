@@ -25,11 +25,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private TextView tvLog =null;
     private Button btnPackages=null;
-    private static ServerSocket serverSocket=null;
     private Handler handler=null;
 
     /* 监听的端口号 */
-    private static int listenPort=37859;
 
     private static MainActivity instance=null;
 
@@ -44,7 +42,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         btnPackages.setOnClickListener(this);
 
         handler=new Handler();
-        startServer();
+        this.startService(new Intent(this,ListenService.class));
 
         instance=this;
     }
@@ -102,42 +100,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private static Thread serverThread=null;
-    private void startServer(){
-        if(serverThread==null||serverThread.isAlive()==false||serverSocket.isClosed()) {
-            serverThread=new Thread(serverRunnable);
-            serverThread.start();
-        }else{
-            tvLog.setText("Listening on " + listenPort);
-        }
-    }
 
-    private Runnable serverRunnable =new Thread(){
-        public void run(){
-            Socket client;
-            try{
-                serverSocket=new ServerSocket(listenPort);
-                showLog("Listening on "+listenPort);
-                while((client = serverSocket.accept())!=null){
-                    new ConnectionThread(MainActivity.this,client).start();
-                    showLog("Connect to "+client.getRemoteSocketAddress().toString());
-                    NotificationHelper.show("PC Connected",client.getRemoteSocketAddress().toString(),MainActivity.this);
-                }
-            }catch (SocketTimeoutException e){
-                showLog("SocketTimeoutException: "+e.getMessage());
-            }catch (IOException e){
-                showLog("IOException: "+e.getMessage());
-            }finally {
-                if (serverSocket!=null){
-                    try{
-                        serverSocket.close();
-                    }catch (IOException e){
-                        showLog("IOException: "+e.getMessage());
-                    }
-                }
-            }
-        }
-    };
 
     @Override
     public void onClick(View view) {

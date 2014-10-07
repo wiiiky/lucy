@@ -34,6 +34,8 @@ public class ConnectionThread extends Thread {
     public ConnectionThread(Context ctx,Socket s){
         socket=s;
         mContext=ctx;
+
+        MainActivity.LOG(socket.getRemoteSocketAddress().toString() + " is connected!!!" );
     }
 
     public void run(){
@@ -60,7 +62,7 @@ public class ConnectionThread extends Thread {
         } catch (IOException e) {
             MainActivity.LOG(e.getMessage() != null ? e.getMessage() : "!");
         }finally {
-            MainActivity.LOG(socket.getRemoteSocketAddress().toString()+ " is disconnected");
+            MainActivity.LOG(socket.getRemoteSocketAddress().toString()+ " is disconnected!!!");
             cleanup();
         }
     }

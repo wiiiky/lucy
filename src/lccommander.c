@@ -140,13 +140,13 @@ static void on_command_version(const gchar * cmd, GByteArray * array,
         ret = LC_COMMANDER_INIT_FAILED_VERSION;
     } else {
         LcProtocolVersion *version =
-            lc_protocol_create_version(result + 4);
+            lc_protocol_create_version(result + LC_PROTOCOL_HDR_LEN);
         if (g_strcmp0(LILY_VERSION, version->version)) {
             /* Lily version not match */
             g_warning("Lily version doesn't match!!");
             ret = LC_COMMANDER_INIT_FAILED_VERSION;
         }
-        g_message("Lily Version: %s", result + 4);
+        g_message("Lily Version: %s", result + LC_PROTOCOL_HDR_LEN);
         lc_protocol_version_free(version);
     }
     ((LcCommanderInitCallback) cdata->callback) (ret, cdata->user_data);
