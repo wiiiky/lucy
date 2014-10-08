@@ -7,6 +7,7 @@
 #include "lcsmsbox.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 struct _LcSmsBoxPrivate {
 	gchar* text;
@@ -20,6 +21,7 @@ enum  {
 	LC_SMS_BOX_DUMMY_PROPERTY
 };
 static void lc_sms_box_finalize (GObject* obj);
+static void on_draw(GtkDrawingArea *area,cairo_t *cr,gpointer user_data);
 
 
 LcSmsBox* lc_sms_box_construct (GType object_type) {
@@ -44,6 +46,8 @@ static void lc_sms_box_class_init (LcSmsBoxClass * klass) {
 static void lc_sms_box_instance_init (LcSmsBox * self) {
 	self->priv = LC_SMS_BOX_GET_PRIVATE (self);
 
+	g_signal_connect(G_OBJECT(self),"draw",G_CALLBACK(on_draw),self);
+
 	LcSmsBoxPrivate *priv=self->priv;
 
 	priv->text=NULL;
@@ -57,6 +61,22 @@ static void lc_sms_box_finalize (GObject* obj) {
 	G_OBJECT_CLASS (lc_sms_box_parent_class)->finalize (obj);
 }
 
+static void on_draw(GtkDrawingArea *area,cairo_t *cr,gpointer user_data)
+{
+	LcSmsBox *self=(LcSmsBox*)user_data;
+
+	cairo_set_source_rgba(cr,0.3,0.3,0.25,1);
+
+	cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);
+
+	cairo_move_to(cr,10,10);
+	cairo_line_to(cr,200,10);
+	cairo_line_to(cr,200,100);
+	cairo_line_to(cr,10,100);
+	cairo_close_path(cr);
+
+	cairo_stroke(cr);
+}
 
 GType lc_sms_box_get_type (void) {
 	static volatile gsize lc_sms_box_type_id__volatile = 0;
