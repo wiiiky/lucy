@@ -41,7 +41,9 @@ __top_builddir__lucy_SOURCES =  \
 	lcmyphone.h \
 	lcmyphone.c \
 	lcinstalldialog.h \
-	lcinstalldialog.c 
+	lcinstalldialog.c \
+	lcsmsbox.h \
+	lcsmsbox.c
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \
