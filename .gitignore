@@ -3,3 +3,4 @@ Debug/
 test/
 nbproject/
 *.cache
+src/main.c
