@@ -8,6 +8,9 @@ import android.text.format.Formatter;
 
 import org.wl.ll.MainActivity;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+
 /**
  * Created by wiky on 9/27/14.
  *
@@ -50,7 +53,7 @@ public class PhoneResponse extends Response {
         am.getMemoryInfo(mi);
 
         return Formatter.formatFileSize(mContext, mi.availMem)+"\n"+
-                Formatter.formatFileSize(mContext, mi.totalMem)+"\n";// 将获取的内存大小规格化
+                Formatter.formatFileSize(mContext, getTotalMemory())+"\n";// 将获取的内存大小规格化
     }
 
     private String getExternalStorageSize(){
@@ -77,9 +80,9 @@ public class PhoneResponse extends Response {
         long avail=0;
         try{
             StatFs statFs=new StatFs(android.os.Environment.getDataDirectory().getPath());
-            long size=statFs.getBlockSizeLong();
-            total=size*statFs.getBlockCountLong();
-            avail=size*statFs.getAvailableBlocksLong();
+            long size=statFs.getBlockSize();
+            total=size*statFs.getBlockCount();
+            avail=size*statFs.getAvailableBlocks();
         }catch (Exception e){
 
         }
@@ -97,5 +100,24 @@ public class PhoneResponse extends Response {
             }
         }
         return null;
+    }
+
+    private long getTotalMemory(){
+        String infoFile="/proc/meminfo";
+        String line;
+        String[] arrayOfString;
+        long memory=0;
+        try{
+            FileReader reader=new FileReader(infoFile);
+            BufferedReader bufferedReader=new BufferedReader(reader,4096*2);
+            line=bufferedReader.readLine();
+            arrayOfString=line.split("\\s+");
+            memory=Long.valueOf(arrayOfString[1]).longValue()*1024; //KB=>B
+            bufferedReader.close();
+            reader.close();
+        }catch (Exception e){
+
+        }
+        return memory;
     }
 }
