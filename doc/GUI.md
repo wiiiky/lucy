@@ -24,3 +24,9 @@ LcApplicationView继承自GtkScrolledWindow。可以上下滚动。它内部用�
 
 ##LcApplicationRow
 LcApplicationRow继承自GtkEventBox。内部使用一个GtkGrid来管理各个子控件。比如显示图标的GtkImage，显示应用名称、应用版本的GtkLabel等。
+
+
+##更新
+Wiky L(wiiiky@yeah.net)
+
+Saturday, 11. October 2014 10:51PM 

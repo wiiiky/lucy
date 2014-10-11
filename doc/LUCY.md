@@ -65,3 +65,9 @@ Lucy的编码风格继承自GTK+。这里做简单介绍。
 5. 通过LcAdb进行adb可以完成的操作，比如安装和卸载程序。
 6. 不能通过adb完成的操作需要与Lily通信，使用LcCommander。
 7. LcCommander调用LcAdb和LcSocket。
+>关于GUI结构，请看GUI.md
+
+##更新
+Wiky L(wiiiky@yeah.net)
+
+Saturday, 11. October 2014 10:50PM 

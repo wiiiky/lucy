@@ -1,10 +1,10 @@
 Lucy
 =================
 
-Android Manager for Linux.
+Android Device Manager for Linux.
 
 ###Introduce
-I hack ADB source and try to create a Android Manger for Linux.
+I hack ADB source and try to create a Android Device Manger for Linux.
 
 ###Screenshot
 ![ ](https://github.com/wiiiky/lucy/blob/master/screenshot/application_view.png  "Applications")
@@ -19,9 +19,12 @@ Lucy depends on gtk+-3.0, libssl and libzip. Install them before building lucy.
 Please let me know, if you have problem building or running lucy.
 		
 
-##Contact
-Wiky L(wiiiky@yeah.net)
+##Notes and Contact Info
 
-Be free to email me!
+Enjoy!
+
+*	Wiky L(wiiiky@yeah.net)
+
+*	IRC channel: freenode#lucy
 
 
