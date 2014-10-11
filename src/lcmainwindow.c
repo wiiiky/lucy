@@ -24,7 +24,7 @@
 #include "lctoolstack.h"
 #include "lcapplicationview.h"
 #include "lcaboutdialog.h"
-#include "lcmyphone.h"
+#include "lcmyandroid.h"
 #include "lcadb.h"
 #include "lcsocket.h"
 #include "lcutil.h"
@@ -65,7 +65,7 @@ typedef enum {
 
 struct _LcMainWindowPrivate {
     LcToolStack *tool_stack;
-    LcMyPhone *phone;
+    LcMyAndroid *phone;
     LcApplicationView *app_view;
     GtkMenu *app_popmenu;
 
@@ -74,7 +74,7 @@ struct _LcMainWindowPrivate {
 
 #define lc_main_window_get_application_view(self) ((self)->priv->app_view)
 #define lc_main_window_get_tool_stack(self)     ((self)->priv->tool_stack)
-#define lc_main_window_get_my_phone(self)       ((self)->priv->phone)
+#define lc_main_window_get_my_android(self)       ((self)->priv->phone)
 
 #define lc_main_window_set_phone_state(self,_state)    ((self)->priv->state=_state)
 
@@ -105,7 +105,7 @@ static void lc_main_window_class_init(LcMainWindowClass * klass)
     G_OBJECT_CLASS(klass)->finalize = lc_main_window_finalize;
 }
 
-static void on_my_phone(gboolean visible, gpointer user_data)
+static void on_my_android(gboolean visible, gpointer user_data)
 {
     if (visible) {
         g_message("Come on, My Android!");
@@ -150,7 +150,7 @@ static void on_application(gboolean visible, gpointer user_data)
     }
 }
 
-static void lc_main_window_my_phone_init(LcMainWindow * self);
+static void lc_main_window_my_android_init(LcMainWindow * self);
 static void lc_main_window_application_init(LcMainWindow * self);
 
 static void lc_main_window_instance_init(LcMainWindow * self)
@@ -175,12 +175,12 @@ static void lc_main_window_instance_init(LcMainWindow * self)
                        GTK_WIDGET(self->priv->tool_stack), TRUE, TRUE, 0);
     g_object_ref_sink(self->priv->tool_stack);
 
-    lc_main_window_my_phone_init(self);
+    lc_main_window_my_android_init(self);
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("smartphone.svg")),
-                         "My Phone", GTK_WIDGET(self->priv->phone),
-                         on_my_phone, self);
+                         "My Android", GTK_WIDGET(self->priv->phone),
+                         on_my_android, self);
 
     lc_main_window_application_init(self);
     lc_tool_stack_append(self->priv->tool_stack,
@@ -195,16 +195,17 @@ static void lc_main_window_instance_init(LcMainWindow * self)
 static void on_connect_clicked(GtkWidget * button, gpointer data)
 {
     LcMainWindow *self = (LcMainWindow *) data;
-    lc_my_phone_show_connecting(self->priv->phone);
+    lc_my_android_show_connecting(self->priv->phone);
     lc_main_window_start_server(self);
     lc_main_window_set_phone_connecting(self);
 }
 
-static void lc_main_window_my_phone_init(LcMainWindow * self)
+static void lc_main_window_my_android_init(LcMainWindow * self)
 {
-    LcMyPhone *phone = lc_my_phone_new();
-    lc_my_phone_set_connect_callback(phone,
-                                     G_CALLBACK(on_connect_clicked), self);
+    LcMyAndroid *phone = lc_my_android_new();
+    lc_my_android_set_connect_callback(phone,
+                                       G_CALLBACK(on_connect_clicked),
+                                       self);
     g_object_ref_sink(phone);
 
     self->priv->phone = phone;
@@ -323,7 +324,7 @@ static void on_command_phone(const gchar * cmd, GByteArray * array,
         LcMainWindow *self = (LcMainWindow *) user_data;
         LcProtocolPhone *phone =
             lc_protocol_create_phone(result + LC_PROTOCOL_HDR_LEN);
-        lc_my_phone_show_connected_with_info(self->priv->phone, phone);
+        lc_my_android_show_connected_with_info(self->priv->phone, phone);
         lc_protocol_phone_free(phone);
     }
     g_free(result);
@@ -336,11 +337,11 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
     if (result == LC_COMMANDER_INIT_OK) {
         lc_commander_send_command_async(LC_PROTOCOL_PHONE,
                                         on_command_phone, data);
-        lc_my_phone_show_connected(self->priv->phone);
+        lc_my_android_show_connected(self->priv->phone);
         lc_main_window_set_phone_connected(self);
     } else {
         /* Connection failed */
-        lc_my_phone_show_disconnect(self->priv->phone);
+        lc_my_android_show_disconnect(self->priv->phone);
         lc_main_window_set_phone_disconnected(self);
     }
 }

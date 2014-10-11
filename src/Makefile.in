@@ -95,7 +95,7 @@ am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
 	lcaboutdialog.$(OBJEXT) lcapplicationrow.$(OBJEXT) \
 	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT) \
 	lcutil.$(OBJEXT) lccommander.$(OBJEXT) lctoolstack.$(OBJEXT) \
-	lcmyphone.$(OBJEXT) lcinstalldialog.$(OBJEXT) \
+	lcmyandroid.$(OBJEXT) lcinstalldialog.$(OBJEXT) \
 	lcsmsbox.$(OBJEXT)
 __top_builddir__lucy_OBJECTS = $(am___top_builddir__lucy_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -332,8 +332,8 @@ __top_builddir__lucy_SOURCES = \
 	lccommander.h \
 	lctoolstack.h \
 	lctoolstack.c \
-	lcmyphone.h \
-	lcmyphone.c \
+	lcmyandroid.h \
+	lcmyandroid.c \
 	lcinstalldialog.h \
 	lcinstalldialog.c \
 	lcsmsbox.h \
@@ -445,7 +445,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lccommander.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcinstalldialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmainwindow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmyphone.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmyandroid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsmsbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@

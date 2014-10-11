@@ -38,8 +38,8 @@ __top_builddir__lucy_SOURCES =  \
 	lccommander.h \
 	lctoolstack.h \
 	lctoolstack.c \
-	lcmyphone.h \
-	lcmyphone.c \
+	lcmyandroid.h \
+	lcmyandroid.c \
 	lcinstalldialog.h \
 	lcinstalldialog.c \
 	lcsmsbox.h \

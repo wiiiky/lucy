@@ -149,10 +149,10 @@ GType lc_sms_box_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(LcSmsBoxClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) lc_sms_box_class_init,
-                (GClassFinalizeFunc) NULL, NULL,
+            (GClassInitFunc) lc_sms_box_class_init,
+            (GClassFinalizeFunc) NULL, NULL,
             sizeof(LcSmsBox), 0,
-                (GInstanceInitFunc) lc_sms_box_instance_init, NULL
+            (GInstanceInitFunc) lc_sms_box_instance_init, NULL
         };
         GType lc_sms_box_type_id;
         lc_sms_box_type_id =

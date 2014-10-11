@@ -37,7 +37,7 @@ Lucy的编码风格继承自GTK+。这里做简单介绍。
 
 *	**lcapplicationview**.[c,h]：显示所有应用的类，继承GtkScrolledWindow。可滚动，包含了多个LcApplicationRow。
 
-*	**lcmyphone**.[c,h]：显示“我的手机”的界面，继承GtkStack。可以切换显示内容，未连接显示“Connect”按钮，连接完成显示用户的Android设备信息。
+*	**lcmyandroid**.[c,h]：显示“我的手机”的界面，继承GtkStack。可以切换显示内容，未连接显示“Connect”按钮，连接完成显示用户的Android设备信息。
 
 *	**lctoolstack**.[c,h]：统一管理不同界面元素。负责不同界面的切换，比如LcApplicationView界面和LcMyPhone界面的切换。
 
@@ -60,7 +60,7 @@ Lucy的编码风格继承自GTK+。这里做简单介绍。
 ##代码层次
 1. lucy.c为函数入口创建主界面LcMainWindow
 2. LcMainWindow创建菜单栏以及LcToolStack
-3. LcToolStack管理LcMyPhone和LcApplicationView
+3. LcToolStack管理LcMyAndroid和LcApplicationView
 4. LcApplicationView包含多个LcApplicationRow
 5. 通过LcAdb进行adb可以完成的操作，比如安装和卸载程序。
 6. 不能通过adb完成的操作需要与Lily通信，使用LcCommander。
