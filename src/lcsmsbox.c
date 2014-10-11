@@ -148,8 +148,12 @@ GType lc_sms_box_get_type(void)
     if (g_once_init_enter(&lc_sms_box_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(LcSmsBoxClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) lc_sms_box_class_init, (GClassFinalizeFunc) NULL, NULL,
-sizeof(LcSmsBox), 0, (GInstanceInitFunc) lc_sms_box_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+                (GClassInitFunc) lc_sms_box_class_init,
+                (GClassFinalizeFunc) NULL, NULL,
+            sizeof(LcSmsBox), 0,
+                (GInstanceInitFunc) lc_sms_box_instance_init, NULL
+        };
         GType lc_sms_box_type_id;
         lc_sms_box_type_id =
             g_type_register_static(GTK_TYPE_DRAWING_AREA, "LcSmsBox",
