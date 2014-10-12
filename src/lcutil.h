@@ -22,7 +22,7 @@
 #include <gtk/gtk.h>
 #include "lcprotocol.h"
 
-#define DEFAULT_ICON    "default-icon"
+#define DEFAULT_ICON    "default-icon.png"
 
 void lc_init(int argc, char *argv[]);
 

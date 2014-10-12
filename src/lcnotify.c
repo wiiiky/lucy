@@ -49,7 +49,6 @@ void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon
   
   notify_notification_set_image_from_pixbuf(notification, pixbuf);
 
-
   notify_notification_show(notification, NULL);
 
   g_object_unref(pixbuf);
