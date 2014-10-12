@@ -32,13 +32,6 @@ void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon
     notify_notification_new(summary, body,
         NULL);
 
-  /*GdkPixbuf *pixbuf = NULL;*/
-  /*const gchar *path = lc_util_get_resource_by_name(icon);*/
-  /*if (path == NULL) {*/
-  /*pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");*/
-  /*} else {*/
-  /*pixbuf = lc_util_load_pixbuf_from_resouce(icon);*/
-  /*}*/
   GdkPixbuf *pixbuf = NULL;
 
   pixbuf = lc_util_load_pixbuf_from_resouce(icon);
