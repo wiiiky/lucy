@@ -21,14 +21,14 @@
 #define __LC_NOTIFY_H__
 
 #include <glib.h>
-
-void lc_notify_show_full(const gchar * summary, const gchar * body,
-                         const gchar * icon);
+#include <lcutil.h>
 
 /*
- * show a notification message with default icon
+ * show a notification message
+ * if there has the icon, display it
+ * else use the default icon.
  */
-void lc_notify_show(const gchar * summary, const gchar * body);
+void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon);
 
 
 #endif

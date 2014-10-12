@@ -21,30 +21,37 @@
 #include "lcutil.h"
 #include <libnotify/notify.h>
 
-void lc_notify_show_full(const gchar * summary, const gchar * body,
-                         const gchar * icon)
-{
-    NotifyNotification *notification =
-        notify_notification_new(summary, body,
-                                icon);
-    notify_notification_show(notification, NULL);
-
-    g_object_unref(notification);
-}
-
 /*
- * show a notification message with default icon
+ * show a notification message
+ * if icon: show it
+ * else: default-icon
  */
-void lc_notify_show(const gchar * summary, const gchar * body)
+void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon)
 {
-    NotifyNotification *notification =
-        notify_notification_new(summary, body,
-                                NULL);
-    GdkPixbuf *pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");
-    notify_notification_set_image_from_pixbuf(notification, pixbuf);
+  NotifyNotification *notification =
+    notify_notification_new(summary, body,
+        NULL);
 
-    notify_notification_show(notification, NULL);
+  /*GdkPixbuf *pixbuf = NULL;*/
+  /*const gchar *path = lc_util_get_resource_by_name(icon);*/
+  /*if (path == NULL) {*/
+  /*pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");*/
+  /*} else {*/
+  /*pixbuf = lc_util_load_pixbuf_from_resouce(icon);*/
+  /*}*/
+  GdkPixbuf *pixbuf = NULL;
 
-    g_object_unref(pixbuf);
-    g_object_unref(notification);
+  pixbuf = lc_util_load_pixbuf_from_resouce(icon);
+
+  if (pixbuf == NULL) {
+    pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");
+  }
+  
+  notify_notification_set_image_from_pixbuf(notification, pixbuf);
+
+
+  notify_notification_show(notification, NULL);
+
+  g_object_unref(pixbuf);
+  g_object_unref(notification);
 }
