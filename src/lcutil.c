@@ -100,20 +100,14 @@ const gchar *lc_util_get_image_cache_path_by_name(const gchar * name)
 {
     static gchar buf[PATH_MAX + 1];
 
-    const gchar *suffix = ".png";
-    if (g_strstr_len(name, -1, ".png")) {
-        suffix = "";
-    }
-    g_snprintf(buf, sizeof(buf), "%s/%s%s", imgcachedir, name, suffix);
+    g_snprintf(buf, sizeof(buf), "%s/%s", imgcachedir, name);
 
     return buf;
 }
 
 GdkPixbuf *lc_util_load_pixbuf_from_resouce(const gchar * name)
 {
-    gchar buf[128];
-    g_snprintf(buf, sizeof(buf), "%s.png", name);
-    const gchar *path = lc_util_get_resource_by_name(buf);
+    const gchar *path = lc_util_get_resource_by_name(name);
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(path, NULL);
     return pixbuf;
 }

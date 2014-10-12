@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,8 @@ import org.wl.ll.model.ApplicationListModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class ApplicationActivity extends Activity {
@@ -27,21 +30,32 @@ public class ApplicationActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_packages);
 
-        ArrayList<ApplicationListModel> list=new ArrayList<ApplicationListModel>();
-        PackageManager manager=getPackageManager();
-        List<PackageInfo> packages=manager.getInstalledPackages(0);
-        for (int i=0;i<packages.size();i++){
-            PackageInfo info=packages.get(i);
-            ApplicationListModel model=new ApplicationListModel(
-                    info.applicationInfo.loadIcon(manager),
-                    info.packageName,
-                    info.applicationInfo.loadLabel(manager).toString());
-            list.add(model);
-        }
-
         listPackages=(ListView)findViewById(R.id.listPackages);
-        packageListAdapter=new ApplicationListAdapter(this,list);
-        listPackages.setAdapter(packageListAdapter);
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ArrayList<ApplicationListModel> list=new ArrayList<ApplicationListModel>();
+                PackageManager manager=getPackageManager();
+                List<PackageInfo> packages=manager.getInstalledPackages(0);
+                for (int i=0;i<packages.size();i++){
+                    PackageInfo info=packages.get(i);
+                    ApplicationListModel model=new ApplicationListModel(
+                            info.applicationInfo.loadIcon(manager),
+                            info.packageName,
+                            info.applicationInfo.loadLabel(manager).toString());
+                    list.add(model);
+                }
+
+                packageListAdapter=new ApplicationListAdapter(ApplicationActivity.this,list);
+                listPackages.setAdapter(packageListAdapter);
+            }
+        },100);
     }
 
 

@@ -40,7 +40,8 @@ void lc_notify_show(const gchar * summary, const gchar * body)
     NotifyNotification *notification =
         notify_notification_new(summary, body,
                                 NULL);
-    GdkPixbuf *pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");
+    GdkPixbuf *pixbuf =
+        lc_util_load_pixbuf_from_resouce("default-icon.png");
     notify_notification_set_image_from_pixbuf(notification, pixbuf);
 
     notify_notification_show(notification, NULL);
