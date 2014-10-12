@@ -1,5 +1,6 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -10,7 +11,8 @@
 
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <LinearLayout
@@ -25,15 +27,28 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
 
-            <Button
-                android:id="@+id/btnPackages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:text="Packages"/>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnApplication"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Application"/>
+
+        <Button
+            android:id="@+id/btnSMS"
+            android:layout_marginLeft="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SMS"/>
 
         </LinearLayout>
 
-    </ScrollView>
 
-</RelativeLayout>
+</LinearLayout>

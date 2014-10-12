@@ -24,8 +24,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ApplicationActivity"
-            android:label="@string/title_activity_packages" >
+            android:name=".activity.ApplicationActivity"
+            android:label="@string/title_activity_application" >
         </activity>
 
         <service
@@ -33,6 +33,11 @@
             android:enabled="true"
             android:exported="true" >
         </service>
+
+        <activity
+            android:name=".activity.SMSActivity"
+            android:label="@string/title_activity_sms" >
+        </activity>
     </application>
 
 </manifest>

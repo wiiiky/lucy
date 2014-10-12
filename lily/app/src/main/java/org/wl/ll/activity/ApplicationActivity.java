@@ -1,23 +1,20 @@
-package org.wl.ll;
+package org.wl.ll.activity;
 
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 
+import org.wl.ll.adapter.ApplicationListAdapter;
+import org.wl.ll.R;
 import org.wl.ll.model.ApplicationListModel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class ApplicationActivity extends Activity {
@@ -28,15 +25,10 @@ public class ApplicationActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_packages);
+        setContentView(R.layout.activity_application);
 
-        listPackages=(ListView)findViewById(R.id.listPackages);
-    }
+        listPackages=(ListView)findViewById(R.id.list);
 
-
-    @Override
-    public void onStart(){
-        super.onStart();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -56,6 +48,12 @@ public class ApplicationActivity extends Activity {
                 listPackages.setAdapter(packageListAdapter);
             }
         },100);
+    }
+
+
+    @Override
+    public void onStart(){
+        super.onStart();
     }
 
 

@@ -4,6 +4,7 @@
     <string name="app_name">Lily</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_packages">PackagesActivity</string>
+    <string name="title_activity_application">Application</string>
+    <string name="title_activity_sms">SMS</string>
 
 </resources>

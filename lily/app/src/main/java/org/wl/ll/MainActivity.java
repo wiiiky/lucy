@@ -2,30 +2,27 @@ package org.wl.ll;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
+import org.wl.ll.activity.ApplicationActivity;
+import org.wl.ll.activity.SMSActivity;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
 
 public class MainActivity extends Activity implements View.OnClickListener {
 
-    private TextView tvLog =null;
-    private Button btnPackages=null;
-    private Handler handler=null;
+    private TextView tvLog;
+    private Button btnApplication;
+    private Button btnSMS;
+    private Handler handler;
 
     /* 监听的端口号 */
 
@@ -37,9 +34,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         tvLog =(TextView)findViewById(R.id.tvLog);
-        btnPackages=(Button)findViewById(R.id.btnPackages);
+        btnApplication =(Button)findViewById(R.id.btnApplication);
+        btnSMS =(Button)findViewById(R.id.btnSMS);
 
-        btnPackages.setOnClickListener(this);
+        btnApplication.setOnClickListener(this);
+        btnSMS.setOnClickListener(this);
 
         handler=new Handler();
         this.startService(new Intent(this,ListenService.class));
@@ -104,9 +103,14 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.btnPackages){
+        if(view.getId()==R.id.btnApplication){
             tvLog.setText("");
             Intent intent=new Intent(this,ApplicationActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+        }else if(view.getId()==R.id.btnSMS){
+            tvLog.setText("");
+            Intent intent=new Intent(this, SMSActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
         }

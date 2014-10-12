@@ -1,4 +1,4 @@
-package org.wl.ll;
+package org.wl.ll.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.wl.ll.R;
 import org.wl.ll.model.ApplicationListModel;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class ApplicationListAdapter extends BaseAdapter {
         ViewHolder holder=null;
         if(v==null){
             holder=new ViewHolder();
-            holder.view= LayoutInflater.from(mContext).inflate(R.layout.listview_packages_item,null);
+            holder.view= LayoutInflater.from(mContext).inflate(R.layout.listview_application_item,null);
             holder.icon=(ImageView)holder.view.findViewById(R.id.imgIcon);
             holder.packageName=(TextView)holder.view.findViewById(R.id.tvPackageName);
             holder.appName=(TextView)holder.view.findViewById(R.id.tvAppName);
