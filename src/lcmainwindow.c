@@ -34,7 +34,10 @@
 #include "libadb/adb_client.h"
 #include <time.h>
 
-#define MAINWINDOW_TITLE "Android Manager"
+#define MAINWINDOW_TITLE "Android Device Manager - Lucy"
+
+#define MY_ANDROID_TITLE    "My Android"
+#define APPLICATION_VIEW_TITLE  "Applications"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -179,14 +182,14 @@ static void lc_main_window_instance_init(LcMainWindow * self)
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("smartphone.svg")),
-                         "My Android", GTK_WIDGET(self->priv->phone),
+                         MY_ANDROID_TITLE, GTK_WIDGET(self->priv->phone),
                          on_my_android, self);
 
     lc_main_window_application_init(self);
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("computer.svg")),
-                         "Applications", GTK_WIDGET(self->priv->app_view),
+                         APPLICATION_VIEW_TITLE, GTK_WIDGET(self->priv->app_view),
                          on_application, self);
 
     lc_main_window_set_phone_disconnected(self);
@@ -339,6 +342,11 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
                                         on_command_phone, data);
         lc_my_android_show_connected(self->priv->phone);
         lc_main_window_set_phone_connected(self);
+        
+        const gchar *title=lc_tool_stack_get_current_title(self->priv->tool_stack);
+        if(g_strcmp0(title,APPLICATION_VIEW_TITLE)==0){
+            on_application(true,self);
+        }
     } else {
         /* Connection failed */
         lc_my_android_show_disconnect(self->priv->phone);

@@ -61,6 +61,11 @@ void lc_tool_stack_append(LcToolStack * self,
                           gpointer user_data);
 
 /*
+ * return the title of current page
+ */
+const gchar *lc_tool_stack_get_current_title(LcToolStack *self);
+
+/*
  * wrapper for gtk_stack_set_*
  */
 void lc_tool_stack_set_transition_duration(LcToolStack * self,

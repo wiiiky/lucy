@@ -23,13 +23,16 @@
 #include <glib-object.h>
 #include "lctoolstack.h"
 #include <gtk/gtk.h>
+#include <gtk-2.0/gtk/gtkradiotoolbutton.h>
+#include <gtk-2.0/gtk/gtktoolbutton.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 struct _LcToolStackPrivate {
     GtkToolbar *toolbar;
     GtkStack *stack;
-    guint name;
+    GtkRadioToolButton *current;
+    guint stack_index;
 };
 
 
@@ -64,7 +67,8 @@ LcToolStack *lc_tool_stack_construct(GType object_type)
                     1);
     gtk_widget_set_vexpand(GTK_WIDGET(self->priv->stack), TRUE);
 
-    self->priv->name = 0;
+    self->priv->stack_index = 0;
+    self->priv->current=NULL;
     return self;
 }
 
@@ -131,14 +135,16 @@ static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
     gboolean toggled =
         gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(radio));
 
-    const gchar *stack_name = (gchar *) g_object_get_data(G_OBJECT(radio),
-                                                          G_OBJECT_KEY_STACK_NAME);
     LcToolStackToggledNotify callback =
         (LcToolStackToggledNotify) g_object_get_data(G_OBJECT(radio),
                                                      G_OBJECT_KEY_CALLBACK);
     gpointer data =
         g_object_get_data(G_OBJECT(radio), G_OBJECT_KEY_USER_DATA);
     if (toggled) {
+        self->priv->current=radio;
+        
+        const gchar *stack_name = (gchar *) g_object_get_data(G_OBJECT(radio),
+                                                              G_OBJECT_KEY_STACK_NAME);
         gtk_stack_set_visible_child_name(self->priv->stack, stack_name);
     }
     if (callback) {
@@ -164,7 +170,7 @@ void lc_tool_stack_append(LcToolStack * self,
     gtk_toolbar_insert(toolbar, button, -1);
 
     gchar name[8];
-    g_snprintf(name, sizeof(name), "%u", self->priv->name++);
+    g_snprintf(name, sizeof(name), "%u", self->priv->stack_index++);
     gtk_stack_add_named(stack, content, name);
 
     g_object_set_data_full(G_OBJECT(button), G_OBJECT_KEY_STACK_NAME,
@@ -174,6 +180,14 @@ void lc_tool_stack_append(LcToolStack * self,
 
     g_signal_connect(G_OBJECT(button), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);
+}
+
+const gchar *lc_tool_stack_get_current_title(LcToolStack *self)
+{
+    if(self->priv->current){
+        return gtk_tool_button_get_label(GTK_TOOL_BUTTON(self->priv->current));
+    }
+    return NULL;
 }
 
 
