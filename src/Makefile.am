@@ -41,7 +41,9 @@ __top_builddir__lucy_SOURCES =  \
 	lcmyandroid.h \
 	lcmyandroid.c \
 	lcinstalldialog.h \
-	lcinstalldialog.c 
+	lcinstalldialog.c \
+	lcnotify.h \
+	lcnotify.c
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \

@@ -126,14 +126,14 @@ static void lc_my_android_disconnect_init(LcMyAndroid * self)
 static void lc_my_android_connect_init(LcMyAndroid * self)
 {
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
-    gtk_grid_set_column_spacing(cn,15);
-    
-    GtkWidget *label=gtk_label_new("brand:");
-    gtk_grid_attach(cn,label,0,0,1,1);
-    label=gtk_label_new("model:");
-    gtk_grid_attach(cn,label,0,1,1,1);
-    label=gtk_label_new("number:");
-    gtk_grid_attach(cn,label,0,2,1,1);
+    gtk_grid_set_column_spacing(cn, 15);
+
+    GtkWidget *label = gtk_label_new("brand:");
+    gtk_grid_attach(cn, label, 0, 0, 1, 1);
+    label = gtk_label_new("model:");
+    gtk_grid_attach(cn, label, 0, 1, 1, 1);
+    label = gtk_label_new("number:");
+    gtk_grid_attach(cn, label, 0, 2, 1, 1);
 
     GtkWidget *brand = gtk_label_new("");
     GtkWidget *model = gtk_label_new("");

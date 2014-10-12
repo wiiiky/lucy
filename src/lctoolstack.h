@@ -63,7 +63,7 @@ void lc_tool_stack_append(LcToolStack * self,
 /*
  * return the title of current page
  */
-const gchar *lc_tool_stack_get_current_title(LcToolStack *self);
+const gchar *lc_tool_stack_get_current_title(LcToolStack * self);
 
 /*
  * wrapper for gtk_stack_set_*

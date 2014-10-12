@@ -68,7 +68,7 @@ LcToolStack *lc_tool_stack_construct(GType object_type)
     gtk_widget_set_vexpand(GTK_WIDGET(self->priv->stack), TRUE);
 
     self->priv->stack_index = 0;
-    self->priv->current=NULL;
+    self->priv->current = NULL;
     return self;
 }
 
@@ -141,10 +141,11 @@ static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
     gpointer data =
         g_object_get_data(G_OBJECT(radio), G_OBJECT_KEY_USER_DATA);
     if (toggled) {
-        self->priv->current=radio;
-        
-        const gchar *stack_name = (gchar *) g_object_get_data(G_OBJECT(radio),
-                                                              G_OBJECT_KEY_STACK_NAME);
+        self->priv->current = radio;
+
+        const gchar *stack_name =
+            (gchar *) g_object_get_data(G_OBJECT(radio),
+                                        G_OBJECT_KEY_STACK_NAME);
         gtk_stack_set_visible_child_name(self->priv->stack, stack_name);
     }
     if (callback) {
@@ -182,10 +183,12 @@ void lc_tool_stack_append(LcToolStack * self,
                      G_CALLBACK(on_radio_tool_button_toggled), self);
 }
 
-const gchar *lc_tool_stack_get_current_title(LcToolStack *self)
+const gchar *lc_tool_stack_get_current_title(LcToolStack * self)
 {
-    if(self->priv->current){
-        return gtk_tool_button_get_label(GTK_TOOL_BUTTON(self->priv->current));
+    if (self->priv->current) {
+        return
+            gtk_tool_button_get_label(GTK_TOOL_BUTTON
+                                      (self->priv->current));
     }
     return NULL;
 }

@@ -18,7 +18,8 @@ AC_PROG_RANLIB
 PKG_CHECK_MODULES(LUCY,
 				  [gtk+-3.0]
 				  [libssl]
-				  [libzip])
+				  [libzip]
+				  [libnotify])
 
 # Checks for header files.
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h limits.h netdb.h netinet/in.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/mount.h sys/socket.h sys/time.h termios.h unistd.h])

@@ -18,8 +18,7 @@
  */
 
 
-#include <glib.h>
-#include <glib-object.h>
+#include "lcnotify.h"
 #include "lcmainwindow.h"
 #include "lctoolstack.h"
 #include "lcapplicationview.h"
@@ -189,8 +188,9 @@ static void lc_main_window_instance_init(LcMainWindow * self)
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
                          (lc_util_get_resource_by_name("computer.svg")),
-                         APPLICATION_VIEW_TITLE, GTK_WIDGET(self->priv->app_view),
-                         on_application, self);
+                         APPLICATION_VIEW_TITLE,
+                         GTK_WIDGET(self->priv->app_view), on_application,
+                         self);
 
     lc_main_window_set_phone_disconnected(self);
 }
@@ -342,15 +342,19 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
                                         on_command_phone, data);
         lc_my_android_show_connected(self->priv->phone);
         lc_main_window_set_phone_connected(self);
-        
-        const gchar *title=lc_tool_stack_get_current_title(self->priv->tool_stack);
-        if(g_strcmp0(title,APPLICATION_VIEW_TITLE)==0){
-            on_application(true,self);
+
+        const gchar *title =
+            lc_tool_stack_get_current_title(self->priv->tool_stack);
+        if (g_strcmp0(title, APPLICATION_VIEW_TITLE) == 0) {
+            on_application(true, self);
         }
+        lc_notify_show("Lucy", "Connection established successfully!");
     } else {
         /* Connection failed */
         lc_my_android_show_disconnect(self->priv->phone);
         lc_main_window_set_phone_disconnected(self);
+        lc_notify_show("Lucy",
+                       "Failed to connect to your Android device!");
     }
 }
 

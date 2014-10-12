@@ -20,6 +20,7 @@
 #include "lcaboutdialog.h"
 #include <limits.h>
 #include <unistd.h>
+#include <libnotify/notify.h>
 
 static gchar exedir[PATH_MAX] = "./";
 static gchar cachedir[PATH_MAX];
@@ -27,6 +28,7 @@ static gchar imgcachedir[PATH_MAX];
 
 void lc_init(int argc, char *argv[])
 {
+    notify_init("lucy");
     /* get the running executable file's absolute path */
     ssize_t count = readlink("/proc/self/exe", exedir, PATH_MAX);
     if (count <= 0) {
