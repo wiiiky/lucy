@@ -44,7 +44,7 @@ void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon
   pixbuf = lc_util_load_pixbuf_from_resouce(icon);
 
   if (pixbuf == NULL) {
-    pixbuf = lc_util_load_pixbuf_from_resouce("default-icon");
+    pixbuf = lc_util_load_pixbuf_from_resouce("default-icon.png");
   }
   
   notify_notification_set_image_from_pixbuf(notification, pixbuf);

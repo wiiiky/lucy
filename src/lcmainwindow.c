@@ -348,13 +348,13 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
         if (g_strcmp0(title, APPLICATION_VIEW_TITLE) == 0) {
             on_application(true, self);
         }
-        lc_notify_show("Lucy", "Connection established successfully!", "icon-connect_successful");
+        lc_notify_show("Lucy", "Connection established successfully!", "icon-connect_successful.png");
     } else {
         /* Connection failed */
         lc_my_android_show_disconnect(self->priv->phone);
         lc_main_window_set_phone_disconnected(self);
         lc_notify_show("Lucy",
-                       "Failed to connect to your Android device!", "icon-connect-failed");
+                       "Failed to connect to your Android device!", "icon-connect-failed.png");
     }
 }
 
