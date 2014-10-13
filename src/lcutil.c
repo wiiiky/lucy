@@ -157,7 +157,7 @@ GdkPixbuf *lc_util_load_icon(const gchar * package_name, int width,
                                                  height);
     if (pixbuf == NULL) {
         pixbuf =
-            lc_util_load_pixbuf_from_resource_with_size(DEFAULT_ICON,
+            lc_util_load_pixbuf_from_resource_with_size(APPLICATION_DEFAULT_ICON,
                                                         width, height);
     }
     return pixbuf;

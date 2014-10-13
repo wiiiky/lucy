@@ -21,8 +21,7 @@
 
 #include <gtk/gtk.h>
 #include "lcprotocol.h"
-
-#define DEFAULT_ICON    "default-icon.png"
+#include "lcresource.h"
 
 void lc_init(int argc, char *argv[]);
 

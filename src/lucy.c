@@ -51,6 +51,8 @@ int main(int argc, char **argv)
     lc_init(argc, argv);
     gtk_init(&argc, &argv);
 
+    g_message("%s",PACKAGE_DATA_DIR);
+
     LcMainWindow *window = lc_main_window_new();
     lc_main_window_show(window);
 

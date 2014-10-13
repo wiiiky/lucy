@@ -277,7 +277,7 @@ LcApplicationRow *lc_application_row_new_with_data(const
     if (pixbuf == NULL) {
         icon = TRUE;
         pixbuf =
-            lc_util_load_pixbuf_from_resource_with_size(DEFAULT_ICON,
+            lc_util_load_pixbuf_from_resource_with_size(APPLICATION_DEFAULT_ICON,
                                                         ICON_SIZE,
                                                         ICON_SIZE);
     }

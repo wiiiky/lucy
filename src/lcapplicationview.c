@@ -7,6 +7,7 @@
 #include "lcapplicationrow.h"
 #include "lcprotocol.h"
 #include "lcadb.h"
+#include "lcutil.h"
 #include <time.h>
 
 #define _g_list_free0(var) ((var == NULL) ? NULL : (var = (g_list_free (var), NULL)))

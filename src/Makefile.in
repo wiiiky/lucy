@@ -337,7 +337,8 @@ __top_builddir__lucy_SOURCES = \
 	lcinstalldialog.h \
 	lcinstalldialog.c \
 	lcnotify.h \
-	lcnotify.c
+	lcnotify.c \
+	lcresource.h
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \

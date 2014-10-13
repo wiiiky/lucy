@@ -180,14 +180,14 @@ static void lc_main_window_instance_init(LcMainWindow * self)
     lc_main_window_my_android_init(self);
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
-                         (lc_util_get_resource_by_name("smartphone.svg")),
+                         (lc_util_get_resource_by_name(MY_ANDROID_TITLE_ICON)),
                          MY_ANDROID_TITLE, GTK_WIDGET(self->priv->phone),
                          on_my_android, self);
 
     lc_main_window_application_init(self);
     lc_tool_stack_append(self->priv->tool_stack,
                          gtk_image_new_from_file
-                         (lc_util_get_resource_by_name("computer.svg")),
+                         (lc_util_get_resource_by_name(APPLICATION_VIEW_TITLE_ICON)),
                          APPLICATION_VIEW_TITLE,
                          GTK_WIDGET(self->priv->app_view), on_application,
                          self);
@@ -348,13 +348,13 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
         if (g_strcmp0(title, APPLICATION_VIEW_TITLE) == 0) {
             on_application(true, self);
         }
-        lc_notify_show("Lucy", "Connection established successfully!", "icon-connect_successful.png");
+        lc_notify_show("Lucy", "Connection established successfully!", CONNECT_SUCCESS_ICON);
     } else {
         /* Connection failed */
         lc_my_android_show_disconnect(self->priv->phone);
         lc_main_window_set_phone_disconnected(self);
         lc_notify_show("Lucy",
-                       "Failed to connect to your Android device!", "icon-connect-failed.png");
+                       "Failed to connect to your Android device!", CONNECT_FAIL_ICON);
     }
 }
 
