@@ -18,10 +18,10 @@ public class VersionResponse extends Response {
     public String getString() {
         PackageInfo info;
         try {
-            info=mContext.getPackageManager().getPackageInfo(mContext.getPackageName(),0);
+            info = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {
             return "unknown";
         }
-        return getOKAY()+Integer.toString(info.versionCode);
+        return getOKAY() + Integer.toString(info.versionCode);
     }
 }

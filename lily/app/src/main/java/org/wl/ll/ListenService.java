@@ -9,8 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ListenService extends Service {
-    private static int LISTEN_PORT =37859;
-    private ServerSocket serverSocket=null;
+    private static int LISTEN_PORT = 37859;
+    private ServerSocket serverSocket = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -18,19 +18,19 @@ public class ListenService extends Service {
     }
 
     @Override
-    public void onCreate(){
+    public void onCreate() {
         super.onCreate();
 
-        Runnable runnable=new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 Socket client;
-                try{
-                    serverSocket=new ServerSocket(LISTEN_PORT);
-                    while((client = serverSocket.accept())!=null){
-                        new ConnectionThread(ListenService.this,client).start();
+                try {
+                    serverSocket = new ServerSocket(LISTEN_PORT);
+                    while ((client = serverSocket.accept()) != null) {
+                        new ConnectionThread(ListenService.this, client).start();
                     }
-                }catch (Exception e) {
+                } catch (Exception e) {
                 }
             }
         };
@@ -40,9 +40,9 @@ public class ListenService extends Service {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if(serverSocket!=null) {
+        if (serverSocket != null) {
             try {
                 serverSocket.close();
             } catch (IOException e) {

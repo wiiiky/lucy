@@ -7,14 +7,15 @@ import android.content.Context;
  */
 public class UnknownResponse extends Response {
     private String data;
-    public UnknownResponse(Context ctx,String buf) {
+
+    public UnknownResponse(Context ctx, String buf) {
         super(ctx);
-        data=buf;
+        data = buf;
     }
 
     @Override
     public String getString() {
-        return getFAIL()+data;
+        return getFAIL() + data;
     }
 
 }

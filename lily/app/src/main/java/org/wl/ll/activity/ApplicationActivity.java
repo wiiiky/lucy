@@ -9,9 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import org.wl.ll.adapter.ApplicationListAdapter;
+import org.wl.ll.adapter.ApplicationAdapter;
 import org.wl.ll.R;
-import org.wl.ll.model.ApplicationListModel;
+import org.wl.ll.model.ApplicationModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,43 +19,36 @@ import java.util.List;
 
 public class ApplicationActivity extends Activity {
 
-    private ListView listPackages=null;
-    private ApplicationListAdapter packageListAdapter=null;
+    private ListView listPackages = null;
+    private ApplicationAdapter packageListAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_application);
 
-        listPackages=(ListView)findViewById(R.id.list);
+        listPackages = (ListView) findViewById(R.id.list);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                ArrayList<ApplicationListModel> list=new ArrayList<ApplicationListModel>();
-                PackageManager manager=getPackageManager();
-                List<PackageInfo> packages=manager.getInstalledPackages(0);
-                for (int i=0;i<packages.size();i++){
-                    PackageInfo info=packages.get(i);
-                    ApplicationListModel model=new ApplicationListModel(
+                ArrayList<ApplicationModel> list = new ArrayList<ApplicationModel>();
+                PackageManager manager = getPackageManager();
+                List<PackageInfo> packages = manager.getInstalledPackages(0);
+                for (int i = 0; i < packages.size(); i++) {
+                    PackageInfo info = packages.get(i);
+                    ApplicationModel model = new ApplicationModel(
                             info.applicationInfo.loadIcon(manager),
                             info.packageName,
                             info.applicationInfo.loadLabel(manager).toString());
                     list.add(model);
                 }
 
-                packageListAdapter=new ApplicationListAdapter(ApplicationActivity.this,list);
+                packageListAdapter = new ApplicationAdapter(ApplicationActivity.this, list);
                 listPackages.setAdapter(packageListAdapter);
             }
-        },100);
+        }, 100);
     }
-
-
-    @Override
-    public void onStart(){
-        super.onStart();
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,8 +69,8 @@ public class ApplicationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onBackPressed(){
+    public void onBackPressed() {
         finish();
-        overridePendingTransition(R.anim.in_from_left,R.anim.out_to_right);
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 }

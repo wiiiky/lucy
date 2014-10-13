@@ -11,24 +11,24 @@ import android.content.Intent;
  */
 public class NotificationHelper {
 
-    public static void show(String title,String text,Activity ac){
+    public static void show(String title, String text, Activity ac) {
         Intent intent = new Intent(ac, ac.getClass());
         PendingIntent pIntent = PendingIntent.getActivity(ac, 0, intent, 0);
 
         // build notification
-        Notification n  = new Notification.Builder(ac)
+        Notification n = new Notification.Builder(ac)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentIntent(pIntent).build();
 
-        n.flags=Notification.FLAG_AUTO_CANCEL;
+        n.flags = Notification.FLAG_AUTO_CANCEL;
         NotificationManager notificationManager =
                 (NotificationManager) ac.getSystemService(ac.NOTIFICATION_SERVICE);
         notificationManager.notify(0, n);
     }
 
-    public static void cancelAll(Activity ac){
+    public static void cancelAll(Activity ac) {
         NotificationManager notificationManager =
                 (NotificationManager) ac.getSystemService(ac.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();

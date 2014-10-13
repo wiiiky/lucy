@@ -13,9 +13,9 @@ import java.io.FileReader;
 
 /**
  * Created by wiky on 9/27/14.
- *
+ * <p/>
  * 返回基本的手机信息
- *
+ * <p/>
  * 手机型号，手机品牌，手机号码（如果有）,可用内存大小，总内存大小，sdcard可用大小，sdcard总大小,
  * 手机内部存储器可用容量，手机内部存储器总容量
  */
@@ -26,24 +26,24 @@ public class PhoneResponse extends Response {
 
     @Override
     public String getString() {
-        String data=getPhoneInfo()+ getMemorySize()+getExternalStorageSize()+ getDataStorageSize();
-        return getOKAY()+data;
+        String data = getPhoneInfo() + getMemorySize() + getExternalStorageSize() + getDataStorageSize();
+        return getOKAY() + data;
     }
 
 
-    private String getPhoneInfo(){
-        String mtype="unknown";
-        String mtyb="unknown";
-        String number="0";
+    private String getPhoneInfo() {
+        String mtype = "unknown";
+        String mtyb = "unknown";
+        String number = "0";
         try {
             TelephonyManager mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
             mtype = android.os.Build.MODEL; // 手机型号
             mtyb = android.os.Build.BRAND;//手机品牌
             number = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
-        }catch (Exception e){
+        } catch (Exception e) {
             MainActivity.LOG(e.getMessage());
         }
-        return mtype+"\n"+mtyb+"\n"+number+"\n";
+        return mtype + "\n" + mtyb + "\n" + number + "\n";
     }
 
     private String getMemorySize() {// 获取android当前可用内存大小
@@ -52,42 +52,42 @@ public class PhoneResponse extends Response {
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
         am.getMemoryInfo(mi);
 
-        return Formatter.formatFileSize(mContext, mi.availMem)+"\n"+
-                Formatter.formatFileSize(mContext, getTotalMemory())+"\n";// 将获取的内存大小规格化
+        return Formatter.formatFileSize(mContext, mi.availMem) + "\n" +
+                Formatter.formatFileSize(mContext, getTotalMemory()) + "\n";// 将获取的内存大小规格化
     }
 
-    private String getExternalStorageSize(){
-        String path=getExternalStoragePath();
-        long total=0;
-        long avail=0;
+    private String getExternalStorageSize() {
+        String path = getExternalStoragePath();
+        long total = 0;
+        long avail = 0;
         try {
             StatFs fstat = new StatFs(path);
-            int size=fstat.getBlockSize();
-            total=size*fstat.getBlockCount();
-            avail = size*fstat.getAvailableBlocks();
-        }catch (Exception e){
+            int size = fstat.getBlockSize();
+            total = size * fstat.getBlockCount();
+            avail = size * fstat.getAvailableBlocks();
+        } catch (Exception e) {
         }
 
-        return Formatter.formatFileSize(mContext,avail)+"\n"+
-                Formatter.formatFileSize(mContext,total)+"\n";
+        return Formatter.formatFileSize(mContext, avail) + "\n" +
+                Formatter.formatFileSize(mContext, total) + "\n";
     }
 
     /*
      * 获取手机内部存储器大小
      */
-    private String getDataStorageSize(){
-        long total=0;
-        long avail=0;
-        try{
-            StatFs statFs=new StatFs(android.os.Environment.getDataDirectory().getPath());
-            long size=statFs.getBlockSize();
-            total=size*statFs.getBlockCount();
-            avail=size*statFs.getAvailableBlocks();
-        }catch (Exception e){
+    private String getDataStorageSize() {
+        long total = 0;
+        long avail = 0;
+        try {
+            StatFs statFs = new StatFs(android.os.Environment.getDataDirectory().getPath());
+            long size = statFs.getBlockSize();
+            total = size * statFs.getBlockCount();
+            avail = size * statFs.getAvailableBlocks();
+        } catch (Exception e) {
 
         }
-        return Formatter.formatFileSize(mContext,avail)+"\n"+
-                Formatter.formatFileSize(mContext,total)+"\n";
+        return Formatter.formatFileSize(mContext, avail) + "\n" +
+                Formatter.formatFileSize(mContext, total) + "\n";
     }
 
     private String getExternalStoragePath() {
@@ -102,20 +102,20 @@ public class PhoneResponse extends Response {
         return null;
     }
 
-    private long getTotalMemory(){
-        String infoFile="/proc/meminfo";
+    private long getTotalMemory() {
+        String infoFile = "/proc/meminfo";
         String line;
         String[] arrayOfString;
-        long memory=0;
-        try{
-            FileReader reader=new FileReader(infoFile);
-            BufferedReader bufferedReader=new BufferedReader(reader,4096*2);
-            line=bufferedReader.readLine();
-            arrayOfString=line.split("\\s+");
-            memory=Long.valueOf(arrayOfString[1]).longValue()*1024; //KB=>B
+        long memory = 0;
+        try {
+            FileReader reader = new FileReader(infoFile);
+            BufferedReader bufferedReader = new BufferedReader(reader, 4096 * 2);
+            line = bufferedReader.readLine();
+            arrayOfString = line.split("\\s+");
+            memory = Long.valueOf(arrayOfString[1]).longValue() * 1024; //KB=>B
             bufferedReader.close();
             reader.close();
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         return memory;

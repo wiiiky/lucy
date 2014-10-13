@@ -26,28 +26,28 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     /* 监听的端口号 */
 
-    private static MainActivity instance=null;
+    private static MainActivity instance = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        tvLog =(TextView)findViewById(R.id.tvLog);
-        btnApplication =(Button)findViewById(R.id.btnApplication);
-        btnSMS =(Button)findViewById(R.id.btnSMS);
+        tvLog = (TextView) findViewById(R.id.tvLog);
+        btnApplication = (Button) findViewById(R.id.btnApplication);
+        btnSMS = (Button) findViewById(R.id.btnSMS);
 
         btnApplication.setOnClickListener(this);
         btnSMS.setOnClickListener(this);
 
-        handler=new Handler();
-        this.startService(new Intent(this,ListenService.class));
+        handler = new Handler();
+        this.startService(new Intent(this, ListenService.class));
 
-        instance=this;
+        instance = this;
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         super.onDestroy();
         NotificationHelper.cancelAll(this);
     }
@@ -72,47 +72,46 @@ public class MainActivity extends Activity implements View.OnClickListener {
         return super.onOptionsItemSelected(item);
     }
 
-    private Runnable addLog=new Runnable() {
+    private Runnable addLog = new Runnable() {
         @Override
         public void run() {
-            String log="";
+            String log = "";
             synchronized (aqueue) {
                 log = aqueue.remove();
             }
-            tvLog.setText(tvLog.getText()+log+"\n");
+            tvLog.setText(tvLog.getText() + log + "\n");
         }
     };
 
-    private Queue<String> aqueue=new LinkedList<String>();
+    private Queue<String> aqueue = new LinkedList<String>();
 
-    public void showLog(String log){
-        synchronized (aqueue){
+    public void showLog(String log) {
+        synchronized (aqueue) {
             aqueue.add(log);
         }
         handler.post(addLog);
     }
 
 
-    public static void LOG(String log){
-        if(instance!=null){
+    public static void LOG(String log) {
+        if (instance != null) {
             instance.showLog(log);
         }
     }
 
 
-
     @Override
     public void onClick(View view) {
-        if(view.getId()==R.id.btnApplication){
+        if (view.getId() == R.id.btnApplication) {
             tvLog.setText("");
-            Intent intent=new Intent(this,ApplicationActivity.class);
+            Intent intent = new Intent(this, ApplicationActivity.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
-        }else if(view.getId()==R.id.btnSMS){
+            overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+        } else if (view.getId() == R.id.btnSMS) {
             tvLog.setText("");
-            Intent intent=new Intent(this, SMSActivity.class);
+            Intent intent = new Intent(this, SMSActivity.class);
             startActivity(intent);
-            overridePendingTransition(R.anim.in_from_right,R.anim.out_to_left);
+            overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
         }
     }
 }
