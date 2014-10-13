@@ -35,6 +35,9 @@ public class SMSActivity extends Activity {
             @Override
             public void run() {
                 ArrayList<SMSModel> list = readSMS();
+                if(list==null){
+                    return;
+                }
                 SMSAdapter adapter = new SMSAdapter(SMSActivity.this, list);
                 listView.setAdapter(adapter);
             }
@@ -74,33 +77,37 @@ public class SMSActivity extends Activity {
     private final String SMS_COLUMN_TYPE = "type";
 
     private ArrayList<SMSModel> readSMS() {
-        Uri uri = Uri.parse(URI_SMS_INBOX);
-        String[] projection = new String[]{SMS_COLUMN_ID, SMS_COLUMN_ADDRESS,
-                SMS_COLUMN_PERSON, SMS_COLUMN_BODY,
-                SMS_COLUMN_DATE, SMS_COLUMN_TYPE};
-        Cursor cursor = getContentResolver().query(uri, projection, null, null, "date desc");
         ArrayList<SMSModel> list = new ArrayList<SMSModel>();
-        if (cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndex(SMS_COLUMN_ID);
-            int addressIndex = cursor.getColumnIndex(SMS_COLUMN_ADDRESS);
-            int personIndex = cursor.getColumnIndex(SMS_COLUMN_PERSON);
-            int bodyIndex = cursor.getColumnIndex(SMS_COLUMN_BODY);
-            int dateIndex = cursor.getColumnIndex(SMS_COLUMN_DATE);
-            int typeIndex = cursor.getColumnIndex(SMS_COLUMN_TYPE);
+        try {
+            Uri uri = Uri.parse(URI_SMS_INBOX);
+            String[] projection = new String[]{SMS_COLUMN_ID, SMS_COLUMN_ADDRESS,
+                    SMS_COLUMN_PERSON, SMS_COLUMN_BODY,
+                    SMS_COLUMN_DATE, SMS_COLUMN_TYPE};
+            Cursor cursor = getContentResolver().query(uri, projection, null, null, "date desc");
+            if (cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndex(SMS_COLUMN_ID);
+                int addressIndex = cursor.getColumnIndex(SMS_COLUMN_ADDRESS);
+                int personIndex = cursor.getColumnIndex(SMS_COLUMN_PERSON);
+                int bodyIndex = cursor.getColumnIndex(SMS_COLUMN_BODY);
+                int dateIndex = cursor.getColumnIndex(SMS_COLUMN_DATE);
+                int typeIndex = cursor.getColumnIndex(SMS_COLUMN_TYPE);
 
-            do {
-                String body = cursor.getString(bodyIndex);
-                int person = cursor.getInt(personIndex);
-                String address = cursor.getString(addressIndex);
-                long date = cursor.getLong(dateIndex);
+                do {
+                    String body = cursor.getString(bodyIndex);
+                    int person = cursor.getInt(personIndex);
+                    String address = cursor.getString(addressIndex);
+                    long date = cursor.getLong(dateIndex);
 
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                Date d = new Date(date);
-                String dateStr = dateFormat.format(d);
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                    Date d = new Date(date);
+                    String dateStr = dateFormat.format(d);
 
-                SMSModel sms = new SMSModel(body, dateStr, address);
-                list.add(sms);
-            } while (cursor.moveToNext());
+                    SMSModel sms = new SMSModel(body, dateStr, address);
+                    list.add(sms);
+                } while (cursor.moveToNext());
+            }
+        }catch (Exception e){
+            return null;
         }
 
         return list;
