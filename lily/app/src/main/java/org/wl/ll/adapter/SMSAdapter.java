@@ -43,17 +43,17 @@ public class SMSAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder = getViewHolder(view);
         SMSModel sms = (SMSModel) getItem(i);
-        holder.tvContent.setText(sms.content);
-        holder.tvTime.setText(sms.time);
-        holder.tvSender.setText(sms.sender);
+        holder.tvBody.setText(sms.body);
+        holder.tvDate.setText(sms.date);
+        holder.tvAddress.setText(sms.address);
         return holder.view;
     }
 
     private final class ViewHolder {
         public View view;
-        public TextView tvContent;
-        public TextView tvTime;
-        public TextView tvSender;
+        public TextView tvBody;
+        public TextView tvDate;
+        public TextView tvAddress;
     }
 
     private ViewHolder getViewHolder(View v) {
@@ -61,9 +61,9 @@ public class SMSAdapter extends BaseAdapter {
         if (v == null) {
             holder = new ViewHolder();
             holder.view = LayoutInflater.from(context).inflate(R.layout.sms_item, null);
-            holder.tvContent = (TextView) holder.view.findViewById(R.id.tvContent);
-            holder.tvTime = (TextView) holder.view.findViewById(R.id.tvTime);
-            holder.tvSender = (TextView) holder.view.findViewById(R.id.tvSender);
+            holder.tvBody = (TextView) holder.view.findViewById(R.id.tvBody);
+            holder.tvDate = (TextView) holder.view.findViewById(R.id.tvDate);
+            holder.tvAddress = (TextView) holder.view.findViewById(R.id.tvAddress);
             holder.view.setTag(holder);
         } else {
             holder = (ViewHolder) v.getTag();

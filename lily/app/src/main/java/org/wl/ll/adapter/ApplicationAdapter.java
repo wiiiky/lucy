@@ -44,17 +44,17 @@ public class ApplicationAdapter extends BaseAdapter {
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder = getViewHolder(view);
         ApplicationModel d = (ApplicationModel) getItem(i);
-        holder.icon.setImageDrawable(d.icon);
-        holder.packageName.setText(d.packageName);
-        holder.appName.setText(d.appName);
+        holder.imgIcon.setImageDrawable(d.icon);
+        holder.tvPackageName.setText(d.packageName);
+        holder.tvAppName.setText(d.appName);
         return holder.view;
     }
 
     private final class ViewHolder {
         public View view;
-        public ImageView icon;
-        public TextView packageName;
-        public TextView appName;
+        public ImageView imgIcon;
+        public TextView tvPackageName;
+        public TextView tvAppName;
     }
 
     private ViewHolder getViewHolder(View v) {
@@ -62,9 +62,9 @@ public class ApplicationAdapter extends BaseAdapter {
         if (v == null) {
             holder = new ViewHolder();
             holder.view = LayoutInflater.from(mContext).inflate(R.layout.application_item, null);
-            holder.icon = (ImageView) holder.view.findViewById(R.id.imgIcon);
-            holder.packageName = (TextView) holder.view.findViewById(R.id.tvPackageName);
-            holder.appName = (TextView) holder.view.findViewById(R.id.tvAppName);
+            holder.imgIcon = (ImageView) holder.view.findViewById(R.id.imgIcon);
+            holder.tvPackageName = (TextView) holder.view.findViewById(R.id.tvPackageName);
+            holder.tvAppName = (TextView) holder.view.findViewById(R.id.tvAppName);
             holder.view.setTag(holder);
         } else {
             holder = (ViewHolder) v.getTag();

@@ -7,7 +7,6 @@ import java.io.OutputStream;
 
 /**
  * Created by wiky on 9/20/14.
- * <p/>
  * 响应的基类
  */
 public abstract class Response {
@@ -24,8 +23,6 @@ public abstract class Response {
     protected String getString() {
         return null;
     }
-
-    ;
 
     protected byte[] getByte() {
         return null;
@@ -60,6 +57,10 @@ public abstract class Response {
 
     protected byte[] getLength(byte[] data) {
         return String.format("%04x", data.length).getBytes();
+    }
+
+    protected String getLength(String data) {
+        return String.format("%04x", data.length());
     }
 
     protected enum ResponseType {

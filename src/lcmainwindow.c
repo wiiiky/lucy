@@ -335,6 +335,20 @@ static void on_command_phone(const gchar * cmd, GByteArray * array,
     g_free(result);
 }
 
+static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
+                                 gpointer user_data)
+{
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL ||
+        lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Command '%s' Failed:%s", cmd, result);
+    } else {
+        g_message("%s", result);
+    }
+    g_free(result);
+}
+
 
 static void on_connection_init(LcCommanderInitResult result, gpointer data)
 {
@@ -342,6 +356,8 @@ static void on_connection_init(LcCommanderInitResult result, gpointer data)
     if (result == LC_COMMANDER_INIT_OK) {
         lc_commander_send_command_async(LC_PROTOCOL_PHONE,
                                         on_command_phone, data);
+        lc_commander_send_command_async(LC_PROTOCOL_SMS_INBOX,
+                                        on_command_sms_inbox, data);
         lc_my_android_show_connected(self->priv->phone);
         lc_main_window_set_phone_connected(self);
 

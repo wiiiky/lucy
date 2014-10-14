@@ -30,6 +30,7 @@
 #define LC_PROTOCOL_VERSION      "version\n"
 #define LC_PROTOCOL_PHONE        "phone\n"
 #define LC_PROTOCOL_ICON         "icon:%s\n"
+#define LC_PROTOCOL_SMS_INBOX     "sms-inbox\n"
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 
