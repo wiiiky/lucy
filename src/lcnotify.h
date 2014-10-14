@@ -28,7 +28,8 @@
  * if there has the icon, display it
  * else use the default icon.
  */
-void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon);
+void lc_notify_show(const gchar * summary, const gchar * body,
+                    const gchar * icon);
 
 
 #endif

@@ -108,9 +108,9 @@ const gchar *lc_util_get_image_cache_path_by_name(const gchar * name)
 GdkPixbuf *lc_util_load_pixbuf_from_resouce(const gchar * name)
 {
     const gchar *path = lc_util_get_resource_by_name(name);
-	if(path==NULL){
-		return NULL;
-	}
+    if (path == NULL) {
+        return NULL;
+    }
     GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(path, NULL);
     return pixbuf;
 }
@@ -157,8 +157,8 @@ GdkPixbuf *lc_util_load_icon(const gchar * package_name, int width,
                                                  height);
     if (pixbuf == NULL) {
         pixbuf =
-            lc_util_load_pixbuf_from_resource_with_size(APPLICATION_DEFAULT_ICON,
-                                                        width, height);
+            lc_util_load_pixbuf_from_resource_with_size
+            (APPLICATION_DEFAULT_ICON, width, height);
     }
     return pixbuf;
 }

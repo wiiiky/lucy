@@ -26,24 +26,25 @@
  * if icon: show it
  * else: default-icon
  */
-void lc_notify_show(const gchar * summary, const gchar * body, const gchar *icon)
+void lc_notify_show(const gchar * summary, const gchar * body,
+                    const gchar * icon)
 {
-  NotifyNotification *notification =
-    notify_notification_new(summary, body,
-        NULL);
+    NotifyNotification *notification =
+        notify_notification_new(summary, body,
+                                NULL);
 
-  GdkPixbuf *pixbuf = NULL;
+    GdkPixbuf *pixbuf = NULL;
 
-  pixbuf = lc_util_load_pixbuf_from_resouce(icon);
+    pixbuf = lc_util_load_pixbuf_from_resouce(icon);
 
-  if (pixbuf == NULL) {
-    pixbuf = lc_util_load_pixbuf_from_resouce(LUCY_ICON);
-  }
-  
-  notify_notification_set_image_from_pixbuf(notification, pixbuf);
+    if (pixbuf == NULL) {
+        pixbuf = lc_util_load_pixbuf_from_resouce(LUCY_ICON);
+    }
 
-  notify_notification_show(notification, NULL);
+    notify_notification_set_image_from_pixbuf(notification, pixbuf);
 
-  g_object_unref(pixbuf);
-  g_object_unref(notification);
+    notify_notification_show(notification, NULL);
+
+    g_object_unref(pixbuf);
+    g_object_unref(notification);
 }
