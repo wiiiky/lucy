@@ -148,4 +148,26 @@ LcProtocolPhone *lc_protocol_create_phone(const gchar * data);
 
 const gchar *lc_protocol_icon_command(const gchar * package);
 
+
+/**********************************SMS*********************************/
+typedef enum {
+    LC_PROTOCOL_SMS_TYPE_INBOX = 1,
+    LC_PROTOCOL_SMS_TYPE_OUTBOX,
+} LcProtocolSMSType;
+
+typedef struct {
+    LcProtocolSMSType type;
+    gchar *body;                /* the body of SMS */
+    gchar *address;             /* the author of SMS (phone number) */
+    gchar *date;                /* time */
+    gint person;                /* person in contacts */
+} LcProtocolSMS;
+
+LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
+                                   const gchar * body,
+                                   const gchar * address,
+                                   const gchar * date, gint person);
+
+void lc_protocol_sms_free(LcProtocolSMS * sms);
+
 #endif

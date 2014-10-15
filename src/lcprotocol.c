@@ -257,3 +257,29 @@ const gchar *lc_protocol_icon_command(const gchar * package)
     g_snprintf(buf, sizeof(buf), LC_PROTOCOL_ICON, package);
     return buf;
 }
+
+
+LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
+                                   const gchar * body,
+                                   const gchar * address,
+                                   const gchar * date, gint person)
+{
+    LcProtocolSMS *sms =
+        (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->type = type;
+    sms->body = g_strdup(body);
+    sms->address = g_strdup(address);
+    sms->date = g_strdup(date);
+    sms->person = person;
+
+    return sms;
+}
+
+void lc_protocol_sms_free(LcProtocolSMS * sms)
+{
+    g_free(sms->body);
+    g_free(sms->address);
+    g_free(sms->date);
+
+    g_slice_free1(sizeof(LcProtocolSMS), sms);
+}
