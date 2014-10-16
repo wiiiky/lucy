@@ -87,8 +87,12 @@ GType lc_sms_view_get_type(void)
     if (g_once_init_enter(&lc_sms_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
             { sizeof(LcSMSViewClass), (GBaseInitFunc) NULL,
-(GBaseFinalizeFunc) NULL, (GClassInitFunc) lc_sms_view_class_init, (GClassFinalizeFunc) NULL, NULL,
-sizeof(LcSMSView), 0, (GInstanceInitFunc) lc_sms_view_instance_init, NULL };
+            (GBaseFinalizeFunc) NULL,
+                (GClassInitFunc) lc_sms_view_class_init,
+                (GClassFinalizeFunc) NULL, NULL,
+            sizeof(LcSMSView), 0,
+                (GInstanceInitFunc) lc_sms_view_instance_init, NULL
+        };
         GType lc_sms_view_type_id;
         lc_sms_view_type_id =
             g_type_register_static(GTK_TYPE_SCROLLED_WINDOW, "LcSMSView",
@@ -107,44 +111,62 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
     gint width = gtk_widget_get_allocated_width(widget);
     gint margin_left = 20;
     gint margin_right = 20;
-    gint margin_top = 20;
+    gint margin_top = 40;
     gint margin_bottom = 20;
     gint text_margin = 10;
 
     gint margin_begin = 30;
     gint margin_end = 30;
 
-    PangoFontDescription *font = pango_font_description_new();
-    pango_font_description_set_size(font, 20 * PANGO_SCALE);
-    pango_font_description_set_family(font, "ubuntu mono");
-    pango_font_description_set_style(font, PANGO_STYLE_ITALIC);
+    gint margin_date = 5;
 
-    PangoLayout *layout = pango_cairo_create_layout(cr);
-    pango_layout_set_font_description(layout, font);
-    pango_layout_set_width(layout,
+    PangoFontDescription *body_font = pango_font_description_new();
+    pango_font_description_set_size(body_font, 20 * PANGO_SCALE);
+    pango_font_description_set_family(body_font, "ubuntu mono");
+    pango_font_description_set_style(body_font, PANGO_STYLE_ITALIC);
+
+    PangoLayout *body_layout = pango_cairo_create_layout(cr);
+    pango_layout_set_font_description(body_layout, body_font);
+    pango_layout_set_width(body_layout,
+                           (width - margin_left - margin_right -
+                            2 * text_margin) * PANGO_SCALE);
+
+    PangoLayout *date_layout = pango_cairo_create_layout(cr);
+    pango_layout_set_font_description(date_layout, body_font);
+    pango_layout_set_width(date_layout,
                            (width - margin_left - margin_right -
                             2 * text_margin) * PANGO_SCALE);
     gint height = margin_begin;
     while (list) {
         LcProtocolSMS *sms = (LcProtocolSMS *) list->data;
+        gint h1, w2, h2;
 
+        // draw date
+        cairo_set_source_rgba(cr, 0, 0, 0, 0.5);
+        pango_layout_set_text(date_layout, sms->date, -1);
+        pango_layout_get_pixel_size(date_layout, &w2, &h2);
+        cairo_move_to(cr, width - margin_left - margin_right - w2, height);
+        pango_cairo_show_layout(cr, date_layout);
+        height += h2 + margin_date;
+
+        // draw sms body
         cairo_set_source_rgba(cr, 0, 0, 0, 1);
         cairo_move_to(cr, margin_left + text_margin, height + text_margin);
-        pango_layout_set_text(layout, sms->body, -1);
+        pango_layout_set_text(body_layout, sms->body, -1);
+        pango_layout_get_pixel_size(body_layout, NULL, &h1);
+        pango_cairo_show_layout(cr, body_layout);
+        h1 = h1 + text_margin * 2;
 
-        gint h;
-        pango_layout_get_size(layout, NULL, &h);
-        h = h / PANGO_SCALE + text_margin * 2;
-
-        pango_cairo_show_layout(cr, layout);
+        // draw dialog box
         on_draw_box(cr, margin_left, height,
-                    width - margin_left - margin_right, h);
+                    width - margin_left - margin_right, h1);
 
-        height += h + margin_top;
+        height += h1 + margin_top;
         list = g_list_next(list);
     }
-    pango_font_description_free(font);
-    g_object_unref(layout);
+    pango_font_description_free(body_font);
+    g_object_unref(date_layout);
+    g_object_unref(body_layout);
 
     gtk_widget_set_size_request(GTK_WIDGET(widget), -1,
                                 height + margin_end);
