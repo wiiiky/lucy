@@ -241,6 +241,7 @@ nobase_res_DATA = apk/app-debug.apk \
 	icon/app-default-icon.png \
 	icon/application-view-title.svg \
 	icon/connect-success.png \
+	icon/connect-fail.png \
 	icon/my-android-title.svg
 
 all: all-am

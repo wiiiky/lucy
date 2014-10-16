@@ -148,8 +148,13 @@ static void on_install_app(GObject * source_object, GAsyncResult * result,
     gchar *path = (gchar *) user_data;
     if (ret) {
         g_warning("Failed to install %s", path);
+        lc_notify_show("Lucy",
+                       "Failed to install APP!",
+                       CONNECT_FAIL_ICON);
     } else {
         g_message("Install %s successfully", path);
+        lc_notify_show("Lucy", "Install APP successfully!",
+                       CONNECT_SUCCESS_ICON);
     }
     g_free(path);
 }
