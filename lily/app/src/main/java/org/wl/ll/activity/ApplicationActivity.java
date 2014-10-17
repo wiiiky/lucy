@@ -3,6 +3,7 @@ package org.wl.ll.activity;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -20,7 +21,6 @@ import java.util.List;
 public class ApplicationActivity extends Activity {
 
     private ListView listPackages = null;
-    private ApplicationAdapter packageListAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,25 +29,7 @@ public class ApplicationActivity extends Activity {
 
         listPackages = (ListView) findViewById(R.id.list);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ArrayList<ApplicationModel> list = new ArrayList<ApplicationModel>();
-                PackageManager manager = getPackageManager();
-                List<PackageInfo> packages = manager.getInstalledPackages(0);
-                for (int i = 0; i < packages.size(); i++) {
-                    PackageInfo info = packages.get(i);
-                    ApplicationModel model = new ApplicationModel(
-                            info.applicationInfo.loadIcon(manager),
-                            info.packageName,
-                            info.applicationInfo.loadLabel(manager).toString());
-                    list.add(model);
-                }
-
-                packageListAdapter = new ApplicationAdapter(ApplicationActivity.this, list);
-                listPackages.setAdapter(packageListAdapter);
-            }
-        }, 100);
+        new ReadApplicationTask().execute();
     }
 
     @Override
@@ -69,8 +51,37 @@ public class ApplicationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    private class ReadApplicationTask extends AsyncTask<Void, Void, ArrayList<ApplicationModel>> {
+
+        @Override
+        protected ArrayList<ApplicationModel> doInBackground(Void... voids) {
+            return readApplicationList();
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ApplicationModel> list) {
+            ApplicationAdapter adapter = new ApplicationAdapter(ApplicationActivity.this, list);
+            listPackages.setAdapter(adapter);
+        }
+
+        private ArrayList<ApplicationModel> readApplicationList() {
+            ArrayList<ApplicationModel> list = new ArrayList<ApplicationModel>();
+            PackageManager manager = getPackageManager();
+            List<PackageInfo> packages = manager.getInstalledPackages(0);
+            for (int i = 0; i < packages.size(); i++) {
+                PackageInfo info = packages.get(i);
+                ApplicationModel model = new ApplicationModel(
+                        info.applicationInfo.loadIcon(manager),
+                        info.packageName,
+                        info.applicationInfo.loadLabel(manager).toString());
+                list.add(model);
+            }
+            return list;
+        }
+    }
+
     public void onBackPressed() {
-        finish();
+        moveTaskToBack(true);
         overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 }

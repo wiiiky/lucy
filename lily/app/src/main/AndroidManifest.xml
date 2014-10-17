@@ -20,12 +20,12 @@
             android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.ApplicationActivity"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_application" >
         </activity>
 
@@ -37,6 +37,7 @@
 
         <activity
             android:name=".activity.SMSActivity"
+            android:launchMode="singleInstance"
             android:label="@string/title_activity_sms" >
         </activity>
     </application>

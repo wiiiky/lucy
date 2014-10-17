@@ -55,11 +55,6 @@ public class SMSActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onBackPressed() {
-        finish();
-        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
-    }
-
     private class ReadSMSTask extends AsyncTask<Void, Void, ArrayList<SMSModel>> {
 
         @Override
@@ -119,5 +114,10 @@ public class SMSActivity extends Activity {
 
             return list;
         }
+    }
+
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 }
