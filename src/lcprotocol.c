@@ -64,7 +64,13 @@ LcProtocolApplication *lc_protocol_application_new(const gchar *
     p->version = g_strdup(version);
     p->installed_time = g_strdup(installed_time);
     p->location = g_strdup(installed_location);
-    p->type = g_strdup(type);
+    if (g_strcmp0(type, "system") == 0) {
+        p->type = LC_PROTOCOL_APPLICATION_TYPE_SYSTEM;
+    } else if (g_strcmp0(type, "user") == 0) {
+        p->type = LC_PROTOCOL_APPLICATION_TYPE_THIRD;
+    } else {
+        p->type = LC_PROTOCOL_APPLICATION_TYPE_UNKNOWN;
+    }
     p->description = g_strdup(description);
     return p;
 }
@@ -80,7 +86,7 @@ LcProtocolApplication *lc_protocol_application_copy(const
     p->version = g_strdup(info->version);
     p->installed_time = g_strdup(info->installed_time);
     p->location = g_strdup(info->location);
-    p->type = g_strdup(info->type);
+    p->type = info->type;
     p->description = g_strdup(info->description);
     return p;
 }
@@ -93,7 +99,6 @@ lc_protocol_application_free_internal(LcProtocolApplication * p)
     g_free(p->version);
     g_free(p->installed_time);
     g_free(p->location);
-    g_free(p->type);
     g_free(p->description);
 }
 

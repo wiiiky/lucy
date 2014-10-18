@@ -45,14 +45,20 @@ LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes);
 
 
 /******************************APPLICATIONS******************************/
+typedef enum {
+    LC_PROTOCOL_APPLICATION_TYPE_SYSTEM,
+    LC_PROTOCOL_APPLICATION_TYPE_THIRD,
+    LC_PROTOCOL_APPLICATION_TYPE_UNKNOWN,
+} LcProtocolApplicationType;
+
 typedef struct {
     gchar *package_name;
     gchar *app_name;
     gchar *version;
     gchar *installed_time;
     gchar *location;
-    gchar *type;
     gchar *description;
+    LcProtocolApplicationType type;
 } LcProtocolApplication;
 
 #define LC_PROTOCOL_APPLICATION_SIZE    (7)
