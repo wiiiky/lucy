@@ -32,6 +32,9 @@
 struct _LcApplicationViewPrivate {
     GtkGrid *app_grid;
     GtkToolbar *app_toolbar;
+    GtkRadioToolButton *all_app;
+    GtkRadioToolButton *sys_app;
+    GtkRadioToolButton *third_app;
     GtkScrolledWindow *app_scrolled;
     GtkGrid *apps;
     gint app_count;
@@ -47,7 +50,7 @@ struct _LcApplicationViewPrivate {
 
 #define RADIO_BUTTON_ALL    "ALL"
 #define RADIO_BUTTON_SYS    "SYSTEM ONLY"
-#define RADIO_BUTTON_USER   "3RD PARTY ONLY"
+#define RADIO_BUTTON_THIRD   "3RD PARTY ONLY"
 
 #define lc_application_view_get_priv(self)	((self)->priv)
 #define lc_application_view_get_grid(self) \
@@ -89,6 +92,11 @@ enum {
 static void lc_application_view_finalize(GObject * obj);
 static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
                                          gpointer user_data);
+static inline void lc_application_view_show_all(LcApplicationView * self);
+static inline void lc_application_view_show_system(LcApplicationView *
+                                                   self);
+static inline void lc_application_view_show_third(LcApplicationView *
+                                                  self);
 
 
 LcApplicationView *lc_application_view_construct(GType object_type)
@@ -132,26 +140,31 @@ static void lc_application_view_instance_init(LcApplicationView * self)
     gtk_grid_attach(priv->app_grid, GTK_WIDGET(priv->app_toolbar), 0, 0, 1,
                     1);
 
-    GtkToolItem *all_app = gtk_radio_tool_button_new(NULL);
-    g_signal_connect(G_OBJECT(all_app), "toggled",
+    priv->all_app = (GtkRadioToolButton *) gtk_radio_tool_button_new(NULL);
+    g_signal_connect(G_OBJECT(priv->all_app), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);
-    gtk_tool_button_set_label(GTK_TOOL_BUTTON(all_app), RADIO_BUTTON_ALL);
-    GtkToolItem *sys_app =
-        gtk_radio_tool_button_new_from_widget(GTK_RADIO_TOOL_BUTTON
-                                              (all_app));
-    g_signal_connect(G_OBJECT(sys_app), "toggled",
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(priv->all_app),
+                              RADIO_BUTTON_ALL);
+    priv->sys_app =
+        (GtkRadioToolButton *)
+        gtk_radio_tool_button_new_from_widget(priv->all_app);
+    g_signal_connect(G_OBJECT(priv->sys_app), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);
-    gtk_tool_button_set_label(GTK_TOOL_BUTTON(sys_app), RADIO_BUTTON_SYS);
-    GtkToolItem *user_app =
-        gtk_radio_tool_button_new_from_widget(GTK_RADIO_TOOL_BUTTON
-                                              (all_app));
-    g_signal_connect(G_OBJECT(user_app), "toggled",
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(priv->sys_app),
+                              RADIO_BUTTON_SYS);
+    priv->third_app =
+        (GtkRadioToolButton *)
+        gtk_radio_tool_button_new_from_widget(priv->all_app);
+    g_signal_connect(G_OBJECT(priv->third_app), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);
-    gtk_tool_button_set_label(GTK_TOOL_BUTTON(user_app),
-                              RADIO_BUTTON_USER);
-    gtk_toolbar_insert(priv->app_toolbar, all_app, -1);
-    gtk_toolbar_insert(priv->app_toolbar, sys_app, -1);
-    gtk_toolbar_insert(priv->app_toolbar, user_app, -1);
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(priv->third_app),
+                              RADIO_BUTTON_THIRD);
+    gtk_toolbar_insert(priv->app_toolbar, GTK_TOOL_ITEM(priv->all_app),
+                       -1);
+    gtk_toolbar_insert(priv->app_toolbar, GTK_TOOL_ITEM(priv->sys_app),
+                       -1);
+    gtk_toolbar_insert(priv->app_toolbar, GTK_TOOL_ITEM(priv->third_app),
+                       -1);
 
     priv->app_scrolled =
         (GtkScrolledWindow *) gtk_scrolled_window_new(NULL, NULL);
@@ -217,40 +230,12 @@ static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
         const gchar *label =
             gtk_tool_button_get_label(GTK_TOOL_BUTTON(radio));
         LcApplicationView *self = (LcApplicationView *) user_data;
-        gint i, max = self->priv->app_count;
-        GtkGrid *apps = self->priv->apps;
-        if (g_strcmp0(label, RADIO_BUTTON_USER) == 0) {
-            for (i = 0; i < max; i++) {
-                LcApplicationRow *row =
-                    (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
-                LcProtocolApplication *app =
-                    (LcProtocolApplication *)
-                    lc_application_row_get_data(row);
-                if (app->type == LC_PROTOCOL_APPLICATION_TYPE_THIRD) {
-                    gtk_widget_show(GTK_WIDGET(row));
-                } else {
-                    gtk_widget_hide(GTK_WIDGET(row));
-                }
-            }
+        if (g_strcmp0(label, RADIO_BUTTON_THIRD) == 0) {
+            lc_application_view_show_third(self);
         } else if (g_strcmp0(label, RADIO_BUTTON_SYS) == 0) {
-            for (i = 0; i < max; i++) {
-                LcApplicationRow *row =
-                    (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
-                LcProtocolApplication *app =
-                    (LcProtocolApplication *)
-                    lc_application_row_get_data(row);
-                if (app->type == LC_PROTOCOL_APPLICATION_TYPE_SYSTEM) {
-                    gtk_widget_show(GTK_WIDGET(row));
-                } else {
-                    gtk_widget_hide(GTK_WIDGET(row));
-                }
-            }
+            lc_application_view_show_system(self);
         } else {
-            for (i = 0; i < max; i++) {
-                LcApplicationRow *row =
-                    (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
-                gtk_widget_show(GTK_WIDGET(row));
-            }
+            lc_application_view_show_all(self);
         }
     }
 }
@@ -376,8 +361,9 @@ void lc_application_view_update(LcApplicationView * self, GList * list)
         lc_application_view_append_row(self, info);
         lp = g_list_next(lp);
     }
-
     g_list_free(copy);
+
+    lc_application_view_update_view(self);
 }
 
 void lc_application_view_set_loading(LcApplicationView * self,
@@ -394,4 +380,83 @@ gboolean lc_application_view_is_loading(LcApplicationView * self)
 guint64 lc_application_view_get_update_time(LcApplicationView * self)
 {
     return lc_application_view_get_updatetime(self);
+}
+
+LcProtocolApplicationType
+lc_application_view_get_current_type(LcApplicationView * self)
+{
+    GtkRadioToolButton *all_app = self->priv->all_app;
+    GtkRadioToolButton *sys_app = self->priv->sys_app;
+    GtkRadioToolButton *third_app = self->priv->third_app;
+    if (gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(all_app))) {
+        return LC_PROTOCOL_APPLICATION_TYPE_ALL;
+    } else
+        if (gtk_toggle_tool_button_get_active
+            (GTK_TOGGLE_TOOL_BUTTON(sys_app))) {
+        return LC_PROTOCOL_APPLICATION_TYPE_SYSTEM;
+    } else
+        if (gtk_toggle_tool_button_get_active
+            (GTK_TOGGLE_TOOL_BUTTON(third_app))) {
+        return LC_PROTOCOL_APPLICATION_TYPE_THIRD;
+    }
+    return LC_PROTOCOL_APPLICATION_TYPE_UNKNOWN;
+}
+
+void lc_application_view_update_view(LcApplicationView * self)
+{
+    LcProtocolApplicationType type =
+        lc_application_view_get_current_type(self);
+    if (type == LC_PROTOCOL_APPLICATION_TYPE_ALL) {
+        lc_application_view_show_all(self);
+    } else if (type == LC_PROTOCOL_APPLICATION_TYPE_SYSTEM) {
+        lc_application_view_show_system(self);
+    } else if (type == LC_PROTOCOL_APPLICATION_TYPE_THIRD) {
+        lc_application_view_show_third(self);
+    }
+}
+
+static inline void lc_application_view_show_all(LcApplicationView * self)
+{
+    gint i, max = self->priv->app_count;
+    GtkGrid *apps = self->priv->apps;
+    for (i = 0; i < max; i++) {
+        LcApplicationRow *row =
+            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        gtk_widget_show(GTK_WIDGET(row));
+    }
+}
+
+static inline void lc_application_view_show_system(LcApplicationView *
+                                                   self)
+{
+    gint i, max = self->priv->app_count;
+    GtkGrid *apps = self->priv->apps;
+    for (i = 0; i < max; i++) {
+        LcApplicationRow *row =
+            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        LcProtocolApplication *app = (LcProtocolApplication *)
+            lc_application_row_get_data(row);
+        if (app->type == LC_PROTOCOL_APPLICATION_TYPE_SYSTEM) {
+            gtk_widget_show(GTK_WIDGET(row));
+        } else {
+            gtk_widget_hide(GTK_WIDGET(row));
+        }
+    }
+}
+
+static inline void lc_application_view_show_third(LcApplicationView * self)
+{
+    gint i, max = self->priv->app_count;
+    GtkGrid *apps = self->priv->apps;
+    for (i = 0; i < max; i++) {
+        LcApplicationRow *row =
+            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        LcProtocolApplication *app = (LcProtocolApplication *)
+            lc_application_row_get_data(row);
+        if (app->type == LC_PROTOCOL_APPLICATION_TYPE_THIRD) {
+            gtk_widget_show(GTK_WIDGET(row));
+        } else {
+            gtk_widget_hide(GTK_WIDGET(row));
+        }
+    }
 }

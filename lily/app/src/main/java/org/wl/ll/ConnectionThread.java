@@ -1,8 +1,6 @@
 package org.wl.ll;
 
 import android.content.Context;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +29,7 @@ public class ConnectionThread extends Thread {
     private static String REQUEST_ICON = "icon:";     /* 应用图标 */
     private static String REQUEST_VERSION = "version";    /* 当前手机客户端的版本号 */
     private static String REQUEST_PHONE = "phone";    /* 手机的基本信息 */
-    private static String REQUEST_SMS_INBOX = "sms-inbox";    /* 短信收件箱 */
+    private static String REQUEST_SMS_INBOX = "sms";    /* 短信收件箱 */
 
     public ConnectionThread(Context ctx, Socket s) {
         socket = s;
@@ -104,7 +102,7 @@ public class ConnectionThread extends Thread {
     }
 
     private void onSMSInboxResponse() {
-        new InboxSMSResponse(mContext).onResponse(outputStream);
+        new SMSResponse(mContext).onResponse(outputStream);
     }
 
     /*

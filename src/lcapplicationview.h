@@ -60,5 +60,9 @@ void lc_application_view_set_loading(LcApplicationView * self,
                                      gboolean loading);
 gboolean lc_application_view_is_loading(LcApplicationView * self);
 
+LcProtocolApplicationType
+lc_application_view_get_current_type(LcApplicationView * self);
+void lc_application_view_update_view(LcApplicationView * self);
+
 G_END_DECLS
 #endif

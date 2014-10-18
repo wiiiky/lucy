@@ -266,7 +266,8 @@ const gchar *lc_protocol_icon_command(const gchar * package)
 }
 
 
-LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
+LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
+                                   LcProtocolSMSType type,
                                    const gchar * body,
                                    const gchar * address,
                                    const gchar * date, gint person,
@@ -274,6 +275,7 @@ LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->thread_id = thread_id;
     sms->type = type;
     sms->body = g_strdup(body);
     sms->address = g_strdup(address);
@@ -284,13 +286,15 @@ LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
     return sms;
 }
 
-LcProtocolSMS *lc_protocol_sms_new_take(LcProtocolSMSType type,
+LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
+                                        LcProtocolSMSType type,
                                         gchar * body, gchar * address,
                                         gchar * date, gint person,
                                         glong time)
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->thread_id = thread_id;
     sms->type = type;
     sms->body = body;
     sms->address = address;
@@ -304,6 +308,7 @@ LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self)
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->thread_id = self->thread_id;
     sms->type = self->type;
     sms->body = g_strdup(self->body);
     sms->address = g_strdup(self->address);
@@ -333,18 +338,33 @@ static gint sms_compare_func(gconstpointer a, gconstpointer b)
     return 0;
 }
 
-GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
-                                   const gchar * data)
+GList *lc_protocol_create_sms_list(const gchar * data)
 {
-    GHashTable *table = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *table = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     const gchar *cur = data;
     const gchar *colon;
     while ((colon = strchr(cur, ':'))) {
+        gchar *id = g_strndup(cur, colon - cur);
+        cur = colon + 1;
+        if ((colon = strchr(cur, ':')) == NULL) {
+            g_free(id);
+            break;
+        }
+        gchar *type = g_strndup(cur, colon - cur);
+        cur = colon + 1;
+        if ((colon = strchr(cur, ':')) == NULL) {
+            /* ERROR */
+            g_free(id);
+            g_free(type);
+            break;
+        }
         gchar *date = g_strndup(cur, colon - cur);
         cur = colon + 1;
         if ((colon = strchr(cur, ':')) == NULL) {
             /* ERROR */
+            g_free(id);
+            g_free(type);
             g_free(date);
             break;
         }
@@ -352,6 +372,8 @@ GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
         cur = colon + 1;
         if ((colon = strchr(cur, ':')) == NULL) {
             /* ERROR */
+            g_free(id);
+            g_free(type);
             g_free(date);
             g_free(address);
             break;
@@ -361,6 +383,8 @@ GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
         gssize size = lc_util_size_from_hex(cur);
         if (size < 0) {
             /* ERROR */
+            g_free(id);
+            g_free(type);
             g_free(date);
             g_free(address);
             g_free(person);
@@ -369,14 +393,22 @@ GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
         cur = cur + 4;
         gchar *body = g_strndup(cur, size);
         cur = cur + size;
+
+        LcProtocolSMSType _type = LC_PROTOCOL_SMS_TYPE_INBOX;
+        if (g_strcmp0("2", type) == 0) {
+            _type = LC_PROTOCOL_SMS_TYPE_SENT;
+        }
+        gint _id = atoi(id);
         LcProtocolSMS *sms =
-            lc_protocol_sms_new_take(type, body, address, date,
+            lc_protocol_sms_new_take(_id, _type, body, address, date,
                                      atoi(person), atol(date));
+        g_free(id);
+        g_free(type);
         g_free(person);
         GList *lp =
-            (GList *) g_hash_table_lookup(table, (gconstpointer) address);
+            (GList *) g_hash_table_lookup(table, GINT_TO_POINTER(_id));
         lp = g_list_append(lp, sms);
-        g_hash_table_replace(table, (gpointer) address, (gpointer) lp);
+        g_hash_table_replace(table, GINT_TO_POINTER(_id), (gpointer) lp);
     }
 
     GList *ret = NULL;

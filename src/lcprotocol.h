@@ -30,7 +30,7 @@
 #define LC_PROTOCOL_VERSION      "version\n"
 #define LC_PROTOCOL_PHONE        "phone\n"
 #define LC_PROTOCOL_ICON         "icon:%s\n"
-#define LC_PROTOCOL_SMS_INBOX     "sms-inbox\n"
+#define LC_PROTOCOL_SMS_INBOX     "sms\n"
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 
@@ -46,6 +46,7 @@ LcProtocolResult lc_protocol_get_result_from_bytes(GBytes * bytes);
 
 /******************************APPLICATIONS******************************/
 typedef enum {
+    LC_PROTOCOL_APPLICATION_TYPE_ALL,
     LC_PROTOCOL_APPLICATION_TYPE_SYSTEM,
     LC_PROTOCOL_APPLICATION_TYPE_THIRD,
     LC_PROTOCOL_APPLICATION_TYPE_UNKNOWN,
@@ -158,10 +159,11 @@ const gchar *lc_protocol_icon_command(const gchar * package);
 /**********************************SMS*********************************/
 typedef enum {
     LC_PROTOCOL_SMS_TYPE_INBOX = 1,
-    LC_PROTOCOL_SMS_TYPE_OUTBOX,
+    LC_PROTOCOL_SMS_TYPE_SENT,
 } LcProtocolSMSType;
 
 typedef struct {
+    gint thread_id;
     LcProtocolSMSType type;
     gchar *body;                /* the body of SMS */
     gchar *address;             /* the author of SMS (phone number) */
@@ -170,19 +172,20 @@ typedef struct {
     glong time;
 } LcProtocolSMS;
 
-LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
+LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
+                                   LcProtocolSMSType type,
                                    const gchar * body,
                                    const gchar * address,
                                    const gchar * date, gint person,
                                    glong time);
-LcProtocolSMS *lc_protocol_sms_new_take(LcProtocolSMSType type,
+LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
+                                        LcProtocolSMSType type,
                                         gchar * body, gchar * address,
                                         gchar * date, gint person,
                                         glong time);
 LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self);
 
-GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
-                                   const gchar * data);
+GList *lc_protocol_create_sms_list(const gchar * data);
 void lc_protocol_free_sms_list(GList * list);
 
 void lc_protocol_sms_free(LcProtocolSMS * sms);
