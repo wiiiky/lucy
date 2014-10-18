@@ -20,12 +20,12 @@ typedef struct _LcApplicationViewClass LcApplicationViewClass;
 typedef struct _LcApplicationViewPrivate LcApplicationViewPrivate;
 
 struct _LcApplicationView {
-    GtkScrolledWindow parent_instance;
+    GtkStack parent_instance;
     LcApplicationViewPrivate *priv;
 };
 
 struct _LcApplicationViewClass {
-    GtkScrolledWindowClass parent_class;
+    GtkStackClass parent_class;
 };
 
 

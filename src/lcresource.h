@@ -27,7 +27,11 @@
 #define LUCY_ICON		"lucy.png"
 
 #define MY_ANDROID_TITLE_ICON	"icon/my-android-title.svg"
+#define MY_ANDROID_CSS_FILE     "css/my-android.css"
+
+
 #define APPLICATION_VIEW_TITLE_ICON "icon/application-view-title.svg"
+#define APPLICATION_VIEW_CSS_FILE   "css/application-view.css"
 
 #define APPLICATION_DEFAULT_ICON	"icon/app-default-icon.png"
 

@@ -61,6 +61,8 @@ LcMyAndroid *lc_my_android_construct(GType object_type)
                                         "transition-type",
                                         GTK_STACK_TRANSITION_TYPE_CROSSFADE,
                                         NULL);
+
+    lc_util_load_css(GTK_WIDGET(self), MY_ANDROID_CSS_FILE);
     return self;
 }
 
@@ -103,7 +105,7 @@ static void lc_my_android_disconnect_init(LcMyAndroid * self)
 {
     GtkGrid *dc = (GtkGrid *) gtk_grid_new();
 
-    gtk_widget_set_name(GTK_WIDGET(dc), "grid");
+    gtk_widget_set_name(GTK_WIDGET(dc), "dc_grid");
 
     GtkWidget *button = gtk_button_new_with_label(BUTTON_CONNECT_LABEL);
     gtk_widget_set_name(button, "connect");
@@ -112,8 +114,6 @@ static void lc_my_android_disconnect_init(LcMyAndroid * self)
     gtk_widget_set_hexpand(button, TRUE);
     gtk_widget_set_halign(button, GTK_ALIGN_CENTER);
     gtk_widget_set_margin_top(button, 300);
-
-    lc_util_load_css(GTK_WIDGET(dc), "css/disconnected.css");
 
     gtk_widget_show_all(GTK_WIDGET(dc));
 
@@ -126,6 +126,7 @@ static void lc_my_android_disconnect_init(LcMyAndroid * self)
 static void lc_my_android_connect_init(LcMyAndroid * self)
 {
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
+    gtk_widget_set_name(GTK_WIDGET(cn), "c_grid");
     gtk_grid_set_column_spacing(cn, 15);
 
     GtkWidget *label = gtk_label_new("brand:");

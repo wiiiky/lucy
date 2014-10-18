@@ -14,19 +14,25 @@
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 struct _LcApplicationViewPrivate {
-    GtkGrid *grid;
-    gint row_count;
+    GtkGrid *app_grid;
+    GtkToolbar *app_toolbar;
+    GtkScrolledWindow *app_scrolled;
+    GtkGrid *apps;
+    gint app_count;
 
-    gboolean loading;           /* loading data from LILY? */
-    guint64 update_time;        /* the time in second that list updated last time */
+    gboolean app_loading;       /* loading data from LILY? */
+    guint64 app_last_update;    /* the time in second that list updated last time */
 
-    LcApplicationRow *selected; /* the pointer to the selected row */
+    LcApplicationRow *selected_row; /* the pointer to the selected row */
 };
+
+#define STACK_NAME_APPLICATION_VIEW "application-view"
+
 #define lc_application_view_get_priv(self)	((self)->priv)
 #define lc_application_view_get_grid(self) \
-	lc_application_view_get_priv(self)->grid
+	lc_application_view_get_priv(self)->apps
 #define lc_application_view_get_row_count(self) \
-	lc_application_view_get_priv(self)->row_count
+	lc_application_view_get_priv(self)->app_count
 #define lc_application_view_set_row_count(self,count) \
 	lc_application_view_get_row_count(self)=(count)
 #define lc_application_view_inc_row_count(self) \
@@ -36,13 +42,13 @@ struct _LcApplicationViewPrivate {
 	lc_application_view_get_row_count(self) = \
 	lc_application_view_get_row_count(self) - 1
 #define lc_application_view_get_loading(self) \
-        lc_application_view_get_priv(self)->loading
+        lc_application_view_get_priv(self)->app_loading
 #define lc_application_view_get_updatetime(self) \
-        lc_application_view_get_priv(self)->update_time
+        lc_application_view_get_priv(self)->app_last_update
 #define lc_application_view_set_updatetime(self,time) \
         lc_application_view_get_updatetime(self)=time
 #define lc_application_view_get_selected(self) \
-        lc_application_view_get_priv(self)->selected
+        lc_application_view_get_priv(self)->selected_row
 #define lc_application_view_set_selected(self,row) \
         do{ \
         if(lc_application_view_get_selected(self)){ \
@@ -66,8 +72,10 @@ LcApplicationView *lc_application_view_construct(GType object_type)
 {
     LcApplicationView *self = NULL;
     self = (LcApplicationView *) g_object_new(object_type, NULL);
-    gtk_container_add(GTK_CONTAINER(self),
-                      (GtkWidget *) lc_application_view_get_grid(self));
+    gtk_stack_add_named(GTK_STACK(self), GTK_WIDGET(self->priv->app_grid),
+                        STACK_NAME_APPLICATION_VIEW);
+
+    lc_util_load_css(GTK_WIDGET(self), APPLICATION_VIEW_CSS_FILE);
     return self;
 }
 
@@ -91,13 +99,48 @@ static void lc_application_view_instance_init(LcApplicationView * self)
     self->priv = LC_APPLICATION_VIEW_GET_PRIVATE(self);
 
     LcApplicationViewPrivate *priv = self->priv;
-    priv->grid = (GtkGrid *) gtk_grid_new();
-    gtk_grid_set_column_homogeneous(priv->grid, TRUE);
-    g_object_ref_sink(priv->grid);
-    priv->row_count = 0;
-    priv->loading = FALSE;
-    priv->update_time = 0;
-    priv->selected = NULL;
+    priv->app_grid = (GtkGrid *) gtk_grid_new();
+    gtk_grid_set_column_homogeneous(priv->app_grid, TRUE);
+    g_object_ref_sink(priv->app_grid);
+
+    priv->app_toolbar = (GtkToolbar *) gtk_toolbar_new();
+    gtk_toolbar_set_style(priv->app_toolbar, GTK_TOOLBAR_TEXT);
+    g_object_ref_sink(priv->app_toolbar);
+    gtk_grid_attach(priv->app_grid, GTK_WIDGET(priv->app_toolbar), 0, 0, 1,
+                    1);
+
+    GtkToolItem *all_app = gtk_radio_tool_button_new(NULL);
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(all_app), "ALL");
+    GtkToolItem *sys_app =
+        gtk_radio_tool_button_new_from_widget(GTK_RADIO_TOOL_BUTTON
+                                              (all_app));
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(sys_app), "SYSTEM ONLY");
+    GtkToolItem *user_app =
+        gtk_radio_tool_button_new_from_widget(GTK_RADIO_TOOL_BUTTON
+                                              (all_app));
+    gtk_tool_button_set_label(GTK_TOOL_BUTTON(user_app), "3RD PARTY ONLY");
+    gtk_toolbar_insert(priv->app_toolbar, all_app, -1);
+    gtk_toolbar_insert(priv->app_toolbar, sys_app, -1);
+    gtk_toolbar_insert(priv->app_toolbar, user_app, -1);
+
+    priv->app_scrolled =
+        (GtkScrolledWindow *) gtk_scrolled_window_new(NULL, NULL);
+    gtk_widget_set_vexpand(GTK_WIDGET(priv->app_scrolled), TRUE);
+    g_object_ref_sink(priv->app_scrolled);
+    gtk_grid_attach(priv->app_grid, GTK_WIDGET(priv->app_scrolled), 0, 1,
+                    1, 1);
+
+    priv->apps = (GtkGrid *) gtk_grid_new();
+    gtk_widget_set_name(GTK_WIDGET(priv->apps), "apps");
+    gtk_grid_set_column_homogeneous(priv->apps, TRUE);
+    g_object_ref_sink(priv->apps);
+    gtk_container_add(GTK_CONTAINER(priv->app_scrolled),
+                      GTK_WIDGET(priv->apps));
+
+    priv->app_count = 0;
+    priv->app_loading = FALSE;
+    priv->app_last_update = 0;
+    priv->selected_row = NULL;
 }
 
 
@@ -107,7 +150,10 @@ static void lc_application_view_finalize(GObject * obj)
     self =
         G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_APPLICATION_VIEW,
                                    LcApplicationView);
-    _g_object_unref0(self->priv->grid);
+    _g_object_unref0(self->priv->app_grid);
+    _g_object_unref0(self->priv->app_toolbar);
+    _g_object_unref0(self->priv->apps);
+    _g_object_unref0(self->priv->app_scrolled);
     G_OBJECT_CLASS(lc_application_view_parent_class)->finalize(obj);
 }
 
@@ -125,7 +171,7 @@ GType lc_application_view_get_type(void)
         };
         GType lc_application_view_type_id;
         lc_application_view_type_id =
-            g_type_register_static(GTK_TYPE_SCROLLED_WINDOW,
+            g_type_register_static(GTK_TYPE_STACK,
                                    "LcApplicationView",
                                    &g_define_type_info, 0);
         g_once_init_leave(&lc_application_view_type_id__volatile,

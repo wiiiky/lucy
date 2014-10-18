@@ -348,7 +348,7 @@ static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
             lc_protocol_create_sms_list(LC_PROTOCOL_SMS_TYPE_INBOX,
                                         result + LC_PROTOCOL_HDR_LEN);
         if (inbox) {
-            show_test(inbox->data);
+            //show_test(inbox->data);
         } else {
             g_message("fialed");
         }

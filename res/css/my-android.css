@@ -1,6 +1,10 @@
-GtkGrid#grid{
+GtkGrid#dc_grid{
     background-image:url("../android.jpeg");
     background-size:cover;
+}
+
+GtkGrid#c_grid{
+    background: white;
 }
 
 GtkButton#connect{
