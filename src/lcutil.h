@@ -86,4 +86,9 @@ typedef gboolean(*GListElementNotify) (gconstpointer data,
 GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
                              gpointer user_data, GDestroyNotify destroy);
 
+/*
+ * convert 4-byte hexadecimal string to decimal interger.
+ */
+gssize lc_util_size_from_hex(const gchar buf[4]);
+
 #endif

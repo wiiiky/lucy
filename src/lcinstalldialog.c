@@ -21,6 +21,7 @@
 #include "lcinstalldialog.h"
 #include "lcadb.h"
 #include "lcutil.h"
+#include "lcnotify.h"
 #include <gtk/gtk.h>
 
 

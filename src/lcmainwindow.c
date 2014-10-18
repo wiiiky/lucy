@@ -344,7 +344,15 @@ static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
         LC_PROTOCOL_RESULT_OKAY) {
         g_warning("Command '%s' Failed:%s", cmd, result);
     } else {
-        g_message("%s", result);
+        GList *inbox =
+            lc_protocol_create_sms_list(LC_PROTOCOL_SMS_TYPE_INBOX,
+                                        result + LC_PROTOCOL_HDR_LEN);
+        if (inbox) {
+            show_test(inbox->data);
+        } else {
+            g_message("fialed");
+        }
+        lc_protocol_free_sms_list(inbox);
     }
     g_free(result);
 }

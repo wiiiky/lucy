@@ -18,6 +18,8 @@
  */
 #include "lcprotocol.h"
 #include "lcutil.h"
+#include <string.h>
+#include <stdlib.h>
 
 
 LcProtocolResult lc_protocol_get_result_from_string(const gchar * str)
@@ -262,7 +264,8 @@ const gchar *lc_protocol_icon_command(const gchar * package)
 LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
                                    const gchar * body,
                                    const gchar * address,
-                                   const gchar * date, gint person)
+                                   const gchar * date, gint person,
+                                   glong time)
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
@@ -271,8 +274,124 @@ LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
     sms->address = g_strdup(address);
     sms->date = g_strdup(date);
     sms->person = person;
+    sms->time = time;
 
     return sms;
+}
+
+LcProtocolSMS *lc_protocol_sms_new_take(LcProtocolSMSType type,
+                                        gchar * body, gchar * address,
+                                        gchar * date, gint person,
+                                        glong time)
+{
+    LcProtocolSMS *sms =
+        (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->type = type;
+    sms->body = body;
+    sms->address = address;
+    sms->date = date;
+    sms->person = person;
+    sms->time = time;
+    return sms;
+}
+
+LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self)
+{
+    LcProtocolSMS *sms =
+        (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
+    sms->type = self->type;
+    sms->body = g_strdup(self->body);
+    sms->address = g_strdup(self->address);
+    sms->date = g_strdup(self->date);
+    sms->person = self->person;
+    sms->time = self->time;
+
+    return sms;
+}
+
+static void sms_hash_func(gpointer key, gpointer value, gpointer user_data)
+{
+    GList **list = ((GList **) user_data);
+    *list = g_list_append(*list, value);
+}
+
+static gint sms_compare_func(gconstpointer a, gconstpointer b)
+{
+    LcProtocolSMS *sa = (LcProtocolSMS *) ((GList *) a)->data;
+    LcProtocolSMS *sb = (LcProtocolSMS *) ((GList *) b)->data;
+
+    if (sa->time > sb->time) {
+        return -1;
+    } else if (sa->time < sb->time) {
+        return 1;
+    }
+    return 0;
+}
+
+GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
+                                   const gchar * data)
+{
+    GHashTable *table = g_hash_table_new(g_str_hash, g_str_equal);
+
+    const gchar *cur = data;
+    const gchar *colon;
+    while ((colon = strchr(cur, ':'))) {
+        gchar *date = g_strndup(cur, colon - cur);
+        cur = colon + 1;
+        if ((colon = strchr(cur, ':')) == NULL) {
+            /* ERROR */
+            g_free(date);
+            break;
+        }
+        gchar *address = g_strndup(cur, colon - cur);
+        cur = colon + 1;
+        if ((colon = strchr(cur, ':')) == NULL) {
+            /* ERROR */
+            g_free(date);
+            g_free(address);
+            break;
+        }
+        gchar *person = g_strndup(cur, colon - cur);
+        cur = colon + 1;
+        gssize size = lc_util_size_from_hex(cur);
+        if (size < 0) {
+            /* ERROR */
+            g_free(date);
+            g_free(address);
+            g_free(person);
+            break;
+        }
+        cur = cur + 4;
+        gchar *body = g_strndup(cur, size);
+        cur = cur + size;
+        LcProtocolSMS *sms =
+            lc_protocol_sms_new_take(type, body, address, date,
+                                     atoi(person), atol(date));
+        g_free(person);
+        GList *lp =
+            (GList *) g_hash_table_lookup(table, (gconstpointer) address);
+        lp = g_list_append(lp, sms);
+        g_hash_table_replace(table, (gpointer) address, (gpointer) lp);
+    }
+
+    GList *ret = NULL;
+    g_hash_table_foreach(table, sms_hash_func, &ret);
+    g_hash_table_destroy(table);
+
+    ret = g_list_sort(ret, (GCompareFunc) sms_compare_func);
+
+    return ret;
+}
+
+void lc_protocol_free_sms_list(GList * list)
+{
+    GList *lp = list;
+    while (lp) {
+        GList *l = (GList *) lp->data;
+        g_list_free_full(l, (GDestroyNotify) lc_protocol_sms_free);
+        lp = g_list_next(lp);
+    }
+    g_list_free(list);
 }
 
 void lc_protocol_sms_free(LcProtocolSMS * sms)

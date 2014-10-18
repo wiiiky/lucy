@@ -214,3 +214,28 @@ GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
     }
     return list;
 }
+
+gssize lc_util_size_from_hex(const gchar buf[4])
+{
+    int i, j;
+    int size = 0;
+    for (i = 0; i < 4; i++) {
+        int power = 3 - i;
+        int base = 1;
+        for (j = 0; j < power; j++) {
+            base = base * 16;
+        }
+        int times = 0;
+        if (buf[i] >= '0' && buf[i] <= '9') {
+            times = buf[i] - '0';
+        } else if (buf[i] >= 'a' && buf[i] <= 'f') {
+            times = buf[i] - 'a' + 10;
+        } else if (buf[i] >= 'A' && buf[i] <= 'F') {
+            times = buf[i] - 'A' + 10;
+        } else {
+            return -1;
+        }
+        size += times * base;
+    }
+    return size;
+}

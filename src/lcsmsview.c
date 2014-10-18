@@ -43,7 +43,7 @@ struct _LcSMSViewPrivate {
     LcSMSFontStyle address_style;   /* the font style of address */
     LcSMSFontColor address_color;   /* the color of address */
 
-     /**/ gint margin_top;
+    gint margin_top;
     gint margin_bottom;
     gint margin_left;
     gint margin_right;
@@ -51,6 +51,9 @@ struct _LcSMSViewPrivate {
     gint margin_date;
     gint margin_address;
     gint message_spacing;
+
+
+    gboolean show_address;
 
     GList *list;
 };
@@ -83,6 +86,13 @@ LcSMSView *lc_sms_view_construct(GType object_type, GList * list)
 
 
 LcSMSView *lc_sms_view_new(GList * list)
+{
+    GList *copy =
+        g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    return lc_sms_view_construct(TYPE_LC_SMS_VIEW, copy);
+}
+
+LcSMSView *lc_sms_view_new_take(GList * list)
 {
     return lc_sms_view_construct(TYPE_LC_SMS_VIEW, list);
 }
@@ -132,7 +142,7 @@ static void lc_sms_view_instance_init(LcSMSView * self)
     priv->address_color.blue = 1.1;
     priv->address_color.alpha = 0.8;
 
-     /**/ priv->margin_top = 20;
+    priv->margin_top = 20;
     priv->margin_bottom = 30;
     priv->margin_left = 15;
     priv->margin_right = 15;
@@ -140,6 +150,8 @@ static void lc_sms_view_instance_init(LcSMSView * self)
     priv->margin_date = 5;
     priv->margin_address = 8;
     priv->message_spacing = 25;
+
+    priv->show_address = TRUE;
 }
 
 
@@ -207,6 +219,8 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
     gdouble address_b = self->priv->address_color.blue;
     gdouble address_a = self->priv->address_color.alpha;
 
+    gboolean show_address = self->priv->show_address;
+
     PangoFontDescription *body_font = pango_font_description_new();
     pango_font_description_set_size(body_font,
                                     self->priv->body_size * PANGO_SCALE);
@@ -259,14 +273,16 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
         pango_cairo_show_layout(cr, date_layout);
 
         // draw address
-        cairo_set_source_rgba(cr, address_r, address_g, address_b,
-                              address_a);
-        pango_layout_set_text(address_layout, sms->address, -1);
-        pango_layout_get_pixel_size(address_layout, &w3, &h3);
-        cairo_move_to(cr,
-                      width - margin_left - margin_right - w2 - w3 -
-                      margin_address, height);
-        pango_cairo_show_layout(cr, address_layout);
+        if (show_address) {
+            cairo_set_source_rgba(cr, address_r, address_g, address_b,
+                                  address_a);
+            pango_layout_set_text(address_layout, sms->address, -1);
+            pango_layout_get_pixel_size(address_layout, &w3, &h3);
+            cairo_move_to(cr,
+                          width - margin_left - margin_right - w2 - w3 -
+                          margin_address, height);
+            pango_cairo_show_layout(cr, address_layout);
+        }
 
         height += h2 + margin_date;
 
@@ -471,5 +487,32 @@ void lc_sms_view_set_margin_full(LcSMSView * self,
     self->priv->margin_address = margin_address;
     self->priv->message_spacing = message_spacing;
 
+    lc_sms_view_redraw(self);
+}
+
+void lc_sms_view_show_address(LcSMSView * self, gboolean show)
+{
+    self->priv->show_address = show;
+    lc_sms_view_redraw(self);
+}
+
+void lc_sms_view_set_data(LcSMSView * self, GList * list)
+{
+    GList *copy =
+        g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    lc_sms_view_set_data_take(self, copy);
+}
+
+void lc_sms_view_set_data_take(LcSMSView * self, GList * list)
+{
+    g_list_free_full(self->priv->list,
+                     (GDestroyNotify) lc_protocol_sms_free);
+    self->priv->list = list;
+    lc_sms_view_redraw(self);
+}
+
+void lc_sms_view_reverse(LcSMSView * self)
+{
+    self->priv->list = g_list_reverse(self->priv->list);
     lc_sms_view_redraw(self);
 }

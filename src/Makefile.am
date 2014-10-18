@@ -44,7 +44,10 @@ __top_builddir__lucy_SOURCES =  \
 	lcinstalldialog.c \
 	lcnotify.h \
 	lcnotify.c \
-	lcresource.h
+	lcresource.h \
+	lcsmsview.h \
+	lcsmsview.c \
+	test.c
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \

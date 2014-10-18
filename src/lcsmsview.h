@@ -54,7 +54,8 @@ typedef GdkRGBA LcSMSFontColor;
 
 
 GType lc_sms_view_get_type(void) G_GNUC_CONST;
-LcSMSView *lc_sms_view_new(GList * list);
+LcSMSView *lc_sms_view_new(GList * list);   //this function will copy the list
+LcSMSView *lc_sms_view_new_take(GList * list);  //just take the list
 LcSMSView *lc_sms_view_construct(GType object_type, GList * list);
 
 
@@ -97,6 +98,13 @@ void lc_sms_view_set_margin_full(LcSMSView * self,
                                  gint margin_date,
                                  gint margin_address,
                                  gint message_spacing);
+
+void lc_sms_view_show_address(LcSMSView * self, gboolean show);
+
+void lc_sms_view_set_data(LcSMSView * self, GList * list);
+void lc_sms_view_set_data_take(LcSMSView * self, GList * list);
+
+void lc_sms_view_reverse(LcSMSView * self);
 
 
 G_END_DECLS

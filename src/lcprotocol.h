@@ -161,12 +161,23 @@ typedef struct {
     gchar *address;             /* the author of SMS (phone number) */
     gchar *date;                /* time */
     gint person;                /* person in contacts */
+    glong time;
 } LcProtocolSMS;
 
 LcProtocolSMS *lc_protocol_sms_new(LcProtocolSMSType type,
                                    const gchar * body,
                                    const gchar * address,
-                                   const gchar * date, gint person);
+                                   const gchar * date, gint person,
+                                   glong time);
+LcProtocolSMS *lc_protocol_sms_new_take(LcProtocolSMSType type,
+                                        gchar * body, gchar * address,
+                                        gchar * date, gint person,
+                                        glong time);
+LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self);
+
+GList *lc_protocol_create_sms_list(LcProtocolSMSType type,
+                                   const gchar * data);
+void lc_protocol_free_sms_list(GList * list);
 
 void lc_protocol_sms_free(LcProtocolSMS * sms);
 

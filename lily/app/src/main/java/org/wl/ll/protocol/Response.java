@@ -60,7 +60,7 @@ public abstract class Response {
     }
 
     protected String getLength(String data) {
-        return String.format("%04x", data.length());
+        return String.format("%04x", data.getBytes().length);
     }
 
     protected enum ResponseType {

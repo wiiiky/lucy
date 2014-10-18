@@ -36,7 +36,7 @@ public class InboxSMSResponse extends Response {
             String[] projection = new String[]{SMS_COLUMN_ID, SMS_COLUMN_ADDRESS,
                     SMS_COLUMN_PERSON, SMS_COLUMN_BODY,
                     SMS_COLUMN_DATE, SMS_COLUMN_TYPE};
-            Cursor cursor = mContext.getContentResolver().query(uri, projection, null, null, "date asc");
+            Cursor cursor = mContext.getContentResolver().query(uri, projection, null, null, "date desc");
             if (cursor.moveToFirst()) {
                 int idIndex = cursor.getColumnIndex(SMS_COLUMN_ID);
                 int addressIndex = cursor.getColumnIndex(SMS_COLUMN_ADDRESS);

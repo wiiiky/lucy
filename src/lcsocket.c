@@ -5,6 +5,7 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "lcsocket.h"
+#include "lcutil.h"
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -172,31 +173,6 @@ gssize lc_socket_receive(LcSocket * socket, gchar * buffer, gsize size)
     return ret;
 }
 
-gssize lc_data_length(gchar buf[4])
-{
-    int i, j;
-    int ret = 0;
-    for (i = 0; i < 4; i++) {
-        int power = 3 - i;
-        int base = 1;
-        for (j = 0; j < power; j++) {
-            base = base * 16;
-        }
-        int times = 0;
-        if (buf[i] >= '0' && buf[i] <= '9') {
-            times = buf[i] - '0';
-        } else if (buf[i] >= 'a' && buf[i] <= 'f') {
-            times = buf[i] - 'a' + 10;
-        } else if (buf[i] >= 'A' && buf[i] <= 'F') {
-            times = buf[i] - 'A' + 10;
-        } else {
-            return -1;
-        }
-        ret += times * base;
-    }
-    return ret;
-}
-
 GByteArray *lc_socket_send_command(LcSocket * socket,
                                    const gchar * command)
 {
@@ -212,7 +188,7 @@ GByteArray *lc_socket_send_command(LcSocket * socket,
     if (n != 4) {
         goto ERROR;
     }
-    gssize length = lc_data_length(buf);
+    gssize length = lc_util_size_from_hex(buf);
     if (length < 4) {           /* the response must be longer than 4 */
         goto ERROR;
     }
