@@ -51,7 +51,8 @@ struct _LcSMSViewPrivate {
     gint margin_date;
     gint margin_address;
     gint message_spacing;
-
+    gint margin_inbox;
+    gint margin_sent;
 
     gboolean show_address;
 
@@ -70,7 +71,7 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data);
 
 /* draw a dialog box */
 static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
-                        gint height);
+                        gint height, gboolean left);
 
 
 LcSMSView *lc_sms_view_construct(GType object_type, GList * list)
@@ -144,12 +145,14 @@ static void lc_sms_view_instance_init(LcSMSView * self)
 
     priv->margin_top = 20;
     priv->margin_bottom = 30;
-    priv->margin_left = 15;
-    priv->margin_right = 15;
+    priv->margin_left = 18;
+    priv->margin_right = 18;
     priv->margin_text = 8;
     priv->margin_date = 5;
     priv->margin_address = 8;
-    priv->message_spacing = 25;
+    priv->message_spacing = 32;
+    priv->margin_inbox = 120;
+    priv->margin_sent = 120;
 
     priv->show_address = TRUE;
 }
@@ -196,7 +199,10 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 {
     LcSMSView *self = (LcSMSView *) data;
     GList *list = self->priv->list;
-    gint width = gtk_widget_get_allocated_width(widget);
+    gint _width = gtk_widget_get_allocated_width(widget);
+    if (_width <= 100) {
+        return FALSE;
+    }
     gint margin_left = self->priv->margin_left;
     gint margin_right = self->priv->margin_right;
     gint margin_top = self->priv->margin_top;
@@ -205,6 +211,8 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
     gint margin_date = self->priv->margin_date;
     gint margin_address = self->priv->margin_address;
     gint message_spacing = self->priv->message_spacing;
+    gint margin_inbox = self->priv->margin_inbox;
+    gint margin_sent = self->priv->margin_sent;
 
     gdouble body_r = self->priv->body_color.red;
     gdouble body_g = self->priv->body_color.green;
@@ -229,9 +237,6 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
     PangoLayout *body_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(body_layout, body_font);
-    pango_layout_set_width(body_layout,
-                           (width - margin_left - margin_right -
-                            2 * margin_text) * PANGO_SCALE);
 
     PangoFontDescription *date_font = pango_font_description_new();
     pango_font_description_set_size(date_font,
@@ -241,9 +246,6 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
     PangoLayout *date_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(date_layout, date_font);
-    pango_layout_set_width(date_layout,
-                           (width - margin_left - margin_right -
-                            2 * margin_text) * PANGO_SCALE);
 
     PangoFontDescription *address_font = pango_font_description_new();
     pango_font_description_set_size(address_font,
@@ -256,20 +258,34 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
     PangoLayout *address_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(address_layout, address_font);
-    pango_layout_set_width(address_layout,
-                           (width - margin_left - margin_right -
-                            2 * margin_text) * PANGO_SCALE);
 
     gint height = margin_top;
     while (list) {
         LcProtocolSMS *sms = (LcProtocolSMS *) list->data;
-        gint h1, w2, h2, w3, h3;
+        gint w1, h1, w2, h2, w3, h3;
+
+        gint width = 0;
+        gint offset = 0;
+        if (sms->type == LC_PROTOCOL_SMS_TYPE_INBOX) {
+            width = _width - margin_inbox;
+        } else {
+            width = _width - margin_sent;
+            offset = margin_sent;
+        }
+        gint text_width =
+            (width - margin_left - margin_right - 2 * margin_text);
+        gint pango_width = text_width * PANGO_SCALE;
+
+        pango_layout_set_width(body_layout, pango_width);
+        pango_layout_set_width(date_layout, pango_width);
+        pango_layout_set_width(address_layout, pango_width);
 
         // draw date
         cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
         pango_layout_set_text(date_layout, sms->date, -1);
         pango_layout_get_pixel_size(date_layout, &w2, &h2);
-        cairo_move_to(cr, width - margin_left - margin_right - w2, height);
+        cairo_move_to(cr, width - margin_left - margin_right - w2 + offset,
+                      height);
         pango_cairo_show_layout(cr, date_layout);
 
         // draw address
@@ -280,7 +296,7 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
             pango_layout_get_pixel_size(address_layout, &w3, &h3);
             cairo_move_to(cr,
                           width - margin_left - margin_right - w2 - w3 -
-                          margin_address, height);
+                          margin_address + offset, height);
             pango_cairo_show_layout(cr, address_layout);
         }
 
@@ -288,17 +304,26 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
         // draw sms body
         cairo_set_source_rgba(cr, body_r, body_g, body_b, body_a);
-        cairo_move_to(cr, margin_left + margin_text, height + margin_text);
         pango_layout_set_text(body_layout, sms->body, -1);
-        pango_layout_get_pixel_size(body_layout, NULL, &h1);
+        pango_layout_get_pixel_size(body_layout, &w1, &h1);
+        cairo_move_to(cr, margin_left + margin_text + offset,
+                      height + margin_text);
+        if (offset > 0 && h1 < text_width) {
+            // alignment
+            cairo_move_to(cr,
+                          margin_left + margin_text + offset + text_width -
+                          w1, height + margin_text);
+            offset += text_width - w1;
+        }
         pango_cairo_show_layout(cr, body_layout);
         h1 = h1 + margin_text * 2;
 
         // draw dialog box
-        on_draw_box(cr, margin_left, height,
-                    width - margin_left - margin_right, h1);
+        on_draw_box(cr, margin_left + offset, height, w1 + margin_text * 2,
+                    h1, offset == 0);
 
         height += h1 + message_spacing;
+
         list = g_list_next(list);
     }
     pango_font_description_free(body_font);
@@ -314,14 +339,14 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 }
 
 static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
-                        gint height)
+                        gint height, gboolean left)
 {
     if (width <= 0 || height <= 0) {
         return;
     }
     gint radius = 3;
-    gint offset_y1 = 10;
-    gint offset_y2 = 10;
+    gint offset_y1 = 8;
+    gint offset_y2 = 12;
     gint offset_x = 10;
     cairo_save(cr);
 
@@ -341,6 +366,11 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
     cairo_arc(cr, xc, yc, radius, M_PI3_2, M_PI2);
 
     yc = y + height - radius;
+    if (!left) {
+        cairo_line_to(cr, x + width, y + height - offset_y1 - offset_y2);
+        cairo_line_to(cr, x + width + offset_x, y + height - offset_y1);
+        cairo_line_to(cr, x + width, y + height - offset_y1);
+    }
     cairo_line_to(cr, x + width, yc);
     cairo_arc(cr, xc, yc, radius, 0, M_PI1_2);
 
@@ -348,9 +378,11 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
     cairo_line_to(cr, xc, y + height);
     cairo_arc(cr, xc, yc, radius, M_PI1_2, M_PI);
 
-    cairo_line_to(cr, x, y + height - offset_y1);
-    cairo_line_to(cr, x - offset_x, y + height - offset_y1);
-    cairo_line_to(cr, x, y + height - offset_y1 - offset_y2);
+    if (left) {
+        cairo_line_to(cr, x, y + height - offset_y1);
+        cairo_line_to(cr, x - offset_x, y + height - offset_y1);
+        cairo_line_to(cr, x, y + height - offset_y1 - offset_y2);
+    }
 
     yc = y + radius;
     cairo_line_to(cr, x, yc);

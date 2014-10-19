@@ -145,15 +145,13 @@ static void lc_application_view_instance_init(LcApplicationView * self)
                      G_CALLBACK(on_radio_tool_button_toggled), self);
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(priv->all_app),
                               RADIO_BUTTON_ALL);
-    priv->sys_app =
-        (GtkRadioToolButton *)
+    priv->sys_app = (GtkRadioToolButton *)
         gtk_radio_tool_button_new_from_widget(priv->all_app);
     g_signal_connect(G_OBJECT(priv->sys_app), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(priv->sys_app),
                               RADIO_BUTTON_SYS);
-    priv->third_app =
-        (GtkRadioToolButton *)
+    priv->third_app = (GtkRadioToolButton *)
         gtk_radio_tool_button_new_from_widget(priv->all_app);
     g_signal_connect(G_OBJECT(priv->third_app), "toggled",
                      G_CALLBACK(on_radio_tool_button_toggled), self);

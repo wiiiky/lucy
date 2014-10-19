@@ -20,7 +20,7 @@ LcMyAndroid继承自GtkStack。它分为两个界面，一个是“未连接”�
 Android设备信息界面容器也是GtkGrid。目前只是添加了几个GtkLabel显示手机品牌、手机型号和手机号码。
 
 ##LcApplicationView
-LcApplicationView继承自GtkScrolledWindow。可以上下滚动。它内部用一个GtkGrid容器管理大量LcApplicationRow。每个LcApplicationRow表示一个Android应用。
+LcApplicationView继承自GtkStack，它应该也可以显示多个类型的界面，不过目前只有一个界面，就是应用列表界面。应用列表界面的根容器是一个GtkGrid，上面放置了一个GtkToolbar和GtkScrolledWindow，前者用于显示一些控制按钮，后者用滚动形式显示应用列表。GtkScrolledWindow内部用一个GtkGrid容器管理大量LcApplicationRow。每个LcApplicationRow表示一个Android应用。
 
 ##LcApplicationRow
 LcApplicationRow继承自GtkEventBox。内部使用一个GtkGrid来管理各个子控件。比如显示图标的GtkImage，显示应用名称、应用版本的GtkLabel等。
@@ -29,4 +29,4 @@ LcApplicationRow继承自GtkEventBox。内部使用一个GtkGrid来管理各个�
 ##更新
 Wiky L(wiiiky@yeah.net)
 
-Saturday, 11. October 2014 10:51PM 
+Sunday, 19. October 2014 09:39PM 
