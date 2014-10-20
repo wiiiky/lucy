@@ -96,7 +96,8 @@ am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
 	lcmainwindow.$(OBJEXT) lcadb.$(OBJEXT) lcsocket.$(OBJEXT) \
 	lcutil.$(OBJEXT) lccommander.$(OBJEXT) lctoolstack.$(OBJEXT) \
 	lcmyandroid.$(OBJEXT) lcinstalldialog.$(OBJEXT) \
-	lcnotify.$(OBJEXT) lcsmsview.$(OBJEXT) test.$(OBJEXT)
+	lcnotify.$(OBJEXT) lcsmsview.$(OBJEXT) lcsmsrow.$(OBJEXT) \
+	test.$(OBJEXT)
 __top_builddir__lucy_OBJECTS = $(am___top_builddir__lucy_OBJECTS)
 am__DEPENDENCIES_1 =
 __top_builddir__lucy_DEPENDENCIES = libadb/libadb.a \
@@ -341,6 +342,8 @@ __top_builddir__lucy_SOURCES = \
 	lcresource.h \
 	lcsmsview.h \
 	lcsmsview.c \
+	lcsmsrow.h \
+	lcsmsrow.c \
 	test.c
 
 __top_builddir__lucy_LDADD = \
@@ -452,6 +455,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcmyandroid.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcnotify.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcprotocol.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsmsrow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsmsview.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lctoolstack.Po@am__quote@

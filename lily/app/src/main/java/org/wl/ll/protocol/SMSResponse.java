@@ -60,7 +60,7 @@ public class SMSResponse extends Response {
 
                         builder.append(threadId).append(":").
                                 append(type).append(":").
-                                append(date/1000).append(":").
+                                append(date/1000).append(":").      //时间单位是毫秒...
                                 append(address).append(":").
                                 append(person).append(":").
                                 append(getLength(body)).append(body);

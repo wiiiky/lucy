@@ -56,6 +56,7 @@ typedef GdkRGBA LcSMSFontColor;
 GType lc_sms_view_get_type(void) G_GNUC_CONST;
 LcSMSView *lc_sms_view_new(GList * list);   //this function will copy the list
 LcSMSView *lc_sms_view_new_take(GList * list);  //just take the list
+LcSMSView *lc_sms_view_new_reverse(GList * list);
 LcSMSView *lc_sms_view_construct(GType object_type, GList * list);
 
 

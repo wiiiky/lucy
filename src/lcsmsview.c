@@ -56,6 +56,8 @@ struct _LcSMSViewPrivate {
 
     gboolean show_address;
 
+    gint upper;
+
     GList *list;
 };
 
@@ -82,6 +84,8 @@ LcSMSView *lc_sms_view_construct(GType object_type, GList * list)
 
     gtk_container_add(GTK_CONTAINER(self),
                       GTK_WIDGET(self->priv->draw_area));
+
+    gtk_widget_set_size_request(GTK_WIDGET(self), 450, -1);
     return self;
 }
 
@@ -90,6 +94,14 @@ LcSMSView *lc_sms_view_new(GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    return lc_sms_view_construct(TYPE_LC_SMS_VIEW, copy);
+}
+
+LcSMSView *lc_sms_view_new_reverse(GList * list)
+{
+    GList *copy =
+        g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    copy = g_list_reverse(copy);
     return lc_sms_view_construct(TYPE_LC_SMS_VIEW, copy);
 }
 
@@ -155,6 +167,8 @@ static void lc_sms_view_instance_init(LcSMSView * self)
     priv->margin_sent = 120;
 
     priv->show_address = TRUE;
+
+    priv->upper = 0;
 }
 
 
@@ -359,6 +373,16 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
     gtk_widget_set_size_request(GTK_WIDGET(widget), -1,
                                 height + margin_bottom);
+
+    self->priv->upper++;
+    if (self->priv->upper == 2) {
+        GtkAdjustment *adjust =
+            gtk_scrolled_window_get_vadjustment(GTK_SCROLLED_WINDOW(self));
+        gdouble upper = gtk_adjustment_get_upper(adjust);
+        gdouble page = gtk_adjustment_get_page_size(adjust);
+        gtk_adjustment_set_value(adjust, upper - page);
+    }
+
     return FALSE;
 }
 

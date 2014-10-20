@@ -47,6 +47,8 @@ __top_builddir__lucy_SOURCES =  \
 	lcresource.h \
 	lcsmsview.h \
 	lcsmsview.c \
+	lcsmsrow.h \
+	lcsmsrow.c \
 	test.c
 
 __top_builddir__lucy_LDADD = \
