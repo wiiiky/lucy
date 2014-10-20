@@ -280,25 +280,48 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
         pango_layout_set_width(date_layout, pango_width);
         pango_layout_set_width(address_layout, pango_width);
 
-        // draw date
-        cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
-        pango_layout_set_text(date_layout, sms->date, -1);
-        pango_layout_get_pixel_size(date_layout, &w2, &h2);
-        cairo_move_to(cr, width - margin_left - margin_right - w2 + offset,
-                      height);
-        pango_cairo_show_layout(cr, date_layout);
+        if (offset == 0) {
+            /* left */
+            // draw address
+            if (show_address) {
+                cairo_set_source_rgba(cr, address_r, address_g, address_b,
+                                      address_a);
+                pango_layout_set_text(address_layout, sms->address, -1);
+                pango_layout_get_pixel_size(address_layout, &w3, &h3);
+                cairo_move_to(cr, margin_left, height);
+                pango_cairo_show_layout(cr, address_layout);
+            } else {
+                w3 = -margin_address;
+            }
 
-        // draw address
-        if (show_address) {
-            cairo_set_source_rgba(cr, address_r, address_g, address_b,
-                                  address_a);
-            pango_layout_set_text(address_layout, sms->address, -1);
-            pango_layout_get_pixel_size(address_layout, &w3, &h3);
-            cairo_move_to(cr,
-                          width - margin_left - margin_right - w2 - w3 -
-                          margin_address + offset, height);
-            pango_cairo_show_layout(cr, address_layout);
+            // draw date
+            cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
+            pango_layout_set_text(date_layout, sms->date, -1);
+            pango_layout_get_pixel_size(date_layout, &w2, &h2);
+            cairo_move_to(cr, margin_left + w3 + margin_address, height);
+            pango_cairo_show_layout(cr, date_layout);
+        } else {
+            /* right */
+            // draw date
+            cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
+            pango_layout_set_text(date_layout, sms->date, -1);
+            pango_layout_get_pixel_size(date_layout, &w2, &h2);
+            cairo_move_to(cr, width - margin_right - w2 + offset, height);
+            pango_cairo_show_layout(cr, date_layout);
+
+            // draw address
+            if (show_address) {
+                cairo_set_source_rgba(cr, address_r, address_g, address_b,
+                                      address_a);
+                pango_layout_set_text(address_layout, sms->address, -1);
+                pango_layout_get_pixel_size(address_layout, &w3, &h3);
+                cairo_move_to(cr,
+                              width - margin_right - w2 - w3 -
+                              margin_address + offset, height);
+                pango_cairo_show_layout(cr, address_layout);
+            }
         }
+
 
         height += h2 + margin_date;
 
@@ -306,14 +329,15 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
         cairo_set_source_rgba(cr, body_r, body_g, body_b, body_a);
         pango_layout_set_text(body_layout, sms->body, -1);
         pango_layout_get_pixel_size(body_layout, &w1, &h1);
-        cairo_move_to(cr, margin_left + margin_text + offset,
-                      height + margin_text);
         if (offset > 0 && h1 < text_width) {
             // alignment
             cairo_move_to(cr,
                           margin_left + margin_text + offset + text_width -
                           w1, height + margin_text);
             offset += text_width - w1;
+        } else {
+            cairo_move_to(cr, margin_left + margin_text,
+                          height + margin_text);
         }
         pango_cairo_show_layout(cr, body_layout);
         h1 = h1 + margin_text * 2;
