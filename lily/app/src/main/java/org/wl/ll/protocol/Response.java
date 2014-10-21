@@ -1,6 +1,7 @@
 package org.wl.ll.protocol;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -73,5 +74,9 @@ public abstract class Response {
         System.arraycopy(b1, 0, b3, 0, b1.length);
         System.arraycopy(b2, 0, b3, b1.length, b2.length);
         return b3;
+    }
+
+    protected String permissionDenied(){
+        return "Permission Denied";
     }
 }

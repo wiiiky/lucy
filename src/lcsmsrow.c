@@ -92,8 +92,7 @@ static void lc_sms_row_instance_init(LcSMSRow * self)
     gtk_container_set_border_width(GTK_CONTAINER(priv->grid), 6);
     gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(priv->grid));
 
-    priv->icon =
-        (GtkImage *)
+    priv->icon = (GtkImage *)
         gtk_image_new_from_file(lc_util_get_resource_by_name
                                 (DEFAULT_AVATAR_ICON));
     g_object_ref_sink(priv->icon);
@@ -148,10 +147,10 @@ GType lc_sms_row_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(LcSMSRowClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) lc_sms_row_class_init,
-                (GClassFinalizeFunc) NULL, NULL,
+            (GClassInitFunc) lc_sms_row_class_init,
+            (GClassFinalizeFunc) NULL, NULL,
             sizeof(LcSMSRow), 0,
-                (GInstanceInitFunc) lc_sms_row_instance_init, NULL
+            (GInstanceInitFunc) lc_sms_row_instance_init, NULL
         };
         GType lc_sms_row_type_id;
         lc_sms_row_type_id =

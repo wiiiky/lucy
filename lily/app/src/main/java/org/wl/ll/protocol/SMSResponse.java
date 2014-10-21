@@ -3,6 +3,7 @@ package org.wl.ll.protocol;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Created by wiky on 10/14/14.
@@ -66,6 +67,8 @@ public class SMSResponse extends Response {
                                 append(getLength(body)).append(body);
                     }
                 } while (cursor.moveToNext());
+            }else{  //没有权限
+                return getFAIL()+permissionDenied();
             }
         } catch (Exception e) {
             return getFAIL() + e.getMessage();

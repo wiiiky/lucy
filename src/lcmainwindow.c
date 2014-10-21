@@ -349,7 +349,7 @@ static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
         if (inbox) {
             show_test(inbox->data);
         } else {
-            g_message("fialed");
+            g_message("failed");
         }
         lc_protocol_free_sms_list(inbox);
     }
