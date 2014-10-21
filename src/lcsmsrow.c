@@ -54,7 +54,7 @@ LcSMSRow *lc_sms_row_construct(GType object_type, GList * data)
     self->priv->data = data;
     if (data) {
         LcProtocolSMS *sms = (LcProtocolSMS *) data->data;
-        gchar *date = lc_date_time_format(sms->time, "%m - %d");
+        gchar *date = lc_util_date_time_format(sms->time, "%m - %d");
         lc_sms_row_set_full(self, sms->address, sms->body, date);
         g_free(date);
     }

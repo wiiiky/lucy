@@ -402,8 +402,8 @@ GList *lc_protocol_create_sms_list(const gchar * data)
         glong _date = atol(date);
         LcProtocolSMS *sms =
             lc_protocol_sms_new_take(_id, _type, body, address,
-                                     lc_date_time_format(_date,
-                                                         "%y-%m-%d %T"),
+                                     lc_util_date_time_format(_date,
+                                                              "%y-%m-%d %T"),
                                      atoi(person), _date);
         g_free(id);
         g_free(type);

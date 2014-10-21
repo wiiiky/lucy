@@ -51,7 +51,7 @@ const gchar *lc_util_get_resource_by_name(const gchar * name);
 
 /*
  * get the absolute path of a cache file
- * 
+ *
  * return string is stored in static memory and should not be freed
  */
 const gchar *lc_util_get_cache_path_by_name(const gchar * name);
@@ -91,7 +91,13 @@ GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
  */
 gssize lc_util_size_from_hex(const gchar buf[4]);
 
-gchar *lc_date_time_format(glong time, const gchar * f);
+gchar *lc_util_date_time_format(glong time, const gchar * f);
+
+
+/*
+ * 获取系统的默认字体
+ */
+const gchar *lc_util_get_system_font();
 
 
 #endif
