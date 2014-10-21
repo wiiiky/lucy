@@ -23,7 +23,7 @@ int show_test(GList * list)
                      G_CALLBACK(close_window), NULL);
 
     LcSMSView *view = lc_sms_view_new_reverse(list);
-    LcSMSRow *row = lc_sms_row_new();
+    LcSMSRow *row = lc_sms_row_new(list);
 
     GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
     gtk_paned_pack1(GTK_PANED(paned), GTK_WIDGET(row), TRUE, TRUE);

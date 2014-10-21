@@ -11,4 +11,5 @@ nobase_res_DATA=apk/app-debug.apk \
 	icon/application-view-title.svg \
 	icon/connect-success.png \
 	icon/connect-fail.png \
-	icon/my-android-title.svg
+	icon/my-android-title.svg \
+	icon/avatar-default.png

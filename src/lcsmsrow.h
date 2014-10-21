@@ -46,8 +46,15 @@ struct _LcSMSRowClass {
 
 
 GType lc_sms_row_get_type(void) G_GNUC_CONST;
-LcSMSRow *lc_sms_row_new(void);
-LcSMSRow *lc_sms_row_construct(GType object_type);
+LcSMSRow *lc_sms_row_new(GList * data);
+LcSMSRow *lc_sms_row_new_take(GList * data);
+LcSMSRow *lc_sms_row_construct(GType object_type, GList * data);
+
+void lc_sms_row_set_address(LcSMSRow * self, const gchar * address);
+void lc_sms_row_set_preview(LcSMSRow * self, const gchar * preview);
+void lc_sms_row_set_date(LcSMSRow * self, const gchar * date);
+void lc_sms_row_set_full(LcSMSRow * self, const gchar * address,
+                         const gchar * preview, const gchar * date);
 
 
 G_END_DECLS
