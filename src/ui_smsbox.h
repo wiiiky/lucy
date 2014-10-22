@@ -1,5 +1,5 @@
 /*
- * ui_smsview.h
+ * ui_smsbox.h
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -53,51 +53,50 @@ typedef GdkRGBA SMSFontColor;
 
 
 GType ui_sms_box_get_type(void) G_GNUC_CONST;
-UISMSBox *ui_sms_box_new(GList * list);   //this function will copy the list
-UISMSBox *ui_sms_box_new_take(GList * list);  //just take the list
+UISMSBox *ui_sms_box_new(GList * list); //this function will copy the list
+UISMSBox *ui_sms_box_new_take(GList * list);    //just take the list
 UISMSBox *ui_sms_box_new_reverse(GList * list);
 UISMSBox *ui_sms_box_construct(GType object_type, GList * list);
 
 
 void ui_sms_box_set_body_font_full(UISMSBox * self,
-                                    const gchar * font_name,
-                                    gint font_size,
-                                    SMSFontStyle font_style);
+                                   const gchar * font_name,
+                                   gint font_size,
+                                   SMSFontStyle font_style);
 void ui_sms_box_set_body_font_family(UISMSBox * self,
-                                      const gchar * font_name);
+                                     const gchar * font_name);
 void ui_sms_box_set_body_font_size(UISMSBox * self, gint font_size);
 void ui_sms_box_set_body_font_style(UISMSBox * self,
-                                     SMSFontStyle font_style);
+                                    SMSFontStyle font_style);
 
 void ui_sms_box_set_date_font_full(UISMSBox * self,
-                                    const gchar * font_name,
-                                    gint font_size,
-                                    SMSFontStyle font_style);
+                                   const gchar * font_name,
+                                   gint font_size,
+                                   SMSFontStyle font_style);
 void ui_sms_box_set_date_font_family(UISMSBox * self,
-                                      const gchar * font_name);
+                                     const gchar * font_name);
 void ui_sms_box_set_date_font_size(UISMSBox * self, gint font_size);
 void ui_sms_box_set_date_font_style(UISMSBox * self,
-                                     SMSFontStyle font_style);
+                                    SMSFontStyle font_style);
 
 void ui_sms_box_set_address_font_full(UISMSBox * self,
-                                       const gchar * font_name,
-                                       gint font_size,
-                                       SMSFontStyle font_style);
+                                      const gchar * font_name,
+                                      gint font_size,
+                                      SMSFontStyle font_style);
 void ui_sms_box_set_address_font_family(UISMSBox * self,
-                                         const gchar * font_name);
+                                        const gchar * font_name);
 void ui_sms_box_set_address_font_size(UISMSBox * self, gint font_size);
 void ui_sms_box_set_address_font_style(UISMSBox * self,
-                                        SMSFontStyle font_style);
+                                       SMSFontStyle font_style);
 
 void ui_sms_box_set_margin_full(UISMSBox * self,
-                                 gint margin_top,
-                                 gint margin_bottom,
-                                 gint margin_left,
-                                 gint margin_right,
-                                 gint margin_text,
-                                 gint margin_date,
-                                 gint margin_address,
-                                 gint message_spacing);
+                                gint margin_top,
+                                gint margin_bottom,
+                                gint margin_left,
+                                gint margin_right,
+                                gint margin_text,
+                                gint margin_date,
+                                gint margin_address, gint message_spacing);
 
 void ui_sms_box_show_address(UISMSBox * self, gboolean show);
 

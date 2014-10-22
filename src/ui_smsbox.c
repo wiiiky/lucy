@@ -1,5 +1,5 @@
 /*
- * ui_smsview.h
+ * ui_smsbox.h
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -454,9 +454,8 @@ static void inline ui_sms_box_redraw(UISMSBox * self)
 }
 
 void ui_sms_box_set_body_font_full(UISMSBox * self,
-                                    const gchar * font_name,
-                                    gint font_size,
-                                    SMSFontStyle font_style)
+                                   const gchar * font_name,
+                                   gint font_size, SMSFontStyle font_style)
 {
     g_free(self->priv->body_font);
     self->priv->body_font = g_strdup(font_name);
@@ -467,7 +466,7 @@ void ui_sms_box_set_body_font_full(UISMSBox * self,
 }
 
 void ui_sms_box_set_body_font_family(UISMSBox * self,
-                                      const gchar * font_name)
+                                     const gchar * font_name)
 {
     g_free(self->priv->body_font);
     self->priv->body_font = g_strdup(font_name);
@@ -482,16 +481,15 @@ void ui_sms_box_set_body_font_size(UISMSBox * self, gint font_size)
 }
 
 void ui_sms_box_set_body_font_style(UISMSBox * self,
-                                     SMSFontStyle font_style)
+                                    SMSFontStyle font_style)
 {
     self->priv->body_style = font_style;
     ui_sms_box_redraw(self);
 }
 
 void ui_sms_box_set_date_font_full(UISMSBox * self,
-                                    const gchar * font_name,
-                                    gint font_size,
-                                    SMSFontStyle font_style)
+                                   const gchar * font_name,
+                                   gint font_size, SMSFontStyle font_style)
 {
     g_free(self->priv->date_font);
     self->priv->date_font = g_strdup(font_name);
@@ -502,7 +500,7 @@ void ui_sms_box_set_date_font_full(UISMSBox * self,
 }
 
 void ui_sms_box_set_date_font_family(UISMSBox * self,
-                                      const gchar * font_name)
+                                     const gchar * font_name)
 {
     g_free(self->priv->date_font);
     self->priv->date_font = g_strdup(font_name);
@@ -515,16 +513,16 @@ void ui_sms_box_set_date_font_size(UISMSBox * self, gint font_size)
 }
 
 void ui_sms_box_set_date_font_style(UISMSBox * self,
-                                     SMSFontStyle font_style)
+                                    SMSFontStyle font_style)
 {
     self->priv->date_style = font_style;
     ui_sms_box_redraw(self);
 }
 
 void ui_sms_box_set_address_font_full(UISMSBox * self,
-                                       const gchar * font_name,
-                                       gint font_size,
-                                       SMSFontStyle font_style)
+                                      const gchar * font_name,
+                                      gint font_size,
+                                      SMSFontStyle font_style)
 {
     g_free(self->priv->address_font);
     self->priv->address_font = g_strdup(font_name);
@@ -535,7 +533,7 @@ void ui_sms_box_set_address_font_full(UISMSBox * self,
 }
 
 void ui_sms_box_set_address_font_family(UISMSBox * self,
-                                         const gchar * font_name)
+                                        const gchar * font_name)
 {
     g_free(self->priv->address_font);
     self->priv->address_font = g_strdup(font_name);
@@ -548,20 +546,20 @@ void ui_sms_box_set_address_font_size(UISMSBox * self, gint font_size)
 }
 
 void ui_sms_box_set_address_font_style(UISMSBox * self,
-                                        SMSFontStyle font_style)
+                                       SMSFontStyle font_style)
 {
     self->priv->address_style = font_style;
     ui_sms_box_redraw(self);
 }
 
 void ui_sms_box_set_margin_full(UISMSBox * self,
-                                 gint margin_top,
-                                 gint margin_bottom,
-                                 gint margin_left,
-                                 gint margin_right,
-                                 gint margin_text,
-                                 gint margin_date,
-                                 gint margin_address, gint message_spacing)
+                                gint margin_top,
+                                gint margin_bottom,
+                                gint margin_left,
+                                gint margin_right,
+                                gint margin_text,
+                                gint margin_date,
+                                gint margin_address, gint message_spacing)
 {
     self->priv->margin_top = margin_top;
     self->priv->margin_bottom = margin_bottom;

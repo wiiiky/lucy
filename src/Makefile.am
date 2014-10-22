@@ -36,6 +36,8 @@ __top_builddir__lucy_SOURCES =  \
 	ui_smsbox.c \
 	ui_smsrow.h \
 	ui_smsrow.c \
+	ui_smsview.h \
+	ui_smsview.c \
 	lcprotocol.h \
 	lcprotocol.c \
 	lcadb.c \

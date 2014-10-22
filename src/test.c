@@ -27,8 +27,8 @@ int show_test(GList * list)
     ui_sms_row_highlight(row);
 
     GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_paned_pack1(GTK_PANED(paned), GTK_WIDGET(row), TRUE, TRUE);
-    gtk_paned_pack2(GTK_PANED(paned), GTK_WIDGET(view), FALSE, FALSE);
+    gtk_paned_pack1(GTK_PANED(paned), GTK_WIDGET(row), TRUE, FALSE);
+    gtk_paned_pack2(GTK_PANED(paned), GTK_WIDGET(view), TRUE, FALSE);
     gtk_container_add(GTK_CONTAINER(window), paned);
 
     gtk_widget_show_all(window);
