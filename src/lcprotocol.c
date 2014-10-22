@@ -270,8 +270,7 @@ LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
                                    LcProtocolSMSType type,
                                    const gchar * body,
                                    const gchar * address,
-                                   const gchar * date, gint person,
-                                   glong time)
+                                   guint64 date, gint person)
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
@@ -279,9 +278,8 @@ LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
     sms->type = type;
     sms->body = g_strdup(body);
     sms->address = g_strdup(address);
-    sms->date = g_strdup(date);
+    sms->date = date;
     sms->person = person;
-    sms->time = time;
 
     return sms;
 }
@@ -289,8 +287,7 @@ LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
 LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
                                         LcProtocolSMSType type,
                                         gchar * body, gchar * address,
-                                        gchar * date, gint person,
-                                        glong time)
+                                        guint64 date, gint person)
 {
     LcProtocolSMS *sms =
         (LcProtocolSMS *) g_slice_alloc0(sizeof(LcProtocolSMS));
@@ -300,7 +297,6 @@ LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
     sms->address = address;
     sms->date = date;
     sms->person = person;
-    sms->time = time;
     return sms;
 }
 
@@ -312,9 +308,8 @@ LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self)
     sms->type = self->type;
     sms->body = g_strdup(self->body);
     sms->address = g_strdup(self->address);
-    sms->date = g_strdup(self->date);
+    sms->date = self->date;
     sms->person = self->person;
-    sms->time = self->time;
 
     return sms;
 }
@@ -330,9 +325,9 @@ static gint sms_compare_func(gconstpointer a, gconstpointer b)
     LcProtocolSMS *sa = (LcProtocolSMS *) ((GList *) a)->data;
     LcProtocolSMS *sb = (LcProtocolSMS *) ((GList *) b)->data;
 
-    if (sa->time > sb->time) {
+    if (sa->date > sb->date) {
         return -1;
-    } else if (sa->time < sb->time) {
+    } else if (sa->date < sb->date) {
         return 1;
     }
     return 0;
@@ -399,12 +394,10 @@ GList *lc_protocol_create_sms_list(const gchar * data)
             _type = LC_PROTOCOL_SMS_TYPE_SENT;
         }
         gint _id = atoi(id);
-        glong _date = atol(date);
         LcProtocolSMS *sms =
             lc_protocol_sms_new_take(_id, _type, body, address,
-                                     lc_util_date_time_format(_date,
-                                                              "%y-%m-%d %T"),
-                                     atoi(person), _date);
+                                     (guint64) atol(date),
+                                     atoi(person));
         g_free(id);
         g_free(type);
         g_free(person);
@@ -438,7 +431,6 @@ void lc_protocol_sms_free(LcProtocolSMS * sms)
 {
     g_free(sms->body);
     g_free(sms->address);
-    g_free(sms->date);
 
     g_slice_free1(sizeof(LcProtocolSMS), sms);
 }

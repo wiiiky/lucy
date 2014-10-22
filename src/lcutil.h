@@ -91,7 +91,7 @@ GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
  */
 gssize lc_util_size_from_hex(const gchar buf[4]);
 
-gchar *lc_util_date_time_format(glong time, const gchar * f);
+const gchar *lc_util_date_time_format(guint64 time, const gchar * f);
 
 
 /*

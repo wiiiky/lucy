@@ -50,5 +50,8 @@ void ui_sms_row_set_date(UISMSRow * self, const gchar * date);
 void ui_sms_row_set_full(UISMSRow * self, const gchar * address,
                          const gchar * preview, const gchar * date);
 
+void ui_sms_row_highlight(UISMSRow * self);
+void ui_sms_row_unhighlight(UISMSRow * self);
+
 G_END_DECLS
 #endif

@@ -20,6 +20,7 @@
 
 #include "ui_smsview.h"
 #include "lcprotocol.h"
+#include "lcutil.h"
 #include <gtk/gtk.h>
 #include <math.h>
 
@@ -209,6 +210,9 @@ GType ui_sms_view_get_type(void)
 }
 
 
+#define get_readable_date(date) lc_util_date_time_format((date),"%m-%d %T")
+
+
 static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 {
     UISMSView *self = (UISMSView *) data;
@@ -310,7 +314,8 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
             // draw date
             cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
-            pango_layout_set_text(date_layout, sms->date, -1);
+            pango_layout_set_text(date_layout,
+                                  get_readable_date(sms->date), -1);
             pango_layout_get_pixel_size(date_layout, &w2, &h2);
             cairo_move_to(cr, margin_left + w3 + margin_address, height);
             pango_cairo_show_layout(cr, date_layout);
@@ -318,7 +323,8 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
             /* right */
             // draw date
             cairo_set_source_rgba(cr, date_r, date_g, date_b, date_a);
-            pango_layout_set_text(date_layout, sms->date, -1);
+            pango_layout_set_text(date_layout,
+                                  get_readable_date(sms->date), -1);
             pango_layout_get_pixel_size(date_layout, &w2, &h2);
             cairo_move_to(cr, width - margin_right - w2 + offset, height);
             pango_cairo_show_layout(cr, date_layout);

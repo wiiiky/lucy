@@ -240,12 +240,14 @@ gssize lc_util_size_from_hex(const gchar buf[4])
     return size;
 }
 
-gchar *lc_util_date_time_format(glong time, const gchar * f)
+#include <time.h>
+const gchar *lc_util_date_time_format(guint64 time, const gchar * f)
 {
-    GDateTime *dt = g_date_time_new_from_unix_local(time);
-    gchar *format = g_date_time_format(dt, f);
-    g_date_time_unref(dt);
-    return format;
+    time_t timep = (time_t) time;
+    struct tm *tp = localtime(&timep);
+    static gchar buf[128];
+    strftime(buf, sizeof(buf), f, tp);
+    return buf;
 }
 
 const gchar *lc_util_get_system_font()

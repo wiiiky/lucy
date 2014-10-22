@@ -45,10 +45,10 @@ UISMSRow *ui_sms_row_construct(GType object_type, GList * data)
     self->priv->data = data;
     if (data) {
         LcProtocolSMS *sms = (LcProtocolSMS *) data->data;
-        gchar *date = lc_util_date_time_format(sms->time, "%m - %d");
+        const gchar *date = lc_util_date_time_format(sms->date, "%m - %d");
         ui_sms_row_set_full(self, sms->address, sms->body, date);
-        g_free(date);
     }
+    gtk_widget_set_size_request(GTK_WIDGET(self), 250, -1);
     return self;
 }
 
@@ -80,12 +80,15 @@ static void ui_sms_row_instance_init(UISMSRow * self)
     gtk_container_set_border_width(GTK_CONTAINER(priv->grid), 6);
     gtk_container_add(GTK_CONTAINER(self), GTK_WIDGET(priv->grid));
 
+    /* 人物头像 */
     priv->icon = (GtkImage *)
         gtk_image_new_from_file(lc_util_get_resource_by_name
                                 (DEFAULT_AVATAR_ICON));
+    gtk_widget_set_margin_right(GTK_WIDGET(priv->icon), 5);
     g_object_ref_sink(priv->icon);
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->icon), 0, 0, 2, 2);
 
+    /* 电话号码 */
     priv->address = (GtkLabel *) gtk_label_new("10086");
     gtk_label_set_markup(priv->address, "<span color='blue'>10086</span>");
     gtk_label_set_use_markup(priv->address, TRUE);
@@ -94,17 +97,19 @@ static void ui_sms_row_instance_init(UISMSRow * self)
     gtk_widget_set_halign(GTK_WIDGET(priv->address), GTK_ALIGN_START);
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->address), 2, 0, 1, 1);
 
+    /* 日期 */
     priv->date = (GtkLabel *) gtk_label_new("10-23");
     gtk_widget_set_margin_right(GTK_WIDGET(priv->date), 10);
     gtk_widget_set_halign(GTK_WIDGET(priv->date), GTK_ALIGN_END);
     g_object_ref_sink(priv->date);
     gtk_grid_attach(priv->grid, GTK_WIDGET(priv->date), 3, 0, 1, 1);
 
+    /* 消息预览 */
     priv->preview = (GtkLabel *)
         gtk_label_new
         ("Linux是一套免费使用和自由传播的类Unix操作系统，是一个基于POSIX和UNIX的多用户");
     g_object_ref_sink(priv->preview);
-	gtk_widget_set_hexpand(GTK_WIDGET(priv->preview),TRUE);
+    gtk_widget_set_hexpand(GTK_WIDGET(priv->preview), TRUE);
     gtk_widget_set_halign(GTK_WIDGET(priv->preview), GTK_ALIGN_START);
     gtk_label_set_ellipsize(priv->preview, PANGO_ELLIPSIZE_END);
     gtk_label_set_single_line_mode(priv->preview, TRUE);
@@ -176,4 +181,29 @@ void ui_sms_row_set_full(UISMSRow * self,
     ui_sms_row_set_address(self, address);
     ui_sms_row_set_preview(self, preview);
     ui_sms_row_set_date(self, date);
+}
+
+static GtkCssProvider *highlight_provider = NULL;
+void ui_sms_row_highlight(UISMSRow * self)
+{
+    if (highlight_provider == NULL) {
+        highlight_provider = gtk_css_provider_new();
+        gtk_css_provider_load_from_data(highlight_provider,
+                                        "GtkGrid{background-color:lightblue;}",
+                                        -1, NULL);
+    }
+    GtkStyleContext *style =
+        gtk_widget_get_style_context(GTK_WIDGET(self->priv->grid));
+    gtk_style_context_add_provider(style,
+                                   GTK_STYLE_PROVIDER(highlight_provider),
+                                   GTK_STYLE_PROVIDER_PRIORITY_USER);
+}
+
+void ui_sms_row_unhighlight(UISMSRow * self)
+{
+    GtkStyleContext *style =
+        gtk_widget_get_style_context(GTK_WIDGET(self->priv->grid));
+    gtk_style_context_remove_provider(style,
+                                      GTK_STYLE_PROVIDER
+                                      (highlight_provider));
 }
