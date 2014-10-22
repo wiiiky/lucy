@@ -94,7 +94,7 @@ am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
 	ui_aboutdialog.$(OBJEXT) ui_applicationview.$(OBJEXT) \
 	ui_applicationrow.$(OBJEXT) ui_mainwindow.$(OBJEXT) \
 	ui_myandroid.$(OBJEXT) ui_toolstack.$(OBJEXT) \
-	ui_installdialog.$(OBJEXT) ui_smsview.$(OBJEXT) \
+	ui_installdialog.$(OBJEXT) ui_smsbox.$(OBJEXT) \
 	ui_smsrow.$(OBJEXT) lcprotocol.$(OBJEXT) lcadb.$(OBJEXT) \
 	lcsocket.$(OBJEXT) lcutil.$(OBJEXT) lccommander.$(OBJEXT) \
 	lcnotify.$(OBJEXT) test.$(OBJEXT)
@@ -327,8 +327,8 @@ __top_builddir__lucy_SOURCES = \
 	ui_toolstack.c \
 	ui_installdialog.h \
 	ui_installdialog.c \
-	ui_smsview.h \
-	ui_smsview.c \
+	ui_smsbox.h \
+	ui_smsbox.c \
 	ui_smsrow.h \
 	ui_smsrow.c \
 	lcprotocol.h \
@@ -459,8 +459,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_installdialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_mainwindow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_myandroid.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_smsbox.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_smsrow.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_smsview.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_toolstack.Po@am__quote@
 
 .c.o:

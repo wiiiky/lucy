@@ -1,5 +1,5 @@
 #include <gtk/gtk.h>
-#include "ui_smsview.h"
+#include "ui_smsbox.h"
 #include "ui_smsrow.h"
 #include "lcprotocol.h"
 
@@ -22,7 +22,7 @@ int show_test(GList * list)
     g_signal_connect(G_OBJECT(window), "destroy",
                      G_CALLBACK(close_window), NULL);
 
-    UISMSView *view = ui_sms_view_new_reverse(list);
+    UISMSBox *view = ui_sms_box_new_reverse(list);
     UISMSRow *row = ui_sms_row_new(list);
     ui_sms_row_highlight(row);
 

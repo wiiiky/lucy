@@ -32,8 +32,8 @@ __top_builddir__lucy_SOURCES =  \
 	ui_toolstack.c \
 	ui_installdialog.h \
 	ui_installdialog.c \
-	ui_smsview.h \
-	ui_smsview.c \
+	ui_smsbox.h \
+	ui_smsbox.c \
 	ui_smsrow.h \
 	ui_smsrow.c \
 	lcprotocol.h \

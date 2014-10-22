@@ -18,15 +18,14 @@
  */
 
 
-#include "ui_smsview.h"
+#include "ui_smsbox.h"
 #include "lcprotocol.h"
 #include "lcutil.h"
-#include <gtk/gtk.h>
 #include <math.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _UISMSViewPrivate {
+struct _UISMSBoxPrivate {
     GtkDrawingArea *draw_area;
 
     gchar *body_font;           /* the font name of content */
@@ -63,13 +62,13 @@ struct _UISMSViewPrivate {
 };
 
 
-static gpointer ui_sms_view_parent_class = NULL;
+static gpointer ui_sms_box_parent_class = NULL;
 
-#define UI_SMS_VIEW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_SMS_VIEW, UISMSViewPrivate))
+#define UI_SMS_BOX_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_SMS_BOX, UISMSBoxPrivate))
 enum {
-    UI_SMS_VIEW_DUMMY_PROPERTY
+    UI_SMS_BOX_DUMMY_PROPERTY
 };
-static void ui_sms_view_finalize(GObject * obj);
+static void ui_sms_box_finalize(GObject * obj);
 static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data);
 
 /* draw a dialog box */
@@ -77,10 +76,10 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
                         gint height, gboolean left);
 
 
-UISMSView *ui_sms_view_construct(GType object_type, GList * list)
+UISMSBox *ui_sms_box_construct(GType object_type, GList * list)
 {
-    UISMSView *self = NULL;
-    self = (UISMSView *) g_object_new(object_type, NULL);
+    UISMSBox *self = NULL;
+    self = (UISMSBox *) g_object_new(object_type, NULL);
     self->priv->list = list;
 
     gtk_container_add(GTK_CONTAINER(self),
@@ -91,40 +90,40 @@ UISMSView *ui_sms_view_construct(GType object_type, GList * list)
 }
 
 
-UISMSView *ui_sms_view_new(GList * list)
+UISMSBox *ui_sms_box_new(GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
-    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, copy);
+    return ui_sms_box_construct(TYPE_UI_SMS_BOX, copy);
 }
 
-UISMSView *ui_sms_view_new_reverse(GList * list)
+UISMSBox *ui_sms_box_new_reverse(GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
     copy = g_list_reverse(copy);
-    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, copy);
+    return ui_sms_box_construct(TYPE_UI_SMS_BOX, copy);
 }
 
-UISMSView *ui_sms_view_new_take(GList * list)
+UISMSBox *ui_sms_box_new_take(GList * list)
 {
-    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, list);
-}
-
-
-static void ui_sms_view_class_init(UISMSViewClass * klass)
-{
-    ui_sms_view_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(UISMSViewPrivate));
-    G_OBJECT_CLASS(klass)->finalize = ui_sms_view_finalize;
+    return ui_sms_box_construct(TYPE_UI_SMS_BOX, list);
 }
 
 
-static void ui_sms_view_instance_init(UISMSView * self)
+static void ui_sms_box_class_init(UISMSBoxClass * klass)
 {
-    self->priv = UI_SMS_VIEW_GET_PRIVATE(self);
+    ui_sms_box_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UISMSBoxPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_sms_box_finalize;
+}
 
-    UISMSViewPrivate *priv = self->priv;
+
+static void ui_sms_box_instance_init(UISMSBox * self)
+{
+    self->priv = UI_SMS_BOX_GET_PRIVATE(self);
+
+    UISMSBoxPrivate *priv = self->priv;
 
     priv->draw_area = (GtkDrawingArea *) gtk_drawing_area_new();
     g_signal_connect(G_OBJECT(priv->draw_area), "draw",
@@ -173,31 +172,31 @@ static void ui_sms_view_instance_init(UISMSView * self)
 }
 
 
-static void ui_sms_view_finalize(GObject * obj)
+static void ui_sms_box_finalize(GObject * obj)
 {
-    UISMSView *self;
-    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_SMS_VIEW, UISMSView);
+    UISMSBox *self;
+    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_SMS_BOX, UISMSBox);
     _g_object_unref0(self->priv->draw_area);
     g_list_free_full(self->priv->list,
                      (GDestroyNotify) lc_protocol_sms_free);
     g_free(self->priv->body_font);
     g_free(self->priv->date_font);
     g_free(self->priv->address_font);
-    G_OBJECT_CLASS(ui_sms_view_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_sms_box_parent_class)->finalize(obj);
 }
 
 
-GType ui_sms_view_get_type(void)
+GType ui_sms_box_get_type(void)
 {
     static volatile gsize lc_sms_view_type_id__volatile = 0;
     if (g_once_init_enter(&lc_sms_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(UISMSViewClass), (GBaseInitFunc) NULL,
+            { sizeof(UISMSBoxClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) ui_sms_view_class_init,
+            (GClassInitFunc) ui_sms_box_class_init,
             (GClassFinalizeFunc) NULL, NULL,
-            sizeof(UISMSView), 0,
-            (GInstanceInitFunc) ui_sms_view_instance_init, NULL
+            sizeof(UISMSBox), 0,
+            (GInstanceInitFunc) ui_sms_box_instance_init, NULL
         };
         GType lc_sms_view_type_id;
         lc_sms_view_type_id =
@@ -215,7 +214,7 @@ GType ui_sms_view_get_type(void)
 
 static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 {
-    UISMSView *self = (UISMSView *) data;
+    UISMSBox *self = (UISMSBox *) data;
     GList *list = self->priv->list;
     gint _width = gtk_widget_get_allocated_width(widget);
     if (_width <= 100) {
@@ -449,12 +448,12 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
     cairo_restore(cr);
 }
 
-static void inline ui_sms_view_redraw(UISMSView * self)
+static void inline ui_sms_box_redraw(UISMSBox * self)
 {
     gtk_widget_queue_draw(GTK_WIDGET(self->priv->draw_area));
 }
 
-void ui_sms_view_set_body_font_full(UISMSView * self,
+void ui_sms_box_set_body_font_full(UISMSBox * self,
                                     const gchar * font_name,
                                     gint font_size,
                                     SMSFontStyle font_style)
@@ -464,32 +463,32 @@ void ui_sms_view_set_body_font_full(UISMSView * self,
     self->priv->body_size = font_size;
     self->priv->body_style = font_style;
 
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_body_font_family(UISMSView * self,
+void ui_sms_box_set_body_font_family(UISMSBox * self,
                                       const gchar * font_name)
 {
     g_free(self->priv->body_font);
     self->priv->body_font = g_strdup(font_name);
 
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_body_font_size(UISMSView * self, gint font_size)
+void ui_sms_box_set_body_font_size(UISMSBox * self, gint font_size)
 {
     self->priv->body_size = font_size;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_body_font_style(UISMSView * self,
+void ui_sms_box_set_body_font_style(UISMSBox * self,
                                      SMSFontStyle font_style)
 {
     self->priv->body_style = font_style;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_date_font_full(UISMSView * self,
+void ui_sms_box_set_date_font_full(UISMSBox * self,
                                     const gchar * font_name,
                                     gint font_size,
                                     SMSFontStyle font_style)
@@ -499,30 +498,30 @@ void ui_sms_view_set_date_font_full(UISMSView * self,
     self->priv->date_size = font_style;
     self->priv->date_style = font_style;
 
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_date_font_family(UISMSView * self,
+void ui_sms_box_set_date_font_family(UISMSBox * self,
                                       const gchar * font_name)
 {
     g_free(self->priv->date_font);
     self->priv->date_font = g_strdup(font_name);
 }
 
-void ui_sms_view_set_date_font_size(UISMSView * self, gint font_size)
+void ui_sms_box_set_date_font_size(UISMSBox * self, gint font_size)
 {
     self->priv->date_size = font_size;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_date_font_style(UISMSView * self,
+void ui_sms_box_set_date_font_style(UISMSBox * self,
                                      SMSFontStyle font_style)
 {
     self->priv->date_style = font_style;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_address_font_full(UISMSView * self,
+void ui_sms_box_set_address_font_full(UISMSBox * self,
                                        const gchar * font_name,
                                        gint font_size,
                                        SMSFontStyle font_style)
@@ -532,30 +531,30 @@ void ui_sms_view_set_address_font_full(UISMSView * self,
     self->priv->address_size = font_size;
     self->priv->address_style = font_style;
 
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_address_font_family(UISMSView * self,
+void ui_sms_box_set_address_font_family(UISMSBox * self,
                                          const gchar * font_name)
 {
     g_free(self->priv->address_font);
     self->priv->address_font = g_strdup(font_name);
 }
 
-void ui_sms_view_set_address_font_size(UISMSView * self, gint font_size)
+void ui_sms_box_set_address_font_size(UISMSBox * self, gint font_size)
 {
     self->priv->address_size = font_size;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_address_font_style(UISMSView * self,
+void ui_sms_box_set_address_font_style(UISMSBox * self,
                                         SMSFontStyle font_style)
 {
     self->priv->address_style = font_style;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_margin_full(UISMSView * self,
+void ui_sms_box_set_margin_full(UISMSBox * self,
                                  gint margin_top,
                                  gint margin_bottom,
                                  gint margin_left,
@@ -573,32 +572,32 @@ void ui_sms_view_set_margin_full(UISMSView * self,
     self->priv->margin_address = margin_address;
     self->priv->message_spacing = message_spacing;
 
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_show_address(UISMSView * self, gboolean show)
+void ui_sms_box_show_address(UISMSBox * self, gboolean show)
 {
     self->priv->show_address = show;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_set_data(UISMSView * self, GList * list)
+void ui_sms_box_set_data(UISMSBox * self, GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
-    ui_sms_view_set_data_take(self, copy);
+    ui_sms_box_set_data_take(self, copy);
 }
 
-void ui_sms_view_set_data_take(UISMSView * self, GList * list)
+void ui_sms_box_set_data_take(UISMSBox * self, GList * list)
 {
     g_list_free_full(self->priv->list,
                      (GDestroyNotify) lc_protocol_sms_free);
     self->priv->list = list;
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
 
-void ui_sms_view_reverse(UISMSView * self)
+void ui_sms_box_reverse(UISMSBox * self)
 {
     self->priv->list = g_list_reverse(self->priv->list);
-    ui_sms_view_redraw(self);
+    ui_sms_box_redraw(self);
 }
