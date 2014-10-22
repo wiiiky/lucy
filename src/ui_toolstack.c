@@ -1,5 +1,5 @@
 /*
- * lctoolstack.c
+ * ui_toolstack.c
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -21,14 +21,12 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "lctoolstack.h"
+#include "ui_toolstack.h"
 #include <gtk/gtk.h>
-#include <gtk-2.0/gtk/gtkradiotoolbutton.h>
-#include <gtk-2.0/gtk/gtktoolbutton.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _LcToolStackPrivate {
+struct _UIToolStackPrivate {
     GtkToolbar *toolbar;
     GtkStack *stack;
     GtkRadioToolButton *current;
@@ -40,19 +38,19 @@ struct _LcToolStackPrivate {
 #define G_OBJECT_KEY_CALLBACK	"toggled-callback"
 #define G_OBJECT_KEY_USER_DATA	"toggled-callback-data"
 
-static gpointer lc_tool_stack_parent_class = NULL;
+static gpointer ui_tool_stack_parent_class = NULL;
 
-#define LC_TOOL_STACK_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_TOOL_STACK, LcToolStackPrivate))
+#define UI_TOOL_STACK_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_TOOL_STACK, UIToolStackPrivate))
 enum {
-    LC_TOOL_STACK_DUMMY_PROPERTY
+    UI_TOOL_STACK_DUMMY_PROPERTY
 };
-static void lc_tool_stack_finalize(GObject * obj);
+static void ui_tool_stack_finalize(GObject * obj);
 
 
-LcToolStack *lc_tool_stack_construct(GType object_type)
+UIToolStack *ui_tool_stack_construct(GType object_type)
 {
-    LcToolStack *self = NULL;
-    self = (LcToolStack *) g_object_new(object_type, NULL);
+    UIToolStack *self = NULL;
+    self = (UIToolStack *) g_object_new(object_type, NULL);
     self->priv->toolbar = (GtkToolbar *) gtk_toolbar_new();
     gtk_toolbar_set_style(self->priv->toolbar, GTK_TOOLBAR_BOTH);
     g_object_ref_sink(self->priv->toolbar);
@@ -73,70 +71,70 @@ LcToolStack *lc_tool_stack_construct(GType object_type)
 }
 
 
-LcToolStack *lc_tool_stack_new(void)
+UIToolStack *ui_tool_stack_new(void)
 {
-    return lc_tool_stack_construct(TYPE_LC_TOOL_STACK);
+    return ui_tool_stack_construct(TYPE_UI_TOOL_STACK);
 }
 
 
-static void lc_tool_stack_class_init(LcToolStackClass * klass)
+static void ui_tool_stack_class_init(UIToolStackClass * klass)
 {
-    lc_tool_stack_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcToolStackPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_tool_stack_finalize;
+    ui_tool_stack_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UIToolStackPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_tool_stack_finalize;
 }
 
 
-static void lc_tool_stack_instance_init(LcToolStack * self)
+static void ui_tool_stack_instance_init(UIToolStack * self)
 {
-    self->priv = LC_TOOL_STACK_GET_PRIVATE(self);
+    self->priv = UI_TOOL_STACK_GET_PRIVATE(self);
 
     gtk_grid_set_column_homogeneous(GTK_GRID(self), TRUE);
 }
 
 
-static void lc_tool_stack_finalize(GObject * obj)
+static void ui_tool_stack_finalize(GObject * obj)
 {
-    LcToolStack *self;
+    UIToolStack *self;
     self =
-        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_TOOL_STACK, LcToolStack);
+        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_TOOL_STACK, UIToolStack);
     _g_object_unref0(self->priv->toolbar);
     _g_object_unref0(self->priv->stack);
-    G_OBJECT_CLASS(lc_tool_stack_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_tool_stack_parent_class)->finalize(obj);
 }
 
 
-GType lc_tool_stack_get_type(void)
+GType ui_tool_stack_get_type(void)
 {
-    static volatile gsize lc_tool_stack_type_id__volatile = 0;
-    if (g_once_init_enter(&lc_tool_stack_type_id__volatile)) {
+    static volatile gsize ui_tool_stack_type_id__volatile = 0;
+    if (g_once_init_enter(&ui_tool_stack_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcToolStackClass), (GBaseInitFunc) NULL,
+            { sizeof(UIToolStackClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_tool_stack_class_init,
+            (GClassInitFunc) ui_tool_stack_class_init,
             (GClassFinalizeFunc) NULL,
-            NULL, sizeof(LcToolStack), 0,
-            (GInstanceInitFunc) lc_tool_stack_instance_init, NULL
+            NULL, sizeof(UIToolStack), 0,
+            (GInstanceInitFunc) ui_tool_stack_instance_init, NULL
         };
         GType lc_tool_stack_type_id;
         lc_tool_stack_type_id =
-            g_type_register_static(GTK_TYPE_GRID, "LcToolStack",
+            g_type_register_static(GTK_TYPE_GRID, "UIToolStack",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_tool_stack_type_id__volatile,
+        g_once_init_leave(&ui_tool_stack_type_id__volatile,
                           lc_tool_stack_type_id);
     }
-    return lc_tool_stack_type_id__volatile;
+    return ui_tool_stack_type_id__volatile;
 }
 
 static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
                                          gpointer user_data)
 {
-    LcToolStack *self = LC_TOOL_STACK(user_data);
+    UIToolStack *self = UI_TOOL_STACK(user_data);
     gboolean toggled =
         gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(radio));
 
-    LcToolStackToggledNotify callback =
-        (LcToolStackToggledNotify) g_object_get_data(G_OBJECT(radio),
+    UIToolStackToggledNotify callback =
+        (UIToolStackToggledNotify) g_object_get_data(G_OBJECT(radio),
                                                      G_OBJECT_KEY_CALLBACK);
     gpointer data =
         g_object_get_data(G_OBJECT(radio), G_OBJECT_KEY_USER_DATA);
@@ -153,11 +151,11 @@ static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
     }
 }
 
-void lc_tool_stack_append(LcToolStack * self,
+void ui_tool_stack_append(UIToolStack * self,
                           GtkWidget * title_widget,
                           const gchar * title_label,
                           GtkWidget * content,
-                          LcToolStackToggledNotify callback,
+                          UIToolStackToggledNotify callback,
                           gpointer user_data)
 {
     GtkToolbar *toolbar = self->priv->toolbar;
@@ -183,7 +181,7 @@ void lc_tool_stack_append(LcToolStack * self,
                      G_CALLBACK(on_radio_tool_button_toggled), self);
 }
 
-const gchar *lc_tool_stack_get_current_title(LcToolStack * self)
+const gchar *ui_tool_stack_get_current_title(UIToolStack * self)
 {
     if (self->priv->current) {
         return
@@ -194,13 +192,13 @@ const gchar *lc_tool_stack_get_current_title(LcToolStack * self)
 }
 
 
-void lc_tool_stack_set_transition_duration(LcToolStack * self,
+void ui_tool_stack_set_transition_duration(UIToolStack * self,
                                            guint duration)
 {
     gtk_stack_set_transition_duration(self->priv->stack, duration);
 }
 
-void lc_tool_stack_set_transition_type(LcToolStack * self,
+void ui_tool_stack_set_transition_type(UIToolStack * self,
                                        GtkStackTransitionType type)
 {
     gtk_stack_set_transition_type(self->priv->stack, type);

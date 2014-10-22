@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "lcutil.h"
-#include "lcaboutdialog.h"
+#include "ui_aboutdialog.h"
 #include <limits.h>
 #include <unistd.h>
 #include <libnotify/notify.h>

@@ -18,16 +18,26 @@ bin_PROGRAMS = $(top_builddir)/lucy
 
 __top_builddir__lucy_SOURCES =  \
 	lucy.c \
-	lcapplicationview.h \
-	lcapplicationview.c \
+	ui_aboutdialog.h \
+	ui_aboutdialog.c \
+	ui_applicationview.h \
+	ui_applicationview.c \
+	ui_applicationrow.h \
+	ui_applicationrow.c \
+	ui_mainwindow.h \
+	ui_mainwindow.c \
+	ui_myandroid.h \
+	ui_myandroid.c \
+	ui_toolstack.h \
+	ui_toolstack.c \
+	ui_installdialog.h \
+	ui_installdialog.c \
+	ui_smsview.h \
+	ui_smsview.c \
+	ui_smsrow.h \
+	ui_smsrow.c \
 	lcprotocol.h \
 	lcprotocol.c \
-	lcaboutdialog.h \
-	lcaboutdialog.c \
-	lcapplicationrow.h \
-	lcapplicationrow.c \
-	lcmainwindow.h \
-	lcmainwindow.c \
 	lcadb.c \
 	lcadb.h \
 	lcsocket.h \
@@ -36,19 +46,9 @@ __top_builddir__lucy_SOURCES =  \
 	lcutil.h \
 	lccommander.c \
 	lccommander.h \
-	lctoolstack.h \
-	lctoolstack.c \
-	lcmyandroid.h \
-	lcmyandroid.c \
-	lcinstalldialog.h \
-	lcinstalldialog.c \
 	lcnotify.h \
 	lcnotify.c \
 	lcresource.h \
-	lcsmsview.h \
-	lcsmsview.c \
-	lcsmsrow.h \
-	lcsmsrow.c \
 	test.c
 
 __top_builddir__lucy_LDADD = \

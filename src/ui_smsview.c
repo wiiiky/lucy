@@ -1,5 +1,5 @@
 /*
- * lcsmsview.c
+ * ui_smsview.h
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -18,30 +18,30 @@
  */
 
 
-#include "lcsmsview.h"
+#include "ui_smsview.h"
 #include "lcprotocol.h"
 #include <gtk/gtk.h>
 #include <math.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _LcSMSViewPrivate {
+struct _UISMSViewPrivate {
     GtkDrawingArea *draw_area;
 
     gchar *body_font;           /* the font name of content */
     gint body_size;             /* the font size of content */
-    LcSMSFontStyle body_style;  /* the font style of content */
-    LcSMSFontColor body_color;  /* the color of content */
+    SMSFontStyle body_style;    /* the font style of content */
+    SMSFontColor body_color;    /* the color of content */
 
     gchar *date_font;           /* the font name of date */
     gint date_size;             /* the font size of date */
-    LcSMSFontStyle date_style;  /* the font style of date */
-    LcSMSFontColor date_color;  /* the color of date */
+    SMSFontStyle date_style;    /* the font style of date */
+    SMSFontColor date_color;    /* the color of date */
 
     gchar *address_font;        /* the font name of address */
     gint address_size;          /* the font size of address */
-    LcSMSFontStyle address_style;   /* the font style of address */
-    LcSMSFontColor address_color;   /* the color of address */
+    SMSFontStyle address_style; /* the font style of address */
+    SMSFontColor address_color; /* the color of address */
 
     gint margin_top;
     gint margin_bottom;
@@ -62,13 +62,13 @@ struct _LcSMSViewPrivate {
 };
 
 
-static gpointer lc_sms_view_parent_class = NULL;
+static gpointer ui_sms_view_parent_class = NULL;
 
-#define LC_SMS_VIEW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_SMS_VIEW, LcSMSViewPrivate))
+#define UI_SMS_VIEW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_SMS_VIEW, UISMSViewPrivate))
 enum {
-    LC_SMS_VIEW_DUMMY_PROPERTY
+    UI_SMS_VIEW_DUMMY_PROPERTY
 };
-static void lc_sms_view_finalize(GObject * obj);
+static void ui_sms_view_finalize(GObject * obj);
 static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data);
 
 /* draw a dialog box */
@@ -76,10 +76,10 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
                         gint height, gboolean left);
 
 
-LcSMSView *lc_sms_view_construct(GType object_type, GList * list)
+UISMSView *ui_sms_view_construct(GType object_type, GList * list)
 {
-    LcSMSView *self = NULL;
-    self = (LcSMSView *) g_object_new(object_type, NULL);
+    UISMSView *self = NULL;
+    self = (UISMSView *) g_object_new(object_type, NULL);
     self->priv->list = list;
 
     gtk_container_add(GTK_CONTAINER(self),
@@ -90,40 +90,40 @@ LcSMSView *lc_sms_view_construct(GType object_type, GList * list)
 }
 
 
-LcSMSView *lc_sms_view_new(GList * list)
+UISMSView *ui_sms_view_new(GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
-    return lc_sms_view_construct(TYPE_LC_SMS_VIEW, copy);
+    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, copy);
 }
 
-LcSMSView *lc_sms_view_new_reverse(GList * list)
+UISMSView *ui_sms_view_new_reverse(GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
     copy = g_list_reverse(copy);
-    return lc_sms_view_construct(TYPE_LC_SMS_VIEW, copy);
+    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, copy);
 }
 
-LcSMSView *lc_sms_view_new_take(GList * list)
+UISMSView *ui_sms_view_new_take(GList * list)
 {
-    return lc_sms_view_construct(TYPE_LC_SMS_VIEW, list);
-}
-
-
-static void lc_sms_view_class_init(LcSMSViewClass * klass)
-{
-    lc_sms_view_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcSMSViewPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_sms_view_finalize;
+    return ui_sms_view_construct(TYPE_UI_SMS_VIEW, list);
 }
 
 
-static void lc_sms_view_instance_init(LcSMSView * self)
+static void ui_sms_view_class_init(UISMSViewClass * klass)
 {
-    self->priv = LC_SMS_VIEW_GET_PRIVATE(self);
+    ui_sms_view_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UISMSViewPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_sms_view_finalize;
+}
 
-    LcSMSViewPrivate *priv = self->priv;
+
+static void ui_sms_view_instance_init(UISMSView * self)
+{
+    self->priv = UI_SMS_VIEW_GET_PRIVATE(self);
+
+    UISMSViewPrivate *priv = self->priv;
 
     priv->draw_area = (GtkDrawingArea *) gtk_drawing_area_new();
     g_signal_connect(G_OBJECT(priv->draw_area), "draw",
@@ -133,7 +133,7 @@ static void lc_sms_view_instance_init(LcSMSView * self)
     priv->list = NULL;
     priv->body_font = g_strdup("ubuntu mono");
     priv->body_size = 12;
-    priv->body_style = LC_SMS_FONT_STYLE_NOMARL;
+    priv->body_style = SMS_FONT_STYLE_NOMARL;
     priv->body_color.red = 0;
     priv->body_color.green = 0;
     priv->body_color.blue = 0;
@@ -141,7 +141,7 @@ static void lc_sms_view_instance_init(LcSMSView * self)
 
     priv->date_font = g_strdup("consolas");
     priv->date_size = 10;
-    priv->date_style = LC_SMS_FONT_STYLE_ITALIC;
+    priv->date_style = SMS_FONT_STYLE_ITALIC;
     priv->date_color.red = 0.1;
     priv->date_color.green = 0.1;
     priv->date_color.blue = 0.1;
@@ -149,7 +149,7 @@ static void lc_sms_view_instance_init(LcSMSView * self)
 
     priv->address_font = g_strdup("consolas");
     priv->address_size = 10;
-    priv->address_style = LC_SMS_FONT_STYLE_NOMARL;
+    priv->address_style = SMS_FONT_STYLE_NOMARL;
     priv->address_color.red = 0.1;
     priv->address_color.green = 0.1;
     priv->address_color.blue = 1.1;
@@ -172,35 +172,35 @@ static void lc_sms_view_instance_init(LcSMSView * self)
 }
 
 
-static void lc_sms_view_finalize(GObject * obj)
+static void ui_sms_view_finalize(GObject * obj)
 {
-    LcSMSView *self;
-    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_SMS_VIEW, LcSMSView);
+    UISMSView *self;
+    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_SMS_VIEW, UISMSView);
     _g_object_unref0(self->priv->draw_area);
     g_list_free_full(self->priv->list,
                      (GDestroyNotify) lc_protocol_sms_free);
     g_free(self->priv->body_font);
     g_free(self->priv->date_font);
     g_free(self->priv->address_font);
-    G_OBJECT_CLASS(lc_sms_view_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_sms_view_parent_class)->finalize(obj);
 }
 
 
-GType lc_sms_view_get_type(void)
+GType ui_sms_view_get_type(void)
 {
     static volatile gsize lc_sms_view_type_id__volatile = 0;
     if (g_once_init_enter(&lc_sms_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcSMSViewClass), (GBaseInitFunc) NULL,
+            { sizeof(UISMSViewClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_sms_view_class_init,
+            (GClassInitFunc) ui_sms_view_class_init,
             (GClassFinalizeFunc) NULL, NULL,
-            sizeof(LcSMSView), 0,
-            (GInstanceInitFunc) lc_sms_view_instance_init, NULL
+            sizeof(UISMSView), 0,
+            (GInstanceInitFunc) ui_sms_view_instance_init, NULL
         };
         GType lc_sms_view_type_id;
         lc_sms_view_type_id =
-            g_type_register_static(GTK_TYPE_SCROLLED_WINDOW, "LcSMSView",
+            g_type_register_static(GTK_TYPE_SCROLLED_WINDOW, "UISMSView",
                                    &g_define_type_info, 0);
         g_once_init_leave(&lc_sms_view_type_id__volatile,
                           lc_sms_view_type_id);
@@ -211,7 +211,7 @@ GType lc_sms_view_get_type(void)
 
 static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 {
-    LcSMSView *self = (LcSMSView *) data;
+    UISMSView *self = (UISMSView *) data;
     GList *list = self->priv->list;
     gint _width = gtk_widget_get_allocated_width(widget);
     if (_width <= 100) {
@@ -443,113 +443,113 @@ static void on_draw_box(cairo_t * cr, gint x, gint y, gint width,
     cairo_restore(cr);
 }
 
-static void inline lc_sms_view_redraw(LcSMSView * self)
+static void inline ui_sms_view_redraw(UISMSView * self)
 {
     gtk_widget_queue_draw(GTK_WIDGET(self->priv->draw_area));
 }
 
-void lc_sms_view_set_body_font_full(LcSMSView * self,
+void ui_sms_view_set_body_font_full(UISMSView * self,
                                     const gchar * font_name,
                                     gint font_size,
-                                    LcSMSFontStyle font_style)
+                                    SMSFontStyle font_style)
 {
     g_free(self->priv->body_font);
     self->priv->body_font = g_strdup(font_name);
     self->priv->body_size = font_size;
     self->priv->body_style = font_style;
 
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_body_font_family(LcSMSView * self,
+void ui_sms_view_set_body_font_family(UISMSView * self,
                                       const gchar * font_name)
 {
     g_free(self->priv->body_font);
     self->priv->body_font = g_strdup(font_name);
 
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_body_font_size(LcSMSView * self, gint font_size)
+void ui_sms_view_set_body_font_size(UISMSView * self, gint font_size)
 {
     self->priv->body_size = font_size;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_body_font_style(LcSMSView * self,
-                                     LcSMSFontStyle font_style)
+void ui_sms_view_set_body_font_style(UISMSView * self,
+                                     SMSFontStyle font_style)
 {
     self->priv->body_style = font_style;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_date_font_full(LcSMSView * self,
+void ui_sms_view_set_date_font_full(UISMSView * self,
                                     const gchar * font_name,
                                     gint font_size,
-                                    LcSMSFontStyle font_style)
+                                    SMSFontStyle font_style)
 {
     g_free(self->priv->date_font);
     self->priv->date_font = g_strdup(font_name);
     self->priv->date_size = font_style;
     self->priv->date_style = font_style;
 
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_date_font_family(LcSMSView * self,
+void ui_sms_view_set_date_font_family(UISMSView * self,
                                       const gchar * font_name)
 {
     g_free(self->priv->date_font);
     self->priv->date_font = g_strdup(font_name);
 }
 
-void lc_sms_view_set_date_font_size(LcSMSView * self, gint font_size)
+void ui_sms_view_set_date_font_size(UISMSView * self, gint font_size)
 {
     self->priv->date_size = font_size;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_date_font_style(LcSMSView * self,
-                                     LcSMSFontStyle font_style)
+void ui_sms_view_set_date_font_style(UISMSView * self,
+                                     SMSFontStyle font_style)
 {
     self->priv->date_style = font_style;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_address_font_full(LcSMSView * self,
+void ui_sms_view_set_address_font_full(UISMSView * self,
                                        const gchar * font_name,
                                        gint font_size,
-                                       LcSMSFontStyle font_style)
+                                       SMSFontStyle font_style)
 {
     g_free(self->priv->address_font);
     self->priv->address_font = g_strdup(font_name);
     self->priv->address_size = font_size;
     self->priv->address_style = font_style;
 
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_address_font_family(LcSMSView * self,
+void ui_sms_view_set_address_font_family(UISMSView * self,
                                          const gchar * font_name)
 {
     g_free(self->priv->address_font);
     self->priv->address_font = g_strdup(font_name);
 }
 
-void lc_sms_view_set_address_font_size(LcSMSView * self, gint font_size)
+void ui_sms_view_set_address_font_size(UISMSView * self, gint font_size)
 {
     self->priv->address_size = font_size;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_address_font_style(LcSMSView * self,
-                                        LcSMSFontStyle font_style)
+void ui_sms_view_set_address_font_style(UISMSView * self,
+                                        SMSFontStyle font_style)
 {
     self->priv->address_style = font_style;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_margin_full(LcSMSView * self,
+void ui_sms_view_set_margin_full(UISMSView * self,
                                  gint margin_top,
                                  gint margin_bottom,
                                  gint margin_left,
@@ -567,32 +567,32 @@ void lc_sms_view_set_margin_full(LcSMSView * self,
     self->priv->margin_address = margin_address;
     self->priv->message_spacing = message_spacing;
 
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_show_address(LcSMSView * self, gboolean show)
+void ui_sms_view_show_address(UISMSView * self, gboolean show)
 {
     self->priv->show_address = show;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_set_data(LcSMSView * self, GList * list)
+void ui_sms_view_set_data(UISMSView * self, GList * list)
 {
     GList *copy =
         g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
-    lc_sms_view_set_data_take(self, copy);
+    ui_sms_view_set_data_take(self, copy);
 }
 
-void lc_sms_view_set_data_take(LcSMSView * self, GList * list)
+void ui_sms_view_set_data_take(UISMSView * self, GList * list)
 {
     g_list_free_full(self->priv->list,
                      (GDestroyNotify) lc_protocol_sms_free);
     self->priv->list = list;
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }
 
-void lc_sms_view_reverse(LcSMSView * self)
+void ui_sms_view_reverse(UISMSView * self)
 {
     self->priv->list = g_list_reverse(self->priv->list);
-    lc_sms_view_redraw(self);
+    ui_sms_view_redraw(self);
 }

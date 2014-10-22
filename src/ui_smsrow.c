@@ -1,5 +1,5 @@
 /*
- * lcsmsrow.c
+ * ui_smsrow.c
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -10,83 +10,71 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <glib.h>
-#include <glib-object.h>
-#include "lcsmsrow.h"
+#include "ui_smsrow.h"
 #include "lcutil.h"
-#include <gtk/gtk.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _LcSMSRowPrivate {
+struct _UISMSRowPrivate {
     GtkGrid *grid;
-
     GtkImage *icon;
     GtkLabel *address;
     GtkLabel *date;
     GtkLabel *preview;
-
     GList *data;
 };
+static gpointer ui_sms_row_parent_class = NULL;
+#define UI_SMS_ROW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_SMS_ROW, UISMSRowPrivate))
 
-
-static gpointer lc_sms_row_parent_class = NULL;
-
-#define LC_SMS_ROW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_SMS_ROW, LcSMSRowPrivate))
 enum {
-    LC_SMS_ROW_DUMMY_PROPERTY
+    UI_SMS_ROW_DUMMY_PROPERTY
 };
-static void lc_sms_row_finalize(GObject * obj);
+static void ui_sms_row_finalize(GObject * obj);
 
-
-LcSMSRow *lc_sms_row_construct(GType object_type, GList * data)
+UISMSRow *ui_sms_row_construct(GType object_type, GList * data)
 {
-    LcSMSRow *self = NULL;
-    self = (LcSMSRow *) g_object_new(object_type, NULL);
+    UISMSRow *self = NULL;
+    self = (UISMSRow *) g_object_new(object_type, NULL);
     self->priv->data = data;
     if (data) {
         LcProtocolSMS *sms = (LcProtocolSMS *) data->data;
         gchar *date = lc_util_date_time_format(sms->time, "%m - %d");
-        lc_sms_row_set_full(self, sms->address, sms->body, date);
+        ui_sms_row_set_full(self, sms->address, sms->body, date);
         g_free(date);
     }
     return self;
 }
 
-LcSMSRow *lc_sms_row_new(GList * data)
+UISMSRow *ui_sms_row_new(GList * data)
 {
     GList *copy =
         g_list_copy_deep(data, (GCopyFunc) lc_protocol_sms_copy, NULL);
-    return lc_sms_row_construct(TYPE_LC_SMS_ROW, copy);
+    return ui_sms_row_construct(TYPE_UI_SMS_ROW, copy);
 }
 
-LcSMSRow *lc_sms_row_new_take(GList * data)
+UISMSRow *ui_sms_row_new_take(GList * data)
 {
-    return lc_sms_row_construct(TYPE_LC_SMS_ROW, data);
+    return ui_sms_row_construct(TYPE_UI_SMS_ROW, data);
 }
 
-
-static void lc_sms_row_class_init(LcSMSRowClass * klass)
+static void ui_sms_row_class_init(UISMSRowClass * klass)
 {
-    lc_sms_row_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcSMSRowPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_sms_row_finalize;
+    ui_sms_row_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UISMSRowPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_sms_row_finalize;
 }
 
-
-static void lc_sms_row_instance_init(LcSMSRow * self)
+static void ui_sms_row_instance_init(UISMSRow * self)
 {
-    self->priv = LC_SMS_ROW_GET_PRIVATE(self);
-
-    LcSMSRowPrivate *priv = self->priv;
+    self->priv = UI_SMS_ROW_GET_PRIVATE(self);
+    UISMSRowPrivate *priv = self->priv;
     priv->grid = (GtkGrid *) gtk_grid_new();
     g_object_ref_sink(priv->grid);
     gtk_container_set_border_width(GTK_CONTAINER(priv->grid), 6);
@@ -116,6 +104,7 @@ static void lc_sms_row_instance_init(LcSMSRow * self)
         gtk_label_new
         ("Linux是一套免费使用和自由传播的类Unix操作系统，是一个基于POSIX和UNIX的多用户");
     g_object_ref_sink(priv->preview);
+	gtk_widget_set_hexpand(GTK_WIDGET(priv->preview),TRUE);
     gtk_widget_set_halign(GTK_WIDGET(priv->preview), GTK_ALIGN_START);
     gtk_label_set_ellipsize(priv->preview, PANGO_ELLIPSIZE_END);
     gtk_label_set_single_line_mode(priv->preview, TRUE);
@@ -124,11 +113,10 @@ static void lc_sms_row_instance_init(LcSMSRow * self)
     priv->data = NULL;
 }
 
-
-static void lc_sms_row_finalize(GObject * obj)
+static void ui_sms_row_finalize(GObject * obj)
 {
-    LcSMSRow *self;
-    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_SMS_ROW, LcSMSRow);
+    UISMSRow *self;
+    self = G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_SMS_ROW, UISMSRow);
     _g_object_unref0(self->priv->grid);
     _g_object_unref0(self->priv->icon);
     _g_object_unref0(self->priv->address);
@@ -136,33 +124,32 @@ static void lc_sms_row_finalize(GObject * obj)
     _g_object_unref0(self->priv->preview);
     g_list_free_full(self->priv->data,
                      (GDestroyNotify) lc_protocol_sms_free);
-    G_OBJECT_CLASS(lc_sms_row_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_sms_row_parent_class)->finalize(obj);
 }
 
-
-GType lc_sms_row_get_type(void)
+GType ui_sms_row_get_type(void)
 {
-    static volatile gsize lc_sms_row_type_id__volatile = 0;
-    if (g_once_init_enter(&lc_sms_row_type_id__volatile)) {
+    static volatile gsize ui_sms_row_type_id__volatile = 0;
+    if (g_once_init_enter(&ui_sms_row_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcSMSRowClass), (GBaseInitFunc) NULL,
+            { sizeof(UISMSRowClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_sms_row_class_init,
+            (GClassInitFunc) ui_sms_row_class_init,
             (GClassFinalizeFunc) NULL, NULL,
-            sizeof(LcSMSRow), 0,
-            (GInstanceInitFunc) lc_sms_row_instance_init, NULL
+            sizeof(UISMSRow), 0,
+            (GInstanceInitFunc) ui_sms_row_instance_init, NULL
         };
-        GType lc_sms_row_type_id;
-        lc_sms_row_type_id =
-            g_type_register_static(GTK_TYPE_EVENT_BOX, "LcSMSRow",
+        GType ui_sms_row_type_id;
+        ui_sms_row_type_id =
+            g_type_register_static(GTK_TYPE_EVENT_BOX, "UISMSRow",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_sms_row_type_id__volatile,
-                          lc_sms_row_type_id);
+        g_once_init_leave(&ui_sms_row_type_id__volatile,
+                          ui_sms_row_type_id);
     }
-    return lc_sms_row_type_id__volatile;
+    return ui_sms_row_type_id__volatile;
 }
 
-void lc_sms_row_set_address(LcSMSRow * self, const gchar * address)
+void ui_sms_row_set_address(UISMSRow * self, const gchar * address)
 {
     GtkLabel *label = self->priv->address;
     gchar buf[1024];
@@ -170,23 +157,23 @@ void lc_sms_row_set_address(LcSMSRow * self, const gchar * address)
     gtk_label_set_markup(label, buf);
 }
 
-void lc_sms_row_set_preview(LcSMSRow * self, const gchar * preview)
+void ui_sms_row_set_preview(UISMSRow * self, const gchar * preview)
 {
     GtkLabel *label = self->priv->preview;
     gtk_label_set_text(label, preview);
 }
 
-void lc_sms_row_set_date(LcSMSRow * self, const gchar * date)
+void ui_sms_row_set_date(UISMSRow * self, const gchar * date)
 {
     GtkLabel *label = self->priv->date;
     gtk_label_set_text(label, date);
 }
 
-void lc_sms_row_set_full(LcSMSRow * self,
+void ui_sms_row_set_full(UISMSRow * self,
                          const gchar * address,
                          const gchar * preview, const gchar * date)
 {
-    lc_sms_row_set_address(self, address);
-    lc_sms_row_set_preview(self, preview);
-    lc_sms_row_set_date(self, date);
+    ui_sms_row_set_address(self, address);
+    ui_sms_row_set_preview(self, preview);
+    ui_sms_row_set_date(self, date);
 }

@@ -1,5 +1,5 @@
 /*
- * lcmyandroid.c
+ * ui_myandroid.c
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -20,14 +20,13 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "lcmyandroid.h"
+#include "ui_myandroid.h"
 #include "lcutil.h"
 #include <gtk/gtk.h>
-#include <gtk-2.0/gtk/gtkbutton.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _LcMyAndroidPrivate {
+struct _UIMyAndroidPrivate {
     GtkGrid *disconnected;
     GtkGrid *connected;
     GtkButton *connectButton;
@@ -44,19 +43,19 @@ struct _LcMyAndroidPrivate {
 #define BUTTON_CONNECT_LABEL	"Connect"
 #define BUTTON_CONNECTING_LABEL	"Connecting"
 
-static gpointer lc_my_android_parent_class = NULL;
+static gpointer ui_my_android_parent_class = NULL;
 
-#define LC_MY_ANDROID_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_MY_ANDROID, LcMyAndroidPrivate))
+#define UI_MY_ANDROID_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_MY_ANDROID, UIMyAndroidPrivate))
 enum {
-    LC_MY_ANDROID_DUMMY_PROPERTY
+    UI_MY_ANDROID_DUMMY_PROPERTY
 };
-static void lc_my_android_finalize(GObject * obj);
+static void ui_my_android_finalize(GObject * obj);
 
 
-LcMyAndroid *lc_my_android_construct(GType object_type)
+UIMyAndroid *ui_my_android_construct(GType object_type)
 {
-    LcMyAndroid *self = NULL;
-    self = (LcMyAndroid *) g_object_new(object_type,
+    UIMyAndroid *self = NULL;
+    self = (UIMyAndroid *) g_object_new(object_type,
                                         "transition-duration", 1000,
                                         "transition-type",
                                         GTK_STACK_TRANSITION_TYPE_CROSSFADE,
@@ -67,28 +66,28 @@ LcMyAndroid *lc_my_android_construct(GType object_type)
 }
 
 
-LcMyAndroid *lc_my_android_new(void)
+UIMyAndroid *ui_my_android_new(void)
 {
-    return lc_my_android_construct(TYPE_LC_MY_ANDROID);
+    return ui_my_android_construct(TYPE_UI_MY_ANDROID);
 }
 
 
-static void lc_my_android_class_init(LcMyAndroidClass * klass)
+static void ui_my_android_class_init(UIMyAndroidClass * klass)
 {
-    lc_my_android_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcMyAndroidPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_my_android_finalize;
+    ui_my_android_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UIMyAndroidPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_my_android_finalize;
 }
 
-static void lc_my_android_disconnect_init(LcMyAndroid * self);
-static void lc_my_android_connect_init(LcMyAndroid * self);
+static void ui_my_android_disconnect_init(UIMyAndroid * self);
+static void ui_my_android_connect_init(UIMyAndroid * self);
 
-static void lc_my_android_instance_init(LcMyAndroid * self)
+static void ui_my_android_instance_init(UIMyAndroid * self)
 {
-    self->priv = LC_MY_ANDROID_GET_PRIVATE(self);
+    self->priv = UI_MY_ANDROID_GET_PRIVATE(self);
 
-    lc_my_android_disconnect_init(self);
-    lc_my_android_connect_init(self);
+    ui_my_android_disconnect_init(self);
+    ui_my_android_connect_init(self);
 
     gtk_stack_add_named(GTK_STACK(self),
                         GTK_WIDGET(self->priv->disconnected),
@@ -101,7 +100,7 @@ static void lc_my_android_instance_init(LcMyAndroid * self)
 }
 
 
-static void lc_my_android_disconnect_init(LcMyAndroid * self)
+static void ui_my_android_disconnect_init(UIMyAndroid * self)
 {
     GtkGrid *dc = (GtkGrid *) gtk_grid_new();
 
@@ -123,7 +122,7 @@ static void lc_my_android_disconnect_init(LcMyAndroid * self)
     g_object_ref_sink(self->priv->connectButton);
 }
 
-static void lc_my_android_connect_init(LcMyAndroid * self)
+static void ui_my_android_connect_init(UIMyAndroid * self)
 {
     GtkGrid *cn = (GtkGrid *) gtk_grid_new();
     gtk_widget_set_name(GTK_WIDGET(cn), "c_grid");
@@ -155,45 +154,45 @@ static void lc_my_android_connect_init(LcMyAndroid * self)
     g_object_ref_sink(self->priv->connected);
 }
 
-static void lc_my_android_finalize(GObject * obj)
+static void ui_my_android_finalize(GObject * obj)
 {
-    LcMyAndroid *self;
+    UIMyAndroid *self;
     self =
-        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_MY_ANDROID, LcMyAndroid);
+        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_MY_ANDROID, UIMyAndroid);
     _g_object_unref0(self->priv->disconnected);
     _g_object_unref0(self->priv->connected);
     _g_object_unref0(self->priv->connectButton);
     _g_object_unref0(self->priv->number);
     _g_object_unref0(self->priv->brand);
     _g_object_unref0(self->priv->model);
-    G_OBJECT_CLASS(lc_my_android_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_my_android_parent_class)->finalize(obj);
 }
 
 
-GType lc_my_android_get_type(void)
+GType ui_my_android_get_type(void)
 {
-    static volatile gsize lc_my_android_type_id__volatile = 0;
-    if (g_once_init_enter(&lc_my_android_type_id__volatile)) {
+    static volatile gsize ui_my_android_type_id__volatile = 0;
+    if (g_once_init_enter(&ui_my_android_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcMyAndroidClass), (GBaseInitFunc) NULL,
+            { sizeof(UIMyAndroidClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_my_android_class_init,
+            (GClassInitFunc) ui_my_android_class_init,
             (GClassFinalizeFunc) NULL, NULL,
-            sizeof(LcMyAndroid), 0,
-            (GInstanceInitFunc) lc_my_android_instance_init, NULL
+            sizeof(UIMyAndroid), 0,
+            (GInstanceInitFunc) ui_my_android_instance_init, NULL
         };
         GType lc_my_android_type_id;
         lc_my_android_type_id =
-            g_type_register_static(GTK_TYPE_STACK, "LcMyAndroid",
+            g_type_register_static(GTK_TYPE_STACK, "UIMyAndroid",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_my_android_type_id__volatile,
+        g_once_init_leave(&ui_my_android_type_id__volatile,
                           lc_my_android_type_id);
     }
-    return lc_my_android_type_id__volatile;
+    return ui_my_android_type_id__volatile;
 }
 
 
-void lc_my_android_set_connect_callback(LcMyAndroid * self,
+void ui_my_android_set_connect_callback(UIMyAndroid * self,
                                         GCallback callback,
                                         gpointer user_data)
 {
@@ -201,7 +200,7 @@ void lc_my_android_set_connect_callback(LcMyAndroid * self,
                      callback, user_data);
 }
 
-void lc_my_android_show_disconnect(LcMyAndroid * self)
+void ui_my_android_show_disconnect(UIMyAndroid * self)
 {
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_DISCONNECTED);
@@ -209,7 +208,7 @@ void lc_my_android_show_disconnect(LcMyAndroid * self)
     gtk_widget_set_sensitive(GTK_WIDGET(self->priv->connectButton), TRUE);
 }
 
-void lc_my_android_show_connecting(LcMyAndroid * self)
+void ui_my_android_show_connecting(UIMyAndroid * self)
 {
     //lc_my_android_set_connecting_timeout(self);
     gtk_widget_set_sensitive(GTK_WIDGET(self->priv->connectButton), FALSE);
@@ -219,16 +218,16 @@ void lc_my_android_show_connecting(LcMyAndroid * self)
                                      STACK_NAME_DISCONNECTED);
 }
 
-void lc_my_android_show_connected(LcMyAndroid * self)
+void ui_my_android_show_connected(UIMyAndroid * self)
 {
     gtk_stack_set_visible_child_name(GTK_STACK(self),
                                      STACK_NAME_CONNECTED);
 }
 
-void lc_my_android_show_connected_with_info(LcMyAndroid * self,
+void ui_my_android_show_connected_with_info(UIMyAndroid * self,
                                             LcProtocolPhone * phone)
 {
-    lc_my_android_show_connected(self);
+    ui_my_android_show_connected(self);
 
     gtk_label_set_text(self->priv->brand, phone->brand);
     gtk_label_set_text(self->priv->model, phone->model);

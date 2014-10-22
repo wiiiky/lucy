@@ -34,7 +34,7 @@
 #include "libadb/adb_auth.h"
 #include "libadb/usb_vendors.h"
 
-#include "lcmainwindow.h"
+#include "ui_mainwindow.h"
 #include "lcutil.h"
 
 
@@ -51,8 +51,8 @@ int main(int argc, char **argv)
     lc_init(argc, argv);
     gtk_init(&argc, &argv);
 
-    LcMainWindow *window = lc_main_window_new();
-    lc_main_window_show(window);
+    UIMainWindow *window = ui_main_window_new();
+    ui_main_window_show(window);
 
     return 0;
 }

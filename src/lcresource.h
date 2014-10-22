@@ -1,5 +1,5 @@
 /*
- * lcresource.h
+ * resource.h
  *
  * Copyright (C) 2014 - Wiky L
  *

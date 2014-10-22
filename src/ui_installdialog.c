@@ -1,5 +1,5 @@
 /*
- * lcinstalldialog.c
+ * ui_installdialog.c
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -18,14 +18,14 @@
  */
 
 
-#include "lcinstalldialog.h"
+#include "ui_installdialog.h"
 #include "lcadb.h"
 #include "lcutil.h"
 #include "lcnotify.h"
 #include <gtk/gtk.h>
 
 
-struct _LcInstallDialogPrivate {
+struct _UIInstallDialogPrivate {
     GtkButton *ok_button;
     GtkButton *cancel_button;
     GtkGrid *grid;
@@ -41,22 +41,22 @@ struct _LcInstallDialogPrivate {
         lc_install_dialog_get_priv(self)->ok_button
 
 
-static gpointer lc_install_dialog_parent_class = NULL;
+static gpointer ui_install_dialog_parent_class = NULL;
 
-#define LC_INSTALL_DIALOG_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_INSTALL_DIALOG, LcInstallDialogPrivate))
+#define UI_INSTALL_DIALOG_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_INSTALL_DIALOG, UIInstallDialogPrivate))
 enum {
-    LC_INSTALL_DIALOG_DUMMY_PROPERTY
+    UI_INSTALL_DIALOG_DUMMY_PROPERTY
 };
-static void lc_install_dialog_finalize(GObject * obj);
+static void ui_install_dialog_finalize(GObject * obj);
 static void on_dialog_response(GtkDialog * dialog, gint response_id,
                                gpointer user_data);
 
-LcInstallDialog *lc_install_dialog_construct(GType object_type,
+UIInstallDialog *ui_install_dialog_construct(GType object_type,
                                              GtkWindow * parent)
 {
-    LcInstallDialog *self = NULL;
+    UIInstallDialog *self = NULL;
     g_return_val_if_fail(parent != NULL, NULL);
-    self = (LcInstallDialog *) g_object_new(object_type,
+    self = (UIInstallDialog *) g_object_new(object_type,
                                             "modal", FALSE,
                                             "transient-for", parent,
                                             "destroy-with-parent", TRUE,
@@ -70,27 +70,27 @@ LcInstallDialog *lc_install_dialog_construct(GType object_type,
 }
 
 
-LcInstallDialog *lc_install_dialog_new(GtkWindow * parent)
+UIInstallDialog *ui_install_dialog_new(GtkWindow * parent)
 {
-    return lc_install_dialog_construct(TYPE_LC_INSTALL_DIALOG, parent);
+    return ui_install_dialog_construct(TYPE_UI_INSTALL_DIALOG, parent);
 }
 
 
-static void lc_install_dialog_class_init(LcInstallDialogClass * klass)
+static void ui_install_dialog_class_init(UIInstallDialogClass * klass)
 {
-    lc_install_dialog_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcInstallDialogPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_install_dialog_finalize;
+    ui_install_dialog_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UIInstallDialogPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_install_dialog_finalize;
 }
 
 static void on_file_changed(GtkFileChooserButton * button,
                             gpointer user_data);
 
-static void lc_install_dialog_instance_init(LcInstallDialog * self)
+static void ui_install_dialog_instance_init(UIInstallDialog * self)
 {
-    self->priv = LC_INSTALL_DIALOG_GET_PRIVATE(self);
+    self->priv = UI_INSTALL_DIALOG_GET_PRIVATE(self);
 
-    LcInstallDialogPrivate *priv = self->priv;
+    UIInstallDialogPrivate *priv = self->priv;
     priv->ok_button = (GtkButton *) gtk_button_new_with_label("OK");
     g_object_ref_sink(priv->ok_button);
     priv->cancel_button =
@@ -134,24 +134,24 @@ static void lc_install_dialog_instance_init(LcInstallDialog * self)
 }
 
 
-static void lc_install_dialog_finalize(GObject * obj)
+static void ui_install_dialog_finalize(GObject * obj)
 {
-    LcInstallDialog *self;
+    UIInstallDialog *self;
     self =
-        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_INSTALL_DIALOG,
-                                   LcInstallDialog);
-    LcInstallDialogPrivate *priv = self->priv;
+        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_INSTALL_DIALOG,
+                                   UIInstallDialog);
+    UIInstallDialogPrivate *priv = self->priv;
     g_object_unref(priv->ok_button);
     g_object_unref(priv->cancel_button);
     g_object_unref(priv->grid);
     g_object_unref(priv->file_button);
-    G_OBJECT_CLASS(lc_install_dialog_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_install_dialog_parent_class)->finalize(obj);
 }
 
 static void on_file_changed(GtkFileChooserButton * button,
                             gpointer user_data)
 {
-    LcInstallDialog *self = (LcInstallDialog *) user_data;
+    UIInstallDialog *self = (UIInstallDialog *) user_data;
     GtkButton *ok_button = lc_install_dialog_get_ok_button(self);
     gchar *path = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(button));
     gtk_widget_set_sensitive(GTK_WIDGET(ok_button), path != NULL);
@@ -178,7 +178,7 @@ static void on_install_app(GObject * source_object, GAsyncResult * result,
 static void on_dialog_response(GtkDialog * dialog, gint response_id,
                                gpointer user_data)
 {
-    LcInstallDialog *self = (LcInstallDialog *) user_data;
+    UIInstallDialog *self = (UIInstallDialog *) user_data;
     if (response_id == GTK_RESPONSE_OK) {
         GtkFileChooserButton *file_button =
             lc_install_dialog_get_file_button(self);
@@ -191,24 +191,24 @@ static void on_dialog_response(GtkDialog * dialog, gint response_id,
     gtk_widget_destroy(GTK_WIDGET(self));
 }
 
-GType lc_install_dialog_get_type(void)
+GType ui_install_dialog_get_type(void)
 {
-    static volatile gsize lc_install_dialog_type_id__volatile = 0;
-    if (g_once_init_enter(&lc_install_dialog_type_id__volatile)) {
+    static volatile gsize ui_install_dialog_type_id__volatile = 0;
+    if (g_once_init_enter(&ui_install_dialog_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcInstallDialogClass), (GBaseInitFunc) NULL,
+            { sizeof(UIInstallDialogClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_install_dialog_class_init,
+            (GClassInitFunc) ui_install_dialog_class_init,
             (GClassFinalizeFunc) NULL,
-            NULL, sizeof(LcInstallDialog), 0,
-            (GInstanceInitFunc) lc_install_dialog_instance_init, NULL
+            NULL, sizeof(UIInstallDialog), 0,
+            (GInstanceInitFunc) ui_install_dialog_instance_init, NULL
         };
         GType lc_install_dialog_type_id;
         lc_install_dialog_type_id =
-            g_type_register_static(GTK_TYPE_DIALOG, "LcInstallDialog",
+            g_type_register_static(GTK_TYPE_DIALOG, "UIInstallDialog",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_install_dialog_type_id__volatile,
+        g_once_init_leave(&ui_install_dialog_type_id__volatile,
                           lc_install_dialog_type_id);
     }
-    return lc_install_dialog_type_id__volatile;
+    return ui_install_dialog_type_id__volatile;
 }

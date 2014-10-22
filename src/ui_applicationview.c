@@ -1,5 +1,5 @@
 /*
- * lcapplicationview.c
+ * ui_applicationview.c
  *
  * Copyright (C) 2014 - Wiky L
  *
@@ -19,8 +19,8 @@
 
 
 #include <gtk/gtk.h>
-#include "lcapplicationview.h"
-#include "lcapplicationrow.h"
+#include "ui_applicationview.h"
+#include "ui_applicationrow.h"
 #include "lcprotocol.h"
 #include "lcadb.h"
 #include "lcutil.h"
@@ -29,7 +29,7 @@
 #define _g_list_free0(var) ((var == NULL) ? NULL : (var = (g_list_free (var), NULL)))
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
-struct _LcApplicationViewPrivate {
+struct _UIApplicationViewPrivate {
     GtkGrid *app_grid;
     GtkToolbar *app_toolbar;
     GtkRadioToolButton *all_app;
@@ -42,7 +42,7 @@ struct _LcApplicationViewPrivate {
     gboolean app_loading;       /* loading data from LILY? */
     guint64 app_last_update;    /* the time in second that list updated last time */
 
-    LcApplicationRow *selected_row; /* the pointer to the selected row */
+    UIApplicationRow *selected_row; /* the pointer to the selected row */
 };
 
 #define STACK_NAME_APPLICATION_VIEW "application-view"
@@ -52,57 +52,36 @@ struct _LcApplicationViewPrivate {
 #define RADIO_BUTTON_SYS    "SYSTEM ONLY"
 #define RADIO_BUTTON_THIRD   "3RD PARTY ONLY"
 
-#define lc_application_view_get_priv(self)	((self)->priv)
-#define lc_application_view_get_grid(self) \
-	lc_application_view_get_priv(self)->apps
-#define lc_application_view_get_row_count(self) \
-	lc_application_view_get_priv(self)->app_count
-#define lc_application_view_set_row_count(self,count) \
-	lc_application_view_get_row_count(self)=(count)
-#define lc_application_view_inc_row_count(self) \
-	lc_application_view_get_row_count(self)= \
-	lc_application_view_get_row_count(self) + 1
-#define lc_application_view_dec_row_count(self) \
-	lc_application_view_get_row_count(self) = \
-	lc_application_view_get_row_count(self) - 1
-#define lc_application_view_get_loading(self) \
-        lc_application_view_get_priv(self)->app_loading
-#define lc_application_view_get_updatetime(self) \
-        lc_application_view_get_priv(self)->app_last_update
-#define lc_application_view_set_updatetime(self,time) \
-        lc_application_view_get_updatetime(self)=time
-#define lc_application_view_get_selected(self) \
-        lc_application_view_get_priv(self)->selected_row
 #define lc_application_view_set_selected(self,row) \
         do{ \
-        if(lc_application_view_get_selected(self)){ \
-            lc_application_row_unhighlight(lc_application_view_get_selected(self)); \
+        if(self->priv->selected_row){ \
+            ui_application_row_unhighlight(self->priv->selected_row); \
         }   \
-        lc_application_view_get_selected(self)=(row); \
-        lc_application_row_highlight(row); \
+        self->priv->selected_row=(row); \
+        ui_application_row_highlight(row); \
         }while(0)
 
 
-static gpointer lc_application_view_parent_class = NULL;
+static gpointer ui_application_view_parent_class = NULL;
 
-#define LC_APPLICATION_VIEW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_LC_APPLICATION_VIEW, LcApplicationViewPrivate))
+#define UI_APPLICATION_VIEW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_APPLICATION_VIEW, UIApplicationViewPrivate))
 enum {
-    LC_APPLICATION_VIEW_DUMMY_PROPERTY
+    UI_APPLICATION_VIEW_DUMMY_PROPERTY
 };
-static void lc_application_view_finalize(GObject * obj);
+static void ui_application_view_finalize(GObject * obj);
 static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
                                          gpointer user_data);
-static inline void lc_application_view_show_all(LcApplicationView * self);
-static inline void lc_application_view_show_system(LcApplicationView *
+static inline void ui_application_view_show_all(UIApplicationView * self);
+static inline void ui_application_view_show_system(UIApplicationView *
                                                    self);
-static inline void lc_application_view_show_third(LcApplicationView *
+static inline void ui_application_view_show_third(UIApplicationView *
                                                   self);
 
 
-LcApplicationView *lc_application_view_construct(GType object_type)
+UIApplicationView *ui_application_view_construct(GType object_type)
 {
-    LcApplicationView *self = NULL;
-    self = (LcApplicationView *) g_object_new(object_type, NULL);
+    UIApplicationView *self = NULL;
+    self = (UIApplicationView *) g_object_new(object_type, NULL);
     gtk_stack_add_named(GTK_STACK(self), GTK_WIDGET(self->priv->app_grid),
                         STACK_NAME_APPLICATION_VIEW);
 
@@ -111,25 +90,25 @@ LcApplicationView *lc_application_view_construct(GType object_type)
 }
 
 
-LcApplicationView *lc_application_view_new(void)
+UIApplicationView *ui_application_view_new(void)
 {
-    return lc_application_view_construct(TYPE_LC_APPLICATION_VIEW);
+    return ui_application_view_construct(TYPE_UI_APPLICATION_VIEW);
 }
 
 
-static void lc_application_view_class_init(LcApplicationViewClass * klass)
+static void ui_application_view_class_init(UIApplicationViewClass * klass)
 {
-    lc_application_view_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(LcApplicationViewPrivate));
-    G_OBJECT_CLASS(klass)->finalize = lc_application_view_finalize;
+    ui_application_view_parent_class = g_type_class_peek_parent(klass);
+    g_type_class_add_private(klass, sizeof(UIApplicationViewPrivate));
+    G_OBJECT_CLASS(klass)->finalize = ui_application_view_finalize;
 }
 
 
-static void lc_application_view_instance_init(LcApplicationView * self)
+static void ui_application_view_instance_init(UIApplicationView * self)
 {
-    self->priv = LC_APPLICATION_VIEW_GET_PRIVATE(self);
+    self->priv = UI_APPLICATION_VIEW_GET_PRIVATE(self);
 
-    LcApplicationViewPrivate *priv = self->priv;
+    UIApplicationViewPrivate *priv = self->priv;
     priv->app_grid = (GtkGrid *) gtk_grid_new();
     gtk_grid_set_column_homogeneous(priv->app_grid, TRUE);
     g_object_ref_sink(priv->app_grid);
@@ -185,40 +164,40 @@ static void lc_application_view_instance_init(LcApplicationView * self)
 }
 
 
-static void lc_application_view_finalize(GObject * obj)
+static void ui_application_view_finalize(GObject * obj)
 {
-    LcApplicationView *self;
+    UIApplicationView *self;
     self =
-        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_LC_APPLICATION_VIEW,
-                                   LcApplicationView);
+        G_TYPE_CHECK_INSTANCE_CAST(obj, TYPE_UI_APPLICATION_VIEW,
+                                   UIApplicationView);
     _g_object_unref0(self->priv->app_grid);
     _g_object_unref0(self->priv->app_toolbar);
     _g_object_unref0(self->priv->apps);
     _g_object_unref0(self->priv->app_scrolled);
-    G_OBJECT_CLASS(lc_application_view_parent_class)->finalize(obj);
+    G_OBJECT_CLASS(ui_application_view_parent_class)->finalize(obj);
 }
 
 
-GType lc_application_view_get_type(void)
+GType ui_application_view_get_type(void)
 {
-    static volatile gsize lc_application_view_type_id__volatile = 0;
-    if (g_once_init_enter(&lc_application_view_type_id__volatile)) {
+    static volatile gsize ui_application_view_type_id__volatile = 0;
+    if (g_once_init_enter(&ui_application_view_type_id__volatile)) {
         static const GTypeInfo g_define_type_info =
-            { sizeof(LcApplicationViewClass), (GBaseInitFunc) NULL,
+            { sizeof(UIApplicationViewClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) lc_application_view_class_init,
-            (GClassFinalizeFunc) NULL, NULL, sizeof(LcApplicationView), 0,
-            (GInstanceInitFunc) lc_application_view_instance_init, NULL
+            (GClassInitFunc) ui_application_view_class_init,
+            (GClassFinalizeFunc) NULL, NULL, sizeof(UIApplicationView), 0,
+            (GInstanceInitFunc) ui_application_view_instance_init, NULL
         };
-        GType lc_application_view_type_id;
-        lc_application_view_type_id =
+        GType ui_application_view_type_id;
+        ui_application_view_type_id =
             g_type_register_static(GTK_TYPE_STACK,
-                                   "LcApplicationView",
+                                   "UIApplicationView",
                                    &g_define_type_info, 0);
-        g_once_init_leave(&lc_application_view_type_id__volatile,
-                          lc_application_view_type_id);
+        g_once_init_leave(&ui_application_view_type_id__volatile,
+                          ui_application_view_type_id);
     }
-    return lc_application_view_type_id__volatile;
+    return ui_application_view_type_id__volatile;
 }
 
 static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
@@ -227,21 +206,21 @@ static void on_radio_tool_button_toggled(GtkRadioToolButton * radio,
     if (gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(radio))) {
         const gchar *label =
             gtk_tool_button_get_label(GTK_TOOL_BUTTON(radio));
-        LcApplicationView *self = (LcApplicationView *) user_data;
+        UIApplicationView *self = (UIApplicationView *) user_data;
         if (g_strcmp0(label, RADIO_BUTTON_THIRD) == 0) {
-            lc_application_view_show_third(self);
+            ui_application_view_show_third(self);
         } else if (g_strcmp0(label, RADIO_BUTTON_SYS) == 0) {
-            lc_application_view_show_system(self);
+            ui_application_view_show_system(self);
         } else {
-            lc_application_view_show_all(self);
+            ui_application_view_show_all(self);
         }
     }
 }
 
-static gint lc_application_view_get_row_number(LcApplicationView * self,
-                                               LcApplicationRow * row)
+static gint ui_application_view_get_row_number(UIApplicationView * self,
+                                               UIApplicationRow * row)
 {
-    GtkGrid *grid = lc_application_view_get_grid(self);
+    GtkGrid *grid = self->priv->apps;
     gint num = -1;
     gtk_container_child_get(GTK_CONTAINER(grid), GTK_WIDGET(row),
                             "top-attach", &num, NULL);
@@ -252,8 +231,8 @@ static gboolean on_row_button_pressed(GtkWidget * widget,
                                       GdkEventButton * event,
                                       gpointer user_data)
 {
-    LcApplicationRow *row = (LcApplicationRow *) widget;
-    LcApplicationView *self = (LcApplicationView *) user_data;
+    UIApplicationRow *row = (UIApplicationRow *) widget;
+    UIApplicationView *self = (UIApplicationView *) user_data;
     lc_application_view_set_selected(self, row);
     return FALSE;
 }
@@ -269,14 +248,14 @@ static void on_uninstall_app(GObject * source_object, GAsyncResult * res,
         gtk_button_set_label(uninstall_button, "uninstall");
         gtk_widget_set_sensitive(GTK_WIDGET(uninstall_button), TRUE);
     } else {
-        LcApplicationRow *row = (LcApplicationRow *)
+        UIApplicationRow *row = (UIApplicationRow *)
             g_object_get_data(G_OBJECT(uninstall_button),
                               UNINSTALL_KEY_ROW);
-        LcApplicationView *self = (LcApplicationView *)
+        UIApplicationView *self = (UIApplicationView *)
             g_object_get_data(G_OBJECT(uninstall_button),
                               UNINSTALL_KEY_SELF);
-        gint count = lc_application_view_get_row_number(self, row);
-        lc_application_view_remove_row(self, count);
+        gint count = ui_application_view_get_row_number(self, row);
+        ui_application_view_remove_row(self, count);
     }
 }
 
@@ -285,22 +264,22 @@ static void on_uninstall_button_clicked(GtkButton * button,
 {
     gtk_button_set_label(button, "uninstalling...");
     gtk_widget_set_sensitive(GTK_WIDGET(button), FALSE);
-    LcApplicationRow *row =
-        (LcApplicationRow *) g_object_get_data(G_OBJECT(button),
+    UIApplicationRow *row =
+        (UIApplicationRow *) g_object_get_data(G_OBJECT(button),
                                                UNINSTALL_KEY_ROW);
     LcProtocolApplication *info =
-        (LcProtocolApplication *) lc_application_row_get_data(row);
+        (LcProtocolApplication *) ui_application_row_get_data(row);
 
     lc_adb_uninstall_app(info->package_name, on_uninstall_app, button);
 }
 
-void lc_application_view_append_row(LcApplicationView * self,
+void ui_application_view_append_row(UIApplicationView * self,
                                     LcProtocolApplication * info)
 {
-    gint count = lc_application_view_get_row_count(self);
-    LcApplicationRow *row = lc_application_row_new_with_data(info);
+    gint count = self->priv->app_count;
+    UIApplicationRow *row = ui_application_row_new_with_data(info);
     GtkButton *uninstall_button =
-        lc_application_row_get_uninstall_button(row);
+        ui_application_row_get_uninstall_button(row);
     g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_ROW,
                       (gpointer) (gulong) count);
     g_object_set_data(G_OBJECT(uninstall_button), UNINSTALL_KEY_ROW,
@@ -311,41 +290,40 @@ void lc_application_view_append_row(LcApplicationView * self,
                      G_CALLBACK(on_uninstall_button_clicked), self);
     g_signal_connect(G_OBJECT(row), "button-press-event",
                      G_CALLBACK(on_row_button_pressed), self);
-    gtk_grid_attach(lc_application_view_get_grid(self), GTK_WIDGET(row), 0,
-                    count, 1, 1);
-    lc_application_view_inc_row_count(self);
+    gtk_grid_attach(self->priv->apps, GTK_WIDGET(row), 0, count, 1, 1);
+    self->priv->app_count++;
 }
 
-void lc_application_view_remove_row(LcApplicationView * self, gint row)
+void ui_application_view_remove_row(UIApplicationView * self, gint row)
 {
-    GtkGrid *grid = lc_application_view_get_grid(self);
+    GtkGrid *grid = self->priv->apps;
     if (gtk_grid_get_child_at(grid, 0, row)) {
         gtk_grid_remove_row(grid, row);
-        lc_application_view_dec_row_count(self);
+        self->priv->app_count--;
     }
 }
 
-void lc_application_view_update(LcApplicationView * self, GList * list)
+void ui_application_view_update(UIApplicationView * self, GList * list)
 {
-    lc_application_view_set_updatetime(self, (guint64) time(NULL));
+    self->priv->app_last_update = (guint64) time(NULL);
 
     GList *copy = g_list_copy(list);
-    gint i, max = lc_application_view_get_row_count(self);
-    GtkGrid *grid = lc_application_view_get_grid(self);
+    gint i, max = self->priv->app_count;
+    GtkGrid *grid = self->priv->apps;
     for (i = 0; i < max; i++) {
-        LcApplicationRow *row =
-            (LcApplicationRow *) gtk_grid_get_child_at(grid, 0, i);
+        UIApplicationRow *row =
+            (UIApplicationRow *) gtk_grid_get_child_at(grid, 0, i);
         if (row) {
-            LcProtocolApplication *info = lc_application_row_get_data(row);
+            LcProtocolApplication *info = ui_application_row_get_data(row);
             LcProtocolApplication *find =
                 lc_protocol_application_find(list, info->package_name);
             if (find) {
                 /* update */
-                lc_application_row_update_data(row, find);
+                ui_application_row_update_data(row, find);
                 copy = g_list_remove(copy, info);
             } else {
                 /* not found, remove */
-                lc_application_view_remove_row(self, i);
+                ui_application_view_remove_row(self, i);
                 i--;
             }
         } else {
@@ -356,32 +334,32 @@ void lc_application_view_update(LcApplicationView * self, GList * list)
     GList *lp = copy;
     while (lp) {
         LcProtocolApplication *info = (LcProtocolApplication *) lp->data;
-        lc_application_view_append_row(self, info);
+        ui_application_view_append_row(self, info);
         lp = g_list_next(lp);
     }
     g_list_free(copy);
 
-    lc_application_view_update_view(self);
+    ui_application_view_update_view(self);
 }
 
-void lc_application_view_set_loading(LcApplicationView * self,
+void ui_application_view_set_loading(UIApplicationView * self,
                                      gboolean loading)
 {
-    lc_application_view_get_loading(self) = loading;
+    self->priv->app_loading = loading;
 }
 
-gboolean lc_application_view_is_loading(LcApplicationView * self)
+gboolean ui_application_view_is_loading(UIApplicationView * self)
 {
-    return lc_application_view_get_loading(self);
+    return self->priv->app_loading;
 }
 
-guint64 lc_application_view_get_update_time(LcApplicationView * self)
+guint64 ui_application_view_get_update_time(UIApplicationView * self)
 {
-    return lc_application_view_get_updatetime(self);
+    return self->priv->app_last_update;
 }
 
 LcProtocolApplicationType
-lc_application_view_get_current_type(LcApplicationView * self)
+ui_application_view_get_current_type(UIApplicationView * self)
 {
     GtkRadioToolButton *all_app = self->priv->all_app;
     GtkRadioToolButton *sys_app = self->priv->sys_app;
@@ -400,40 +378,40 @@ lc_application_view_get_current_type(LcApplicationView * self)
     return LC_PROTOCOL_APPLICATION_TYPE_UNKNOWN;
 }
 
-void lc_application_view_update_view(LcApplicationView * self)
+void ui_application_view_update_view(UIApplicationView * self)
 {
     LcProtocolApplicationType type =
-        lc_application_view_get_current_type(self);
+        ui_application_view_get_current_type(self);
     if (type == LC_PROTOCOL_APPLICATION_TYPE_ALL) {
-        lc_application_view_show_all(self);
+        ui_application_view_show_all(self);
     } else if (type == LC_PROTOCOL_APPLICATION_TYPE_SYSTEM) {
-        lc_application_view_show_system(self);
+        ui_application_view_show_system(self);
     } else if (type == LC_PROTOCOL_APPLICATION_TYPE_THIRD) {
-        lc_application_view_show_third(self);
+        ui_application_view_show_third(self);
     }
 }
 
-static inline void lc_application_view_show_all(LcApplicationView * self)
+static inline void ui_application_view_show_all(UIApplicationView * self)
 {
     gint i, max = self->priv->app_count;
     GtkGrid *apps = self->priv->apps;
     for (i = 0; i < max; i++) {
-        LcApplicationRow *row =
-            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        UIApplicationRow *row =
+            (UIApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
         gtk_widget_show(GTK_WIDGET(row));
     }
 }
 
-static inline void lc_application_view_show_system(LcApplicationView *
+static inline void ui_application_view_show_system(UIApplicationView *
                                                    self)
 {
     gint i, max = self->priv->app_count;
     GtkGrid *apps = self->priv->apps;
     for (i = 0; i < max; i++) {
-        LcApplicationRow *row =
-            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        UIApplicationRow *row =
+            (UIApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
         LcProtocolApplication *app = (LcProtocolApplication *)
-            lc_application_row_get_data(row);
+            ui_application_row_get_data(row);
         if (app->type == LC_PROTOCOL_APPLICATION_TYPE_SYSTEM) {
             gtk_widget_show(GTK_WIDGET(row));
         } else {
@@ -442,15 +420,15 @@ static inline void lc_application_view_show_system(LcApplicationView *
     }
 }
 
-static inline void lc_application_view_show_third(LcApplicationView * self)
+static inline void ui_application_view_show_third(UIApplicationView * self)
 {
     gint i, max = self->priv->app_count;
     GtkGrid *apps = self->priv->apps;
     for (i = 0; i < max; i++) {
-        LcApplicationRow *row =
-            (LcApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
+        UIApplicationRow *row =
+            (UIApplicationRow *) gtk_grid_get_child_at(apps, 0, i);
         LcProtocolApplication *app = (LcProtocolApplication *)
-            lc_application_row_get_data(row);
+            ui_application_row_get_data(row);
         if (app->type == LC_PROTOCOL_APPLICATION_TYPE_THIRD) {
             gtk_widget_show(GTK_WIDGET(row));
         } else {
