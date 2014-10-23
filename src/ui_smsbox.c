@@ -200,7 +200,7 @@ GType ui_sms_box_get_type(void)
         };
         GType lc_sms_view_type_id;
         lc_sms_view_type_id =
-            g_type_register_static(GTK_TYPE_SCROLLED_WINDOW, "UISMSView",
+            g_type_register_static(GTK_TYPE_SCROLLED_WINDOW, "UISMSBox",
                                    &g_define_type_info, 0);
         g_once_init_leave(&lc_sms_view_type_id__volatile,
                           lc_sms_view_type_id);

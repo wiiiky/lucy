@@ -183,6 +183,40 @@ void ui_sms_row_set_full(UISMSRow * self,
     ui_sms_row_set_date(self, date);
 }
 
+gint ui_sms_row_get_thread_id(UISMSRow * self)
+{
+    GList *list = self->priv->data;
+    if (list) {
+        LcProtocolSMS *sms = list->data;
+        return sms->thread_id;
+    }
+    return -1;
+}
+
+GList *ui_sms_row_get_data(UISMSRow * self)
+{
+    return self->priv->data;
+}
+
+void ui_sms_row_set_data(UISMSRow * self, GList * list)
+{
+    GList *copy =
+        g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    ui_sms_row_set_data_take(self, copy);
+}
+
+void ui_sms_row_set_data_take(UISMSRow * self, GList * list)
+{
+    g_list_free_full(self->priv->data,
+                     (GDestroyNotify) lc_protocol_sms_free);
+    self->priv->data = list;
+    if (list) {
+        LcProtocolSMS *sms = (LcProtocolSMS *) list->data;
+        const gchar *date = lc_util_date_time_format(sms->date, "%m - %d");
+        ui_sms_row_set_full(self, sms->address, sms->body, date);
+    }
+}
+
 static GtkCssProvider *highlight_provider = NULL;
 void ui_sms_row_highlight(UISMSRow * self)
 {

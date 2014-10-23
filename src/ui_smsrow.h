@@ -50,6 +50,12 @@ void ui_sms_row_set_date(UISMSRow * self, const gchar * date);
 void ui_sms_row_set_full(UISMSRow * self, const gchar * address,
                          const gchar * preview, const gchar * date);
 
+GList *ui_sms_row_get_data(UISMSRow * self);
+void ui_sms_row_set_data(UISMSRow * self, GList * list);
+void ui_sms_row_set_data_take(UISMSRow * self, GList * list);
+
+gint ui_sms_row_get_thread_id(UISMSRow * self);
+
 void ui_sms_row_highlight(UISMSRow * self);
 void ui_sms_row_unhighlight(UISMSRow * self);
 

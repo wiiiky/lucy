@@ -1,40 +1,36 @@
 Lucy
 =================
 
-Android Device Manager for Linux.
+Linux上的Android设备管理器
 
 ###Introduce
-I hack ADB source and try to create a Android Device Manger for Linux.
+基于ADB的源代码开发，实现Android设备管理的基本功能。目前还在努力开发中。
 
 ###Screenshot
 ![ ](https://github.com/wiiiky/lucy/blob/master/screenshot/screenrecord.gif  "record")
 
 ###Build
-Lucy depends on gtk+-3.0, libssl, libnotify and libzip. Install them before building lucy.
+Lucy依赖 gtk+-3.0, libssl, libnotify 和 libzip。在编译运行之前需要先安装他们。
 
-In apt-get based system (like Ubuntu). You can install the dependencies using following command:
+在类Ubuntu系统上，你可以使用以下命令安装：
 
 		sudo apt-get install libgtk-3-dev libssl-dev libzip-dev libnotify-dev
 
-In other system (like Fedora), package name should be similar.
+在类Fedora系统上，包名应该是类似的。
 
-Try to build lucy and run.
+编译运行三步走：
 
 		./configure
 		make
 		./lucy
 
-Please let me know, if you have problem building or running lucy.
+如果对如何编译运行有问题，欢迎和我联系。
 		
 
 ##Notes and Contact Info
 
-Enjoy!
-
 *	Wiky L(wiiiky@yeah.net)
 
 *	IRC channel: freenode#lucy
-
-**Please help lucy advance faster and better!**
 
 

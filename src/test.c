@@ -1,6 +1,7 @@
 #include <gtk/gtk.h>
 #include "ui_smsbox.h"
 #include "ui_smsrow.h"
+#include "ui_smsview.h"
 #include "lcprotocol.h"
 
 static GtkWidget *window = NULL;
@@ -22,14 +23,17 @@ int show_test(GList * list)
     g_signal_connect(G_OBJECT(window), "destroy",
                      G_CALLBACK(close_window), NULL);
 
-    UISMSBox *view = ui_sms_box_new_reverse(list);
-    UISMSRow *row = ui_sms_row_new(list);
-    ui_sms_row_highlight(row);
+    UISMSView *view = ui_sms_view_new(list);
+    gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(view));
 
-    GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
-    gtk_paned_pack1(GTK_PANED(paned), GTK_WIDGET(row), TRUE, FALSE);
-    gtk_paned_pack2(GTK_PANED(paned), GTK_WIDGET(view), TRUE, FALSE);
-    gtk_container_add(GTK_CONTAINER(window), paned);
+//     UISMSBox *view = ui_sms_box_new_reverse(list);
+//     UISMSRow *row = ui_sms_row_new(list);
+//     ui_sms_row_highlight(row);
+
+//     GtkWidget *paned = gtk_paned_new(GTK_ORIENTATION_HORIZONTAL);
+//     gtk_paned_pack1(GTK_PANED(paned), GTK_WIDGET(row), TRUE, FALSE);
+//     gtk_paned_pack2(GTK_PANED(paned), GTK_WIDGET(view), TRUE, FALSE);
+//     gtk_container_add(GTK_CONTAINER(window), paned);
 
     gtk_widget_show_all(window);
     return 0;

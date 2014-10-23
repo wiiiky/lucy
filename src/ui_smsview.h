@@ -45,8 +45,12 @@ struct _UISMSViewClass {
 
 
 GType ui_sms_view_get_type(void) G_GNUC_CONST;
-UISMSView *ui_sms_view_new(void);
-UISMSView *ui_sms_view_construct(GType object_type);
+UISMSView *ui_sms_view_new(GList * list);   /* will take the list */
+UISMSView *ui_sms_view_construct(GType object_type, GList * list);
+
+void ui_sms_view_update(UISMSView * self, GList * list);
+void ui_sms_view_append_row(UISMSView * self, GList * list);
+void ui_sms_view_append_row_take(UISMSView * self, GList * list);
 
 
 G_END_DECLS

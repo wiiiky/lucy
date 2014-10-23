@@ -341,11 +341,10 @@ static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
         GList *inbox =
             lc_protocol_create_sms_list(result + LC_PROTOCOL_HDR_LEN);
         if (inbox) {
-            show_test(inbox->data);
+            show_test(inbox);
         } else {
             g_message("failed");
         }
-        lc_protocol_free_sms_list(inbox);
     }
     g_free(result);
 }
