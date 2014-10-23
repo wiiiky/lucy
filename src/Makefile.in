@@ -97,7 +97,7 @@ am___top_builddir__lucy_OBJECTS = lucy.$(OBJEXT) \
 	ui_installdialog.$(OBJEXT) ui_smsbox.$(OBJEXT) \
 	ui_smsrow.$(OBJEXT) ui_smsview.$(OBJEXT) lcprotocol.$(OBJEXT) \
 	lcadb.$(OBJEXT) lcsocket.$(OBJEXT) lcutil.$(OBJEXT) \
-	lccommander.$(OBJEXT) lcnotify.$(OBJEXT) test.$(OBJEXT)
+	lccommander.$(OBJEXT) lcnotify.$(OBJEXT)
 __top_builddir__lucy_OBJECTS = $(am___top_builddir__lucy_OBJECTS)
 am__DEPENDENCIES_1 =
 __top_builddir__lucy_DEPENDENCIES = libadb/libadb.a \
@@ -345,8 +345,7 @@ __top_builddir__lucy_SOURCES = \
 	lccommander.h \
 	lcnotify.h \
 	lcnotify.c \
-	lcresource.h \
-	test.c
+	lcresource.h
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \
@@ -454,7 +453,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcsocket.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lcutil.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lucy.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_aboutdialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_applicationrow.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ui_applicationview.Po@am__quote@

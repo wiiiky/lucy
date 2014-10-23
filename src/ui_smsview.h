@@ -52,6 +52,8 @@ void ui_sms_view_update(UISMSView * self, GList * list);
 void ui_sms_view_append_row(UISMSView * self, GList * list);
 void ui_sms_view_append_row_take(UISMSView * self, GList * list);
 
+guint64 ui_sms_view_get_update_time(UISMSView * self);
+
 
 G_END_DECLS
 #endif

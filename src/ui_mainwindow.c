@@ -24,6 +24,7 @@
 #include "ui_applicationview.h"
 #include "ui_aboutdialog.h"
 #include "ui_myandroid.h"
+#include "ui_smsview.h"
 #include "lcadb.h"
 #include "lcsocket.h"
 #include "lcutil.h"
@@ -36,18 +37,14 @@
 #define MAINWINDOW_TITLE "Android Device Manager - Lucy"
 
 #define MY_ANDROID_TITLE    "My Android"
-#define APPLICATION_VIEW_TITLE  "Applications"
+#define APPLICATION_VIEW_TITLE "Applications"
+#define SMS_VIEW_TITLE  	"SMS"
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
 #define UI_MAIN_WINDOW_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), TYPE_UI_MAIN_WINDOW, UIMainWindowPrivate))
 
 static gpointer ui_main_window_parent_class = NULL;
-
-#define APPLICATION_VIEW_NAME "app"
-#define APPLICATION_VIEW_TITLE "Applications"
-#define SMS_VIEW_NAME   "sms"
-#define SMS_VIEW_TITLE  "SMS"
 
 static void ui_main_window_finalize(GObject * obj);
 
@@ -69,7 +66,12 @@ struct _UIMainWindowPrivate {
     UIToolStack *tool_stack;
     UIMyAndroid *phone;
     UIApplicationView *app_view;
+    UISMSView *sms_view;
     GtkMenu *app_popmenu;
+
+    /* 当前处理状态 */
+    gboolean loading_sms;       /* 当前是否在处理短信任务 */
+    gboolean loading_app;       /* 当前是否在处理应用程序列表任务 */
 
     PhoneState state;
 };
@@ -101,53 +103,25 @@ static void ui_main_window_class_init(UIMainWindowClass * klass)
     G_OBJECT_CLASS(klass)->finalize = ui_main_window_finalize;
 }
 
-static void on_my_android(gboolean visible, gpointer user_data)
-{
-    if (visible) {
-        g_message("Come on, My Android!");
-    }
-}
+/* 界面切换的事件 */
+static void on_my_android_view(gboolean visible, gpointer user_data);
+static void on_application_view(gboolean visible, gpointer user_data);
+static void on_sms_view(gboolean visible, gpointer user_data);
 
+/* 通信任务的回调 */
+static void on_connection_init(LcCommanderInitResult result,
+                               gpointer user_data);
+static void on_command_phone(const gchar * cmd, GByteArray * array,
+                             gpointer user_data);
 static void on_command_applications(const gchar * cmd, GByteArray * array,
-                                    gpointer user_data)
-{
-    UIMainWindow *self = (UIMainWindow *) user_data;
-    UIApplicationView *appView = self->priv->app_view;
-    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
-    if (result == NULL || lc_protocol_get_result_from_string(result) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command '%s' Failed:%s", cmd, result);
-    } else {
-        GList *list =
-            lc_protocol_create_application_list(result +
-                                                LC_PROTOCOL_HDR_LEN);
-        ui_application_view_update(appView, list);
-        lc_protocol_free_application_list(list);
-    }
-    g_free(result);
-    ui_application_view_set_loading(appView, FALSE);
-}
+                                    gpointer user_data);
+static void on_command_sms(const gchar * cmd, GByteArray * array,
+                           gpointer user_data);
 
-static void on_application(gboolean visible, gpointer user_data)
-{
-    UIMainWindow *self = (UIMainWindow *) user_data;
-    UIApplicationView *view = self->priv->app_view;
-
-    guint64 last = ui_application_view_get_update_time(view);
-    guint64 now = (guint64) time(NULL);
-
-    if (visible && lc_main_window_is_connected(self) &&
-        ui_application_view_is_loading(view) == FALSE &&
-        now - last >= 60) {
-        ui_application_view_set_loading(view, TRUE);
-        lc_commander_send_command_async(LC_PROTOCOL_APPLICATIONS,
-                                        on_command_applications,
-                                        user_data);
-    }
-}
-
+/* 各个界面的初始化 */
 static void ui_main_window_my_android_init(UIMainWindow * self);
 static void ui_main_window_application_init(UIMainWindow * self);
+static void ui_main_window_sms_init(UIMainWindow * self);
 
 static void ui_main_window_instance_init(UIMainWindow * self)
 {
@@ -172,21 +146,8 @@ static void ui_main_window_instance_init(UIMainWindow * self)
     g_object_ref_sink(self->priv->tool_stack);
 
     ui_main_window_my_android_init(self);
-    ui_tool_stack_append(self->priv->tool_stack,
-                         gtk_image_new_from_file
-                         (lc_util_get_resource_by_name
-                          (MY_ANDROID_TITLE_ICON)), MY_ANDROID_TITLE,
-                         GTK_WIDGET(self->priv->phone), on_my_android,
-                         self);
-
     ui_main_window_application_init(self);
-    ui_tool_stack_append(self->priv->tool_stack,
-                         gtk_image_new_from_file
-                         (lc_util_get_resource_by_name
-                          (APPLICATION_VIEW_TITLE_ICON)),
-                         APPLICATION_VIEW_TITLE,
-                         GTK_WIDGET(self->priv->app_view), on_application,
-                         self);
+    ui_main_window_sms_init(self);
 
     lc_main_window_set_phone_disconnected(self);
 }
@@ -201,13 +162,20 @@ static void on_connect_clicked(GtkWidget * button, gpointer data)
 
 static void ui_main_window_my_android_init(UIMainWindow * self)
 {
-    UIMyAndroid *phone = ui_my_android_new();
-    ui_my_android_set_connect_callback(phone,
+    self->priv->phone = ui_my_android_new();
+    ui_my_android_set_connect_callback(self->priv->phone,
                                        G_CALLBACK(on_connect_clicked),
                                        self);
-    g_object_ref_sink(phone);
+    g_object_ref_sink(self->priv->phone);
 
-    self->priv->phone = phone;
+
+    /* 添加 */
+    ui_tool_stack_append(self->priv->tool_stack,
+                         gtk_image_new_from_file
+                         (lc_util_get_resource_by_name
+                          (MY_ANDROID_TITLE_ICON)), MY_ANDROID_TITLE,
+                         GTK_WIDGET(self->priv->phone), on_my_android_view,
+                         self);
 }
 
 static void ui_main_window_application_init(UIMainWindow * self)
@@ -217,7 +185,33 @@ static void ui_main_window_application_init(UIMainWindow * self)
 
     self->priv->app_popmenu = (GtkMenu *) gtk_menu_new();
     g_object_ref_sink(self->priv->app_popmenu);
-    /* TODO */
+
+    self->priv->loading_app = FALSE;
+
+    /* 添加 */
+    ui_tool_stack_append(self->priv->tool_stack,
+                         gtk_image_new_from_file
+                         (lc_util_get_resource_by_name
+                          (APPLICATION_VIEW_TITLE_ICON)),
+                         APPLICATION_VIEW_TITLE,
+                         GTK_WIDGET(self->priv->app_view),
+                         on_application_view, self);
+}
+
+static void ui_main_window_sms_init(UIMainWindow * self)
+{
+    self->priv->sms_view = ui_sms_view_new(NULL);
+    g_object_ref_sink(self->priv->sms_view);
+
+    self->priv->loading_sms = FALSE;
+    /* 添加 */
+    ui_tool_stack_append(self->priv->tool_stack,
+                         gtk_image_new_from_file
+                         (lc_util_get_resource_by_name
+                          (SMS_VIEW_TITLE_ICON)),
+                         SMS_VIEW_TITLE,
+                         GTK_WIDGET(self->priv->sms_view), on_sms_view,
+                         self);
 }
 
 static void ui_main_window_finalize(GObject * obj)
@@ -228,8 +222,50 @@ static void ui_main_window_finalize(GObject * obj)
     _g_object_unref0(self->priv->app_view);
     _g_object_unref0(self->priv->tool_stack);
     _g_object_unref0(self->priv->phone);
+    _g_object_unref0(self->priv->sms_view);
     _g_object_unref0(self->priv->app_popmenu);
     G_OBJECT_CLASS(ui_main_window_parent_class)->finalize(obj);
+}
+
+static void on_my_android_view(gboolean visible, gpointer user_data)
+{
+    if (visible) {
+        g_message("Come on, My Android!");
+    }
+}
+
+static void on_sms_view(gboolean visible, gpointer user_data)
+{
+    UIMainWindow *self = (UIMainWindow *) user_data;
+    UISMSView *view = self->priv->sms_view;
+
+    if (visible && lc_main_window_is_connected(self)) {
+        guint64 last = ui_sms_view_get_update_time(view);
+        guint64 now = (guint64) time(NULL);
+        if (now - last >= 60 && self->priv->loading_sms == FALSE) {
+            self->priv->loading_sms = TRUE;
+            lc_commander_send_command_async(LC_PROTOCOL_SMS,
+                                            on_command_sms, user_data);
+        }
+    }
+}
+
+static void on_application_view(gboolean visible, gpointer user_data)
+{
+    UIMainWindow *self = (UIMainWindow *) user_data;
+    UIApplicationView *view = self->priv->app_view;
+
+    if (visible && lc_main_window_is_connected(self)) {
+        guint64 last = ui_application_view_get_update_time(view);
+        guint64 now = (guint64) time(NULL);
+
+        if (now - last >= 60 && self->priv->loading_app == FALSE) {
+            self->priv->loading_app = TRUE;
+            lc_commander_send_command_async(LC_PROTOCOL_APPLICATIONS,
+                                            on_command_applications,
+                                            user_data);
+        }
+    }
 }
 
 
@@ -255,6 +291,7 @@ GType ui_main_window_get_type(void)
     return ui_main_window_type_id__volatile;
 }
 
+/* 菜单事件 */
 static void on_about_menu_item_activate(GtkMenuItem * item, gpointer data);
 static void on_app_install_menu_item_activate(GtkMenuItem * item,
                                               gpointer data);
@@ -311,6 +348,39 @@ void ui_main_window_show(UIMainWindow * window)
     gtk_main();
 }
 
+void ui_main_window_start_server(UIMainWindow * window)
+{
+    lc_commander_init_async(on_connection_init, window);
+}
+
+static void on_connection_init(LcCommanderInitResult result, gpointer data)
+{
+    UIMainWindow *self = (UIMainWindow *) data;
+    if (result == LC_COMMANDER_INIT_OK) {
+        lc_commander_send_command_async(LC_PROTOCOL_PHONE,
+                                        on_command_phone, data);
+        ui_my_android_show_connected(self->priv->phone);
+        lc_main_window_set_phone_connected(self);
+
+        const gchar *title =
+            ui_tool_stack_get_current_title(self->priv->tool_stack);
+        if (g_strcmp0(title, APPLICATION_VIEW_TITLE) == 0) {
+            on_application_view(TRUE, self);
+        } else if (g_strcmp0(title, SMS_VIEW_TITLE) == 0) {
+            on_sms_view(TRUE, self);
+        }
+        lc_notify_show("Lucy", "Connection established successfully!",
+                       CONNECT_SUCCESS_ICON);
+    } else {
+        /* Connection failed */
+        ui_my_android_show_disconnect(self->priv->phone);
+        lc_main_window_set_phone_disconnected(self);
+        lc_notify_show("Lucy",
+                       "Failed to connect to your Android device!",
+                       CONNECT_FAIL_ICON);
+    }
+}
+
 static void on_command_phone(const gchar * cmd, GByteArray * array,
                              gpointer user_data)
 {
@@ -329,56 +399,40 @@ static void on_command_phone(const gchar * cmd, GByteArray * array,
     g_free(result);
 }
 
-static void on_command_sms_inbox(const gchar * cmd, GByteArray * array,
-                                 gpointer user_data)
+static void on_command_sms(const gchar * cmd, GByteArray * array,
+                           gpointer user_data)
 {
     gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    UIMainWindow *self = (UIMainWindow *) user_data;
+    self->priv->loading_sms = FALSE;
     if (result == NULL ||
         lc_protocol_get_result_from_string(result) !=
         LC_PROTOCOL_RESULT_OKAY) {
         g_warning("Command '%s' Failed:%s", cmd, result);
     } else {
-        GList *inbox =
+        GList *list =
             lc_protocol_create_sms_list(result + LC_PROTOCOL_HDR_LEN);
-        if (inbox) {
-            show_test(inbox);
-        } else {
-            g_message("failed");
-        }
+        ui_sms_view_update(self->priv->sms_view, list);
     }
     g_free(result);
 }
 
-
-static void on_connection_init(LcCommanderInitResult result, gpointer data)
+static void on_command_applications(const gchar * cmd, GByteArray * array,
+                                    gpointer user_data)
 {
-    UIMainWindow *self = (UIMainWindow *) data;
-    if (result == LC_COMMANDER_INIT_OK) {
-        lc_commander_send_command_async(LC_PROTOCOL_PHONE,
-                                        on_command_phone, data);
-        lc_commander_send_command_async(LC_PROTOCOL_SMS_INBOX,
-                                        on_command_sms_inbox, data);
-        ui_my_android_show_connected(self->priv->phone);
-        lc_main_window_set_phone_connected(self);
-
-        const gchar *title =
-            ui_tool_stack_get_current_title(self->priv->tool_stack);
-        if (g_strcmp0(title, APPLICATION_VIEW_TITLE) == 0) {
-            on_application(true, self);
-        }
-        lc_notify_show("Lucy", "Connection established successfully!",
-                       CONNECT_SUCCESS_ICON);
+    UIMainWindow *self = (UIMainWindow *) user_data;
+    self->priv->loading_app = FALSE;
+    UIApplicationView *appView = self->priv->app_view;
+    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    if (result == NULL || lc_protocol_get_result_from_string(result) !=
+        LC_PROTOCOL_RESULT_OKAY) {
+        g_warning("Command '%s' Failed:%s", cmd, result);
     } else {
-        /* Connection failed */
-        ui_my_android_show_disconnect(self->priv->phone);
-        lc_main_window_set_phone_disconnected(self);
-        lc_notify_show("Lucy",
-                       "Failed to connect to your Android device!",
-                       CONNECT_FAIL_ICON);
+        GList *list =
+            lc_protocol_create_application_list(result +
+                                                LC_PROTOCOL_HDR_LEN);
+        ui_application_view_update(appView, list);
+        lc_protocol_free_application_list(list);
     }
-}
-
-void ui_main_window_start_server(UIMainWindow * window)
-{
-    lc_commander_init_async(on_connection_init, window);
+    g_free(result);
 }

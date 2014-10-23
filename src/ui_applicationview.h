@@ -56,9 +56,6 @@ void ui_application_view_update(UIApplicationView * self, GList * list);
 
 guint64 ui_application_view_get_update_time(UIApplicationView * self);
 
-void ui_application_view_set_loading(UIApplicationView * self,
-                                     gboolean loading);
-gboolean ui_application_view_is_loading(UIApplicationView * self);
 
 LcProtocolApplicationType
 ui_application_view_get_current_type(UIApplicationView * self);

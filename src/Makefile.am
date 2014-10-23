@@ -50,8 +50,7 @@ __top_builddir__lucy_SOURCES =  \
 	lccommander.h \
 	lcnotify.h \
 	lcnotify.c \
-	lcresource.h \
-	test.c
+	lcresource.h
 
 __top_builddir__lucy_LDADD = \
 	libadb/libadb.a \

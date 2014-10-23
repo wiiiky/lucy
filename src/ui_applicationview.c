@@ -342,17 +342,6 @@ void ui_application_view_update(UIApplicationView * self, GList * list)
     ui_application_view_update_view(self);
 }
 
-void ui_application_view_set_loading(UIApplicationView * self,
-                                     gboolean loading)
-{
-    self->priv->app_loading = loading;
-}
-
-gboolean ui_application_view_is_loading(UIApplicationView * self)
-{
-    return self->priv->app_loading;
-}
-
 guint64 ui_application_view_get_update_time(UIApplicationView * self)
 {
     return self->priv->app_last_update;

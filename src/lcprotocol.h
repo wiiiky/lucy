@@ -21,8 +21,8 @@
  * the communication protocol between LUCY and LILY
  */
 
-#ifndef __LC_DATA_MODEL_H__
-#define __LC_DATA_MODEL_H__
+#ifndef __LC_PROTOCOL_H__
+#define __LC_PROTOCOL_H__
 #include <glib-2.0/glib.h>
 
 /* all commands */
@@ -30,7 +30,7 @@
 #define LC_PROTOCOL_VERSION      "version\n"
 #define LC_PROTOCOL_PHONE        "phone\n"
 #define LC_PROTOCOL_ICON         "icon:%s\n"
-#define LC_PROTOCOL_SMS_INBOX     "sms\n"
+#define LC_PROTOCOL_SMS  		   "sms\n"
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 

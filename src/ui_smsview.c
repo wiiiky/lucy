@@ -22,6 +22,7 @@
 #include "ui_smsbox.h"
 #include "ui_smsrow.h"
 #include "lcprotocol.h"
+#include <time.h>
 
 #define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 
@@ -30,6 +31,8 @@ struct _UISMSViewPrivate {
     UISMSBox *sms_box;
     GtkGrid *sms_grid;
     gint sms_count;
+
+    guint64 sms_last_update;    /* 上一次更新界面的时间 */
 };
 #define STACK_NAME_SMS	"sms"
 
@@ -74,6 +77,7 @@ static void ui_sms_view_instance_init(UISMSView * self)
     ui_sms_view_sms_paned_init(self);
 
     self->priv->sms_count = 0;
+    self->priv->sms_last_update = 0;
 }
 
 
@@ -121,10 +125,10 @@ GType ui_sms_view_get_type(void)
         static const GTypeInfo g_define_type_info =
             { sizeof(UISMSViewClass), (GBaseInitFunc) NULL,
             (GBaseFinalizeFunc) NULL,
-                (GClassInitFunc) ui_sms_view_class_init,
-                (GClassFinalizeFunc) NULL, NULL,
+            (GClassInitFunc) ui_sms_view_class_init,
+            (GClassFinalizeFunc) NULL, NULL,
             sizeof(UISMSView), 0,
-                (GInstanceInitFunc) ui_sms_view_instance_init, NULL
+            (GInstanceInitFunc) ui_sms_view_instance_init, NULL
         };
         GType ui_sms_view_type_id;
         ui_sms_view_type_id =
@@ -138,6 +142,10 @@ GType ui_sms_view_get_type(void)
 
 void ui_sms_view_update(UISMSView * self, GList * list)
 {
+    if (list == NULL) {
+        return;
+    }
+    self->priv->sms_last_update = (guint64) time(NULL);
     GtkGrid *grid = self->priv->sms_grid;
     UISMSBox *box = self->priv->sms_box;
     GList *lp = list;
@@ -156,6 +164,7 @@ void ui_sms_view_update(UISMSView * self, GList * list)
     /* 删除多余的 */
     while (gtk_grid_get_child_at(grid, 0, i)) {
         gtk_grid_remove_row(grid, i);
+        self->priv->sms_count--;
     }
 
     /* 显示第一个 */
@@ -178,6 +187,12 @@ void ui_sms_view_append_row_take(UISMSView * self, GList * list)
 {
     GtkGrid *grid = self->priv->sms_grid;
     UISMSRow *row = ui_sms_row_new_take(list);
+    gtk_widget_show_all(GTK_WIDGET(row));
     gtk_grid_attach(grid, GTK_WIDGET(row), 0, self->priv->sms_count, 1, 1);
     self->priv->sms_count++;
+}
+
+guint64 ui_sms_view_get_update_time(UISMSView * self)
+{
+    return self->priv->sms_last_update;
 }
