@@ -1,11 +1,12 @@
 package org.wl.ll.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import android.support.v4.app.NavUtils;
 
 public class SMSActivity extends Activity {
 
@@ -29,6 +31,11 @@ public class SMSActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms);
+
+        ActionBar bar=getActionBar();
+        if(bar!=null){
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
 
         listView = (ListView) findViewById(R.id.list);
 
@@ -49,8 +56,8 @@ public class SMSActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        if (id==android.R.id.home){
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
