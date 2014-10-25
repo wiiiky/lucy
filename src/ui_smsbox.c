@@ -586,6 +586,14 @@ void ui_sms_box_set_data(UISMSBox * self, GList * list)
     ui_sms_box_set_data_take(self, copy);
 }
 
+void ui_sms_box_set_data_reverse(UISMSBox * self, GList * list)
+{
+    GList *copy =
+        g_list_copy_deep(list, (GCopyFunc) lc_protocol_sms_copy, NULL);
+    copy = g_list_reverse(copy);
+    ui_sms_box_set_data_take(self, copy);
+}
+
 void ui_sms_box_set_data_take(UISMSBox * self, GList * list)
 {
     g_list_free_full(self->priv->list,

@@ -176,7 +176,7 @@ void ui_sms_view_update(UISMSView * self, GList * list)
     UISMSRow *row = (UISMSRow *) gtk_grid_get_child_at(grid, 0, 0);
     if (row) {
         GList *list = ui_sms_row_get_data(row);
-        ui_sms_box_set_data(box, list);
+        ui_sms_box_set_data_reverse(box, list);
     }
     g_list_free(list);
 }
@@ -232,5 +232,5 @@ static inline void ui_sms_view_set_selected(UISMSView * self,
         ui_sms_row_highlight(self->priv->selected);
         data = ui_sms_row_get_data(self->priv->selected);
     }
-    ui_sms_box_set_data(self->priv->sms_box, data);
+    ui_sms_box_set_data_reverse(self->priv->sms_box, data);
 }

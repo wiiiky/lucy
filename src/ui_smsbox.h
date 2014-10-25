@@ -101,6 +101,7 @@ void ui_sms_box_set_margin_full(UISMSBox * self,
 void ui_sms_box_show_address(UISMSBox * self, gboolean show);
 
 void ui_sms_box_set_data(UISMSBox * self, GList * list);
+void ui_sms_box_set_data_reverse(UISMSBox * self, GList * list);
 void ui_sms_box_set_data_take(UISMSBox * self, GList * list);
 
 void ui_sms_box_reverse(UISMSBox * self);
