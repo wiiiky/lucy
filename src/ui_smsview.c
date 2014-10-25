@@ -32,9 +32,13 @@ struct _UISMSViewPrivate {
     GtkGrid *sms_grid;
     gint sms_count;
 
+    UISMSRow *selected;         /* 当前选中的短信 */
     guint64 sms_last_update;    /* 上一次更新界面的时间 */
 };
 #define STACK_NAME_SMS	"sms"
+
+static inline void ui_sms_view_set_selected(UISMSView * self,
+                                            UISMSRow * row);
 
 
 static gpointer ui_sms_view_parent_class = NULL;
@@ -78,6 +82,7 @@ static void ui_sms_view_instance_init(UISMSView * self)
 
     self->priv->sms_count = 0;
     self->priv->sms_last_update = 0;
+    self->priv->selected = NULL;
 }
 
 
@@ -183,6 +188,18 @@ void ui_sms_view_append_row(UISMSView * self, GList * list)
     return ui_sms_view_append_row_take(self, copy);
 }
 
+/* 鼠标点击选中某一行短信 */
+static gboolean on_row_pressed(UISMSRow * row, GdkEventButton * event,
+                               gpointer user_data)
+{
+    UISMSView *self = (UISMSView *) user_data;
+    if (event->type == GDK_BUTTON_PRESS && event->button == 1) {
+        ui_sms_view_set_selected(self, row);
+    }
+
+    return FALSE;
+}
+
 void ui_sms_view_append_row_take(UISMSView * self, GList * list)
 {
     GtkGrid *grid = self->priv->sms_grid;
@@ -190,9 +207,30 @@ void ui_sms_view_append_row_take(UISMSView * self, GList * list)
     gtk_widget_show_all(GTK_WIDGET(row));
     gtk_grid_attach(grid, GTK_WIDGET(row), 0, self->priv->sms_count, 1, 1);
     self->priv->sms_count++;
+
+    g_signal_connect(G_OBJECT(row), "button-press-event",
+                     G_CALLBACK(on_row_pressed), self);
 }
 
 guint64 ui_sms_view_get_update_time(UISMSView * self)
 {
     return self->priv->sms_last_update;
+}
+
+static inline void ui_sms_view_set_selected(UISMSView * self,
+                                            UISMSRow * row)
+{
+    if (self->priv->selected == row) {
+        return;
+    }
+    if (self->priv->selected) {
+        ui_sms_row_unhighlight(self->priv->selected);
+    }
+    self->priv->selected = row;
+    GList *data = NULL;
+    if (self->priv->selected) {
+        ui_sms_row_highlight(self->priv->selected);
+        data = ui_sms_row_get_data(self->priv->selected);
+    }
+    ui_sms_box_set_data(self->priv->sms_box, data);
 }

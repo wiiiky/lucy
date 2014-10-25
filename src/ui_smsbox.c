@@ -591,7 +591,7 @@ void ui_sms_box_set_data_take(UISMSBox * self, GList * list)
     g_list_free_full(self->priv->list,
                      (GDestroyNotify) lc_protocol_sms_free);
     self->priv->list = list;
-	self->priv->upper=0;
+    self->priv->upper = 0;
     ui_sms_box_redraw(self);
 }
 
