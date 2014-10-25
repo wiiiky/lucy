@@ -250,7 +250,9 @@ const gchar *lc_util_date_time_format(guint64 time, const gchar * f)
     return buf;
 }
 
-const gchar *lc_util_get_system_font()
+
+/* TODO */
+gchar *lc_util_get_system_font(UtilSystemFontType type, gint * size)
 {
     return NULL;
 }

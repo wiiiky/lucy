@@ -94,10 +94,19 @@ gssize lc_util_size_from_hex(const gchar buf[4]);
 const gchar *lc_util_date_time_format(guint64 time, const gchar * f);
 
 
+typedef enum {
+    UTIL_SYSTEM_FONT_TYPE_NORMAL,   /* 一般字体，key值为font-name */
+    UTIL_SYSTEM_FONT_TYPE_MONO, /* 等宽字体，key值为monospace-font-name */
+    UTIL_SYSTEM_FONT_TYPE_TITLEBAR, /* 窗口标题栏字体，key值为titlebar-font */
+    UTIL_SYSTEM_FONT_TYPE_DOCUMENT, /* 文档字体，key值为document-font-name */
+} UtilSystemFontType;
 /*
  * 获取系统的默认字体
+ * 根据参数type的类型返回不同类型的字体，
+ * 如果type是无效的值，则返回一般字体UTIL_SYSTEM_FONT_TYPE_NORMAL
+ * 如果size为NULL，则忽略；如果不为NULL则返回字体大小
  */
-const gchar *lc_util_get_system_font();
+gchar *lc_util_get_system_font(UtilSystemFontType type, gint * size);
 
 
 #endif
