@@ -27,6 +27,11 @@ const static gchar *LUCY_AUTHORS[] = {
     NULL
 };
 
+const static gchar *LUCY_CONTRIBUTORS[] = {
+    "gansteed",
+    NULL
+};
+
 
 static gpointer ui_about_dialog_parent_class = NULL;
 
@@ -66,6 +71,8 @@ static void ui_about_dialog_instance_init(UIAboutDialog * self)
     gtk_about_dialog_set_comments(GTK_ABOUT_DIALOG(self), LUCY_COMMENTS);
     gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(self), LUCY_WEBSITE);
     gtk_about_dialog_set_authors(GTK_ABOUT_DIALOG(self), LUCY_AUTHORS);
+    gtk_about_dialog_add_credit_section(GTK_ABOUT_DIALOG(self),
+                                        "Contributors", LUCY_CONTRIBUTORS);
 }
 
 

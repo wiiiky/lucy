@@ -186,6 +186,7 @@ static void on_dialog_response(GtkDialog * dialog, gint response_id,
             gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(file_button));
         if (path) {
             lc_adb_install_app(path, on_install_app, path);
+            lc_notify_show("Lucy", "Installing APP!", INSTALLING_APP_ICON);
         }
     }
     gtk_widget_destroy(GTK_WIDGET(self));

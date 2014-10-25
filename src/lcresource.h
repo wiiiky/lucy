@@ -39,6 +39,8 @@
 #define CONNECT_SUCCESS_ICON	"icon/connect-success.png"
 #define CONNECT_FAIL_ICON		"icon/connect-fail.png"
 
+#define INSTALLING_APP_ICON		"icon/installing-app.png"
+
 #define DEFAULT_AVATAR_ICON		"icon/avatar-default.png"
 
 
