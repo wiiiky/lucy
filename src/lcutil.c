@@ -279,12 +279,39 @@ gchar *lc_util_get_system_font(UtilSystemFontType type, gint * size)
       break;
   }
 
+  gchar *font_name = g_settings_get_string(settings, font_type);
+  gchar *font_name_copy = font_name;
   /*
-   * if size is NULL , then pass it
-   * else get font size
+   * set default to 0 again
+   * get integer from string.
+   * if size is NULL , pass it.
    */
   if (size != NULL) {
-    *size = g_settings_get_int(settings, font_type);
+    *size = 0;
+    while (*font_name_copy++ != '\0') {
+      if (*font_name_copy >= '0' && *font_name_copy <= '9') {
+        *size *= 10;
+        *size += *font_name_copy - '0';
+      }
+    }
   }
-  return g_settings_get_string(settings, font_type);
+
+  /* 
+   * loop again for insert '\000' in space 
+   */
+  font_name_copy = font_name;
+
+  while (*font_name_copy++ != '\0') {
+    if (*font_name_copy == ' ') {
+      *font_name_copy = '\0';
+    }
+  }
+
+  /* 
+   * free gsettings
+   * free font_name_copy
+   */
+  g_object_unref(settings);
+
+  return font_name;
 }
