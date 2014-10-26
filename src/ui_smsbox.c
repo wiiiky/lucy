@@ -28,19 +28,13 @@
 struct _UISMSBoxPrivate {
     GtkDrawingArea *draw_area;
 
-    gchar *body_font;           /* the font name of content */
-    gint body_size;             /* the font size of content */
-    SMSFontStyle body_style;    /* the font style of content */
+    gchar *body_font;           /* the font of content */
     SMSFontColor body_color;    /* the color of content */
 
-    gchar *date_font;           /* the font name of date */
-    gint date_size;             /* the font size of date */
-    SMSFontStyle date_style;    /* the font style of date */
+    gchar *date_font;           /* the font of date */
     SMSFontColor date_color;    /* the color of date */
 
-    gchar *address_font;        /* the font name of address */
-    gint address_size;          /* the font size of address */
-    SMSFontStyle address_style; /* the font style of address */
+    gchar *address_font;        /* the font of address */
     SMSFontColor address_color; /* the color of address */
 
     gint margin_top;
@@ -131,25 +125,23 @@ static void ui_sms_box_instance_init(UISMSBox * self)
     g_object_ref_sink(priv->draw_area);
 
     priv->list = NULL;
-    priv->body_font = g_strdup("ubuntu mono");
-    priv->body_size = 12;
-    priv->body_style = SMS_FONT_STYLE_NOMARL;
+    priv->body_font =
+        lc_util_get_system_font(UTIL_SYSTEM_FONT_TYPE_DOCUMENT);
+    g_message("%s", priv->body_font);
     priv->body_color.red = 0;
     priv->body_color.green = 0;
     priv->body_color.blue = 0;
     priv->body_color.alpha = 1;
 
-    priv->date_font = g_strdup("consolas");
-    priv->date_size = 10;
-    priv->date_style = SMS_FONT_STYLE_ITALIC;
+    priv->date_font =
+        lc_util_get_system_font(UTIL_SYSTEM_FONT_TYPE_NORMAL);
     priv->date_color.red = 0.1;
     priv->date_color.green = 0.1;
     priv->date_color.blue = 0.1;
     priv->date_color.alpha = 0.6;
 
-    priv->address_font = g_strdup("consolas");
-    priv->address_size = 10;
-    priv->address_style = SMS_FONT_STYLE_NOMARL;
+    priv->address_font =
+        lc_util_get_system_font(UTIL_SYSTEM_FONT_TYPE_NORMAL);
     priv->address_color.red = 0.1;
     priv->address_color.green = 0.1;
     priv->address_color.blue = 1.1;
@@ -246,32 +238,20 @@ static gboolean on_draw(GtkWidget * widget, cairo_t * cr, gpointer data)
 
     gboolean show_address = self->priv->show_address;
 
-    PangoFontDescription *body_font = pango_font_description_new();
-    pango_font_description_set_size(body_font,
-                                    self->priv->body_size * PANGO_SCALE);
-    pango_font_description_set_family(body_font, self->priv->body_font);
-    pango_font_description_set_style(body_font, self->priv->body_style);
+    PangoFontDescription *body_font =
+        pango_font_description_from_string(self->priv->body_font);
 
     PangoLayout *body_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(body_layout, body_font);
 
-    PangoFontDescription *date_font = pango_font_description_new();
-    pango_font_description_set_size(date_font,
-                                    self->priv->date_size * PANGO_SCALE);
-    pango_font_description_set_family(date_font, self->priv->date_font);
-    pango_font_description_set_style(date_font, self->priv->date_style);
+    PangoFontDescription *date_font =
+        pango_font_description_from_string(self->priv->date_font);
 
     PangoLayout *date_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(date_layout, date_font);
 
-    PangoFontDescription *address_font = pango_font_description_new();
-    pango_font_description_set_size(address_font,
-                                    self->priv->address_size *
-                                    PANGO_SCALE);
-    pango_font_description_set_family(address_font,
-                                      self->priv->address_font);
-    pango_font_description_set_style(address_font,
-                                     self->priv->address_style);
+    PangoFontDescription *address_font =
+        pango_font_description_from_string(self->priv->address_font);
 
     PangoLayout *address_layout = pango_cairo_create_layout(cr);
     pango_layout_set_font_description(address_layout, address_font);
@@ -453,104 +433,6 @@ static void inline ui_sms_box_redraw(UISMSBox * self)
     gtk_widget_queue_draw(GTK_WIDGET(self->priv->draw_area));
 }
 
-void ui_sms_box_set_body_font_full(UISMSBox * self,
-                                   const gchar * font_name,
-                                   gint font_size, SMSFontStyle font_style)
-{
-    g_free(self->priv->body_font);
-    self->priv->body_font = g_strdup(font_name);
-    self->priv->body_size = font_size;
-    self->priv->body_style = font_style;
-
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_body_font_family(UISMSBox * self,
-                                     const gchar * font_name)
-{
-    g_free(self->priv->body_font);
-    self->priv->body_font = g_strdup(font_name);
-
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_body_font_size(UISMSBox * self, gint font_size)
-{
-    self->priv->body_size = font_size;
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_body_font_style(UISMSBox * self,
-                                    SMSFontStyle font_style)
-{
-    self->priv->body_style = font_style;
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_date_font_full(UISMSBox * self,
-                                   const gchar * font_name,
-                                   gint font_size, SMSFontStyle font_style)
-{
-    g_free(self->priv->date_font);
-    self->priv->date_font = g_strdup(font_name);
-    self->priv->date_size = font_style;
-    self->priv->date_style = font_style;
-
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_date_font_family(UISMSBox * self,
-                                     const gchar * font_name)
-{
-    g_free(self->priv->date_font);
-    self->priv->date_font = g_strdup(font_name);
-}
-
-void ui_sms_box_set_date_font_size(UISMSBox * self, gint font_size)
-{
-    self->priv->date_size = font_size;
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_date_font_style(UISMSBox * self,
-                                    SMSFontStyle font_style)
-{
-    self->priv->date_style = font_style;
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_address_font_full(UISMSBox * self,
-                                      const gchar * font_name,
-                                      gint font_size,
-                                      SMSFontStyle font_style)
-{
-    g_free(self->priv->address_font);
-    self->priv->address_font = g_strdup(font_name);
-    self->priv->address_size = font_size;
-    self->priv->address_style = font_style;
-
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_address_font_family(UISMSBox * self,
-                                        const gchar * font_name)
-{
-    g_free(self->priv->address_font);
-    self->priv->address_font = g_strdup(font_name);
-}
-
-void ui_sms_box_set_address_font_size(UISMSBox * self, gint font_size)
-{
-    self->priv->address_size = font_size;
-    ui_sms_box_redraw(self);
-}
-
-void ui_sms_box_set_address_font_style(UISMSBox * self,
-                                       SMSFontStyle font_style)
-{
-    self->priv->address_style = font_style;
-    ui_sms_box_redraw(self);
-}
 
 void ui_sms_box_set_margin_full(UISMSBox * self,
                                 gint margin_top,

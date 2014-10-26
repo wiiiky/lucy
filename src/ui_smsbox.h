@@ -59,35 +59,6 @@ UISMSBox *ui_sms_box_new_reverse(GList * list);
 UISMSBox *ui_sms_box_construct(GType object_type, GList * list);
 
 
-void ui_sms_box_set_body_font_full(UISMSBox * self,
-                                   const gchar * font_name,
-                                   gint font_size,
-                                   SMSFontStyle font_style);
-void ui_sms_box_set_body_font_family(UISMSBox * self,
-                                     const gchar * font_name);
-void ui_sms_box_set_body_font_size(UISMSBox * self, gint font_size);
-void ui_sms_box_set_body_font_style(UISMSBox * self,
-                                    SMSFontStyle font_style);
-
-void ui_sms_box_set_date_font_full(UISMSBox * self,
-                                   const gchar * font_name,
-                                   gint font_size,
-                                   SMSFontStyle font_style);
-void ui_sms_box_set_date_font_family(UISMSBox * self,
-                                     const gchar * font_name);
-void ui_sms_box_set_date_font_size(UISMSBox * self, gint font_size);
-void ui_sms_box_set_date_font_style(UISMSBox * self,
-                                    SMSFontStyle font_style);
-
-void ui_sms_box_set_address_font_full(UISMSBox * self,
-                                      const gchar * font_name,
-                                      gint font_size,
-                                      SMSFontStyle font_style);
-void ui_sms_box_set_address_font_family(UISMSBox * self,
-                                        const gchar * font_name);
-void ui_sms_box_set_address_font_size(UISMSBox * self, gint font_size);
-void ui_sms_box_set_address_font_style(UISMSBox * self,
-                                       SMSFontStyle font_style);
 
 void ui_sms_box_set_margin_full(UISMSBox * self,
                                 gint margin_top,

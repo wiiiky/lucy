@@ -104,9 +104,8 @@ typedef enum {
  * 获取系统的默认字体
  * 根据参数type的类型返回不同类型的字体，
  * 如果type是无效的值，则返回一般字体UTIL_SYSTEM_FONT_TYPE_NORMAL
- * 如果size为NULL，则忽略；如果不为NULL则返回字体大小
  */
-gchar *lc_util_get_system_font(UtilSystemFontType type, gint * size);
+gchar *lc_util_get_system_font(UtilSystemFontType type);
 
 
 #endif
