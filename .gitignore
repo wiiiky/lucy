@@ -4,3 +4,7 @@ test/
 nbproject/
 *.cache
 a.out
+*.o
+src/*.o
+*.a
+src/*.a
