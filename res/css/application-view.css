@@ -2,3 +2,7 @@ GtkGrid#apps{
     background: white;
 }
 
+GtkToolbar#toolbar{
+    background: rgb(155,155,255);
+}
+

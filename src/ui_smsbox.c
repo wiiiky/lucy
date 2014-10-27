@@ -127,7 +127,6 @@ static void ui_sms_box_instance_init(UISMSBox * self)
     priv->list = NULL;
     priv->body_font =
         lc_util_get_system_font(UTIL_SYSTEM_FONT_TYPE_DOCUMENT);
-    g_message("%s", priv->body_font);
     priv->body_color.red = 0;
     priv->body_color.green = 0;
     priv->body_color.blue = 0;

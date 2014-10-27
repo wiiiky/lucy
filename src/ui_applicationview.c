@@ -114,6 +114,7 @@ static void ui_application_view_instance_init(UIApplicationView * self)
     g_object_ref_sink(priv->app_grid);
 
     priv->app_toolbar = (GtkToolbar *) gtk_toolbar_new();
+    gtk_widget_set_name(GTK_WIDGET(priv->app_toolbar), "toolbar");
     gtk_toolbar_set_style(priv->app_toolbar, GTK_TOOLBAR_TEXT);
     g_object_ref_sink(priv->app_toolbar);
     gtk_grid_attach(priv->app_grid, GTK_WIDGET(priv->app_toolbar), 0, 0, 1,
