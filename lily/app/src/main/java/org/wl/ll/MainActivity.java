@@ -4,14 +4,19 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -142,56 +147,61 @@ public class MainActivity extends Activity {
     };
 
     private LinearLayout initContentView(){
+        Resources res = getResources();
+
         LinearLayout tmp1 = new LinearLayout(this);
+        tmp1.setOrientation(LinearLayout.VERTICAL);
+        tmp1.setPadding((int)res.getDimension(R.dimen.activity_horizontal_margin),(int)res.getDimension(R.dimen.activity_vertical_margin),(int)res.getDimension(R.dimen.activity_horizontal_margin),(int)res.getDimension(R.dimen.activity_vertical_margin));
         ViewGroup.LayoutParams tmp1Params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
         tmp1.setLayoutParams(tmp1Params);
-        tmp1.setOrientation(LinearLayout.VERTICAL);
 
         ScrollView tmp2 = new ScrollView(this);
+        tmp2.setFillViewport(true);
         LinearLayout.LayoutParams tmp2Params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,0);
         tmp2Params.weight=1;
         tmp2.setLayoutParams(tmp2Params);
-        tmp2.setFillViewport(true);
         tmp1.addView(tmp2);
 
         LinearLayout tmp3 = new LinearLayout(this);
+        tmp3.setOrientation(LinearLayout.VERTICAL);
         ScrollView.LayoutParams tmp3Params = new ScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
         tmp3.setLayoutParams(tmp3Params);
-        tmp3.setOrientation(LinearLayout.VERTICAL);
         tmp2.addView(tmp3);
 
         TextView tvLog = new TextView(this);
+        tvLog.setTextColor(res.getColor(R.color.green));
         LinearLayout.LayoutParams tvLogParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         tvLogParams.weight=1;
         tvLog.setLayoutParams(tvLogParams);
         tmp3.addView(tvLog);
 
         LinearLayout tmp4 = new LinearLayout(this);
+        tmp4.setOrientation(LinearLayout.HORIZONTAL);
+        tmp4.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams tmp4Params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         tmp4.setLayoutParams(tmp4Params);
-        tmp4.setOrientation(LinearLayout.HORIZONTAL);
         tmp1.addView(tmp4);
 
         Button btnApplication = new Button(this);
+        btnApplication.setText("Application");
         LinearLayout.LayoutParams btnApplicationParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         btnApplication.setLayoutParams(btnApplicationParams);
-        btnApplication.setText("Application");
         tmp4.addView(btnApplication);
 
         Button btnSMS = new Button(this);
+        btnSMS.setText("SMS");
         ViewGroup.MarginLayoutParams btnSMSMargins = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         btnSMSMargins.setMargins(20,0,0,0);
         LinearLayout.LayoutParams btnSMSParams = new LinearLayout.LayoutParams(btnSMSMargins);
         btnSMS.setLayoutParams(btnSMSParams);
-        btnSMS.setText("SMS");
         tmp4.addView(btnSMS);
 
         ImageView tmp5 = new ImageView(this);
+        tmp5.setImageDrawable(res.getDrawable(R.drawable.ic_launcher));
         ViewGroup.MarginLayoutParams tmp5Margins = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         tmp5Margins.setMargins(50,0,0,0);
         LinearLayout.LayoutParams tmp5Params = new LinearLayout.LayoutParams(tmp5Margins);
         tmp5.setLayoutParams(tmp5Params);
-        tmp5.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher));
         tmp4.addView(tmp5);
 
         this.tvLog=tvLog;
