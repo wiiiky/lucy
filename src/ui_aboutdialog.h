@@ -49,7 +49,7 @@ struct _UIAboutDialogClass {
 #define LUCY_WEBSITE "https://github.com/wiiiky/lucy"
 #define LUCY_COMMENTS "Android Manager for Linux"
 #define LUCY_COPYRIGH "Copyright (c) Wiky L"
-#define LUCY_VERSION "0.1"
+#define LUCY_VERSION "0.2"
 
 GType ui_about_dialog_get_type(void) G_GNUC_CONST;
 UIAboutDialog *ui_about_dialog_new(void);
