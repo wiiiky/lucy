@@ -7,7 +7,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.GET_PACKAGE_SIZE" />
-    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -20,13 +21,14 @@
             android:launchMode="singleInstance" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.ApplicationActivity"
-            android:launchMode="singleInstance"
-            android:label="@string/title_activity_application" >
+            android:label="@string/title_activity_application"
+            android:launchMode="singleInstance" >
         </activity>
 
         <service
@@ -37,8 +39,13 @@
 
         <activity
             android:name=".activity.SMSActivity"
+            android:label="@string/title_activity_sms"
+            android:launchMode="singleInstance" >
+        </activity>
+        <activity
             android:launchMode="singleInstance"
-            android:label="@string/title_activity_sms">
+            android:name=".activity.ContactActivity"
+            android:label="@string/title_activity_contact" >
         </activity>
     </application>
 

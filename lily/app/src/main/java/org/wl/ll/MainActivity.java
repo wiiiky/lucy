@@ -23,6 +23,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.wl.ll.activity.ApplicationActivity;
+import org.wl.ll.activity.ContactActivity;
 import org.wl.ll.activity.SMSActivity;
 
 import java.util.LinkedList;
@@ -146,6 +147,15 @@ public class MainActivity extends Activity {
         }
     };
 
+    private final View.OnClickListener ContactClickListener=new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(MainActivity.this, ContactActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.in_from_right, R.anim.out_to_left);
+        }
+    };
+
     private LinearLayout initContentView(){
         Resources res = getResources();
 
@@ -210,6 +220,7 @@ public class MainActivity extends Activity {
 
         this.btnApplication.setOnClickListener(APPClickListener);
         this.btnSMS.setOnClickListener(SMSClickListener);
+        tmp5.setOnClickListener(ContactClickListener);
 
         return tmp1;
     }
