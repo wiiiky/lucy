@@ -124,43 +124,47 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
     return NULL;
 }
 
-LcProtocolApplication *lc_protocol_get_application(const gchar * data)
+LcProtocolApplication
+    *lc_protoocl_application_create_from_json_object(JsonObject * obj)
 {
-    gchar **elements = g_strsplit(data, ":", -1);
-    if (g_strv_length(elements) < LC_PROTOCOL_APPLICATION_SIZE) {
-        g_strfreev(elements);
-        return NULL;
-    }
-    LcProtocolApplication *app = lc_protocol_application_new(elements[0],
-                                                             elements[1],
-                                                             elements[2],
-                                                             elements[3],
-                                                             elements[4],
-                                                             elements[5],
-                                                             elements[6]);
-    g_strfreev(elements);
+    const gchar *package_name =
+        json_object_get_string_member(obj, "package_name");
+    const gchar *app_name = json_object_get_string_member(obj, "app_name");
+    const gchar *version_name =
+        json_object_get_string_member(obj, "version_name");
+    const gchar *location = json_object_get_string_member(obj, "location");
+    const gchar *install_time =
+        json_object_get_string_member(obj, "install_time");
+    const gchar *type = json_object_get_string_member(obj, "type");
+//  gint64 size=json_object_get_int_member(obj,"size");
+    const gchar *description =
+        json_object_get_string_member(obj, "description");
+
+    LcProtocolApplication *app =
+        lc_protocol_application_new(package_name, app_name,
+                                    version_name,
+                                    install_time,
+                                    location,
+                                    type,
+                                    description);
     return app;
 }
 
-GList *lc_protocol_create_application_list(const gchar * data)
+GList *lc_protocol_application_list_create_from_json_array(JsonArray *
+                                                           array)
 {
-    if (data == NULL) {
-        return NULL;
-    }
+    GList *elements = json_array_get_elements(array);
     GList *apps = NULL;
-    gchar **strarray = g_strsplit(data, "\n", -1);
-    gint i = 0;
-    while (strarray[i]) {
-        gchar *line = strarray[i];
-        if (line[0]) {
-            LcProtocolApplication *app = lc_protocol_get_application(line);
-            if (app) {
-                apps = g_list_append(apps, app);
-            }
-        }
-        i++;
+    GList *lp = elements;
+    while (lp) {
+        JsonNode *node = (JsonNode *) lp->data;
+        JsonObject *obj = json_node_get_object(node);
+        LcProtocolApplication *app =
+            lc_protoocl_application_create_from_json_object(obj);
+        apps = g_list_append(apps, app);
+        lp = g_list_next(lp);
     }
-    g_strfreev(strarray);
+    g_list_free(elements);
     return apps;
 }
 
@@ -169,62 +173,51 @@ void lc_protocol_free_application_list(GList * list)
     g_list_free_full(list, (GDestroyNotify) lc_protocol_application_free);
 }
 
-LcProtocolVersion *lc_protocol_version_new(const gchar * v)
-{
-    LcProtocolVersion *version =
-        (LcProtocolVersion *) g_malloc(sizeof(LcProtocolVersion));
-    version->version = g_strdup(v);
-    return version;
-}
-
-void lc_protocol_version_free(LcProtocolVersion * v)
-{
-    if (v) {
-        g_free(v->version);
-        g_free(v);
-    }
-}
-
-LcProtocolVersion *lc_protocol_create_version(const gchar * data)
-{
-    return lc_protocol_version_new(data);
-}
-
-LcProtocolVersion *lc_protocol_create_version_from_byte_array(GByteArray *
-                                                              array)
-{
-    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
-    if (result == NULL || lc_protocol_get_result_from_string(result) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Failed to get lily version");
-        return NULL;
-    }
-    LcProtocolVersion *version = lc_protocol_create_version(result + 4);
-    g_free(result);
-    return version;
-}
 
 LcProtocolPhone *lc_protocol_phone_new(const gchar * model,
                                        const gchar * brand,
                                        const gchar * number,
-                                       const gchar * availableMemory,
-                                       const gchar * totalMemory,
-                                       const gchar * availabelSdCard,
-                                       const gchar * totalSdCard,
-                                       const gchar * availabelInternal,
-                                       const gchar * totalInternal)
+                                       gint64 avail_mem,
+                                       gint64 total_mem,
+                                       gint64 avail_external,
+                                       gint64 total_external,
+                                       gint64 avail_data,
+                                       gint64 total_data)
 {
     LcProtocolPhone *phone =
         (LcProtocolPhone *) g_malloc(sizeof(LcProtocolPhone));
     phone->model = g_strdup(model);
     phone->brand = g_strdup(brand);
     phone->number = g_strdup(number);
-    phone->availableMemory = g_strdup(availableMemory);
-    phone->totalMemory = g_strdup(totalMemory);
-    phone->availableSdCard = g_strdup(availabelSdCard);
-    phone->totalSdCard = g_strdup(totalSdCard);
-    phone->availabelInternal = g_strdup(availabelInternal);
-    phone->totalInternal = g_strdup(totalInternal);
+    phone->avail_mem = avail_mem;
+    phone->total_mem = total_mem;
+    phone->avail_external = avail_external;
+    phone->total_external = total_external;
+    phone->avail_data = avail_data;
+    phone->total_data = total_data;
+    return phone;
+}
+
+LcProtocolPhone *lc_protocol_phone_create_from_json_object(JsonObject *
+                                                           obj)
+{
+    const gchar *model = json_object_get_string_member(obj, "model");
+    const gchar *brand = json_object_get_string_member(obj, "brand");
+    const gchar *number = json_object_get_string_member(obj, "number");
+    gint64 avail_mem = json_object_get_int_member(obj, "avail_mem");
+    gint64 total_mem = json_object_get_int_member(obj, "total_mem");
+    gint64 avail_external =
+        json_object_get_int_member(obj, "avail_external");
+    gint64 total_external =
+        json_object_get_int_member(obj, "total_external");
+    gint64 avail_data = json_object_get_int_member(obj, "avail_data");
+    gint64 total_data = json_object_get_int_member(obj, "total_data");
+    LcProtocolPhone *phone = lc_protocol_phone_new(model, brand, number,
+                                                   avail_mem, total_mem,
+                                                   avail_external,
+                                                   total_external,
+                                                   avail_data,
+                                                   total_data);
     return phone;
 }
 
@@ -233,29 +226,8 @@ void lc_protocol_phone_free(LcProtocolPhone * phone)
     g_free(phone->model);
     g_free(phone->brand);
     g_free(phone->number);
-    g_free(phone->availableMemory);
-    g_free(phone->availableSdCard);
-    g_free(phone->availabelInternal);
-    g_free(phone->totalMemory);
-    g_free(phone->totalSdCard);
-    g_free(phone->totalInternal);
 
     g_free(phone);
-}
-
-LcProtocolPhone *lc_protocol_create_phone(const gchar * data)
-{
-    gchar **array = g_strsplit(data, "\n", -1);
-    if (array == NULL || g_strv_length(array) <= LC_PROTOCOL_PHONE_SIZE) {
-        g_strfreev(array);
-        return NULL;
-    }
-    LcProtocolPhone *phone =
-        lc_protocol_phone_new(array[0], array[1], array[2], array[3],
-                              array[4], array[5], array[6], array[7],
-                              array[8]);
-    g_strfreev(array);
-    return phone;
 }
 
 const gchar *lc_protocol_icon_command(const gchar * package)

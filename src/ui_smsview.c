@@ -234,4 +234,3 @@ static inline void ui_sms_view_set_selected(UISMSView * self,
     }
     ui_sms_box_set_data_reverse(self->priv->sms_box, data);
 }
-

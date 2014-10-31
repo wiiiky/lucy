@@ -308,7 +308,6 @@ void ui_application_view_update(UIApplicationView * self, GList * list)
 {
     self->priv->app_last_update = (guint64) time(NULL);
 
-    GList *copy = g_list_copy(list);
     gint i, max = self->priv->app_count;
     GtkGrid *grid = self->priv->apps;
     for (i = 0; i < max; i++) {
@@ -321,7 +320,7 @@ void ui_application_view_update(UIApplicationView * self, GList * list)
             if (find) {
                 /* update */
                 ui_application_row_update_data(row, find);
-                copy = g_list_remove(copy, info);
+                list = g_list_remove(list, info);
             } else {
                 /* not found, remove */
                 ui_application_view_remove_row(self, i);
@@ -332,13 +331,13 @@ void ui_application_view_update(UIApplicationView * self, GList * list)
         }
     }
 
-    GList *lp = copy;
+    GList *lp = list;
     while (lp) {
         LcProtocolApplication *info = (LcProtocolApplication *) lp->data;
         ui_application_view_append_row(self, info);
         lp = g_list_next(lp);
     }
-    g_list_free(copy);
+    g_list_free(list);
 
     ui_application_view_update_view(self);
 }

@@ -30,6 +30,7 @@ public class ConnectionThread extends Thread {
     private static String REQUEST_VERSION = "version";    /* 当前手机客户端的版本号 */
     private static String REQUEST_PHONE = "phone";    /* 手机的基本信息 */
     private static String REQUEST_SMS_INBOX = "sms";    /* 短信收件箱 */
+    private static String REQUEST_CONTACT = "contact";
 
     public ConnectionThread(Context ctx, Socket s) {
         socket = s;
@@ -57,6 +58,8 @@ public class ConnectionThread extends Thread {
                     onPhoneResponse();
                 } else if (lower.equals(REQUEST_SMS_INBOX)) {
                     onSMSInboxResponse();
+                } else if(lower.equals(REQUEST_CONTACT)){
+                    onContactResponse();
                 } else {
                     onUnknownResponse(buf);
                 }
@@ -103,6 +106,10 @@ public class ConnectionThread extends Thread {
 
     private void onSMSInboxResponse() {
         new SMSResponse(mContext).onResponse(outputStream);
+    }
+
+    private void onContactResponse(){
+        new ContactResponse(mContext).onResponse(outputStream);
     }
 
     /*

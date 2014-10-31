@@ -24,6 +24,7 @@
 #ifndef __LC_PROTOCOL_H__
 #define __LC_PROTOCOL_H__
 #include <glib-2.0/glib.h>
+#include <json-glib/json-glib.h>
 
 /* all commands */
 #define LC_PROTOCOL_APPLICATIONS "applications\n"
@@ -34,6 +35,7 @@
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 
+#define LC_PROTOCOL_RETCODE_OKAY	10086
 
 typedef enum {
     LC_PROTOCOL_RESULT_OKAY,
@@ -62,8 +64,6 @@ typedef struct {
     LcProtocolApplicationType type;
 } LcProtocolApplication;
 
-#define LC_PROTOCOL_APPLICATION_SIZE    (7)
-
 LcProtocolApplication *lc_protocol_application_new(const gchar *
                                                    packageName,
                                                    const gchar * appName,
@@ -80,19 +80,13 @@ LcProtocolApplication *lc_protocol_application_copy(const
                                                     LcProtocolApplication *
                                                     info);
 
-
 /*
- * parse a string that contains infomation of an application.
- * data should be one line of response that's received from lily.
+ * 从lily返回的json数据中解析出应用列表
  */
-LcProtocolApplication *lc_protocol_get_application(const gchar * data);
-/*
- * parse the whole response of command 'applications'.
- * return a list that contains all applications infomation.
- *
- * the return list should be freed by lc_protocol_free_application_list()
- */
-GList *lc_protocol_create_application_list(const gchar * data);
+LcProtocolApplication
+    *lc_protoocl_application_create_from_json_object(JsonObject * obj);
+GList *lc_protocol_application_list_create_from_json_array(JsonArray *
+                                                           array);
 /*
  * free a list of LcProtocolApplication
  */
@@ -102,54 +96,35 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
                                                     const gchar * package);
 
 
-/*******************************VERSION***********************************/
-typedef struct {
-    gchar *version;
-} LcProtocolVersion;
-
-LcProtocolVersion *lc_protocol_version_new(const gchar * v);
-void lc_protocol_version_free(LcProtocolVersion * v);
-
-/*
- * parse the response of command 'version\n'
- */
-LcProtocolVersion *lc_protocol_create_version(const gchar * data);
-
-LcProtocolVersion *lc_protocol_create_version_from_byte_array(GByteArray *
-                                                              array);
-
 /*******************************PHONE************************************/
 
 typedef struct {
     gchar *model;
     gchar *brand;
     gchar *number;              /* phone number */
-    gchar *availableMemory;
-    gchar *totalMemory;
-    gchar *availableSdCard;
-    gchar *totalSdCard;
-    gchar *availabelInternal;
-    gchar *totalInternal;
+    gint64 avail_mem;
+    gint64 total_mem;
+    gint64 avail_external;
+    gint64 total_external;
+    gint64 avail_data;
+    gint64 total_data;
 } LcProtocolPhone;
-
-#define LC_PROTOCOL_PHONE_SIZE  (9)
 
 LcProtocolPhone *lc_protocol_phone_new(const gchar * model,
                                        const gchar * brand,
                                        const gchar * number,
-                                       const gchar * availableMemory,
-                                       const gchar * totalMemory,
-                                       const gchar * availabelSdCard,
-                                       const gchar * totalSdCard,
-                                       const gchar * availabelInternal,
-                                       const gchar * totalInternal);
+                                       gint64 avail_mem,
+                                       gint64 total_mem,
+                                       gint64 avail_external,
+                                       gint64 total_external,
+                                       gint64 avail_data,
+                                       gint64 total_data);
 
 void lc_protocol_phone_free(LcProtocolPhone * phone);
 
-/*
- * parse the response of command 'phone\n'
- */
-LcProtocolPhone *lc_protocol_create_phone(const gchar * data);
+LcProtocolPhone *lc_protocol_phone_create_from_json_object(JsonObject *
+                                                           obj);
+
 
 /**********************************ICON*********************************/
 

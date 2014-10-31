@@ -131,27 +131,30 @@ static void on_command_version(const gchar * cmd, GByteArray * array,
                                gpointer user_data)
 {
     LcCommanderData *cdata = (LcCommanderData *) user_data;
-    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
+    JsonParser *parser = json_parser_new();
     LcCommanderInitResult ret = LC_COMMANDER_INIT_OK;
-    if (result == NULL
-        || lc_protocol_get_result_from_string(result) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Failed to get lily version");
-        ret = LC_COMMANDER_INIT_FAILED_VERSION;
-    } else {
-        LcProtocolVersion *version =
-            lc_protocol_create_version(result + LC_PROTOCOL_HDR_LEN);
-        if (g_strcmp0(LILY_VERSION, version->version)) {
+    if (json_parser_load_from_data
+        (parser, (const gchar *) array->data, array->len, NULL)) {
+        /* json解析成功 */
+        JsonNode *root_node = json_parser_get_root(parser);
+        JsonObject *root_obj = json_node_get_object(root_node);
+        gint64 retcode = json_object_get_int_member(root_obj, "retcode");
+        const gchar *result =
+            json_object_get_string_member(root_obj, "result");
+        if (retcode != LC_PROTOCOL_RETCODE_OKAY
+            || g_strcmp0(LILY_VERSION, result)) {
             /* Lily version not match */
-            g_warning("Lily version doesn't match!!");
+            g_warning("Lily version doesn't match! -- %s", result);
             ret = LC_COMMANDER_INIT_FAILED_VERSION;
+        } else {
+            g_message("Lily Version: %s", result);
         }
-        g_message("Lily Version: %s", result + LC_PROTOCOL_HDR_LEN);
-        lc_protocol_version_free(version);
+    } else {
+        ret = LC_COMMANDER_INIT_FAILED_VERSION;
     }
+    g_object_unref(parser);
+
     ((LcCommanderInitCallback) cdata->callback) (ret, cdata->user_data);
-    lc_commander_data_free(cdata);
-    g_free(result);
 }
 
 static gboolean on_request_version_timeout(gpointer user_data)

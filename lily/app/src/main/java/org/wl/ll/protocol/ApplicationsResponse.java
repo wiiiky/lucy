@@ -5,8 +5,9 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageStats;
-import android.os.RemoteException;
-import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -25,37 +26,32 @@ public class ApplicationsResponse extends Response {
         super(ctx);
     }
 
-    /*
-     * 返回应用包列表
-     * packageName1:appName1:versionName1:installedtime1:installedLocation1:sys:description1\n
-     * packageName2:appName2:versionName2:installedtime2:installedLocation2:sys:description2\n
-     * \n
-     */
     @Override
     public String getString() {
         PackageManager pManager = mContext.getPackageManager();
         List<PackageInfo> packageInfos = pManager.getInstalledPackages(0);
-        String data = "";
-        for (int i = 0; i < packageInfos.size(); i++) {
-            PackageInfo info = packageInfos.get(i);
-            data = data + getApplicationInfoData(info);
+        JSONObject root = new JSONObject();
+        try {
+            root.put("retcode", RETCODE_OKAY);
+            JSONArray array = new JSONArray();
+            for (int i = 0; i < packageInfos.size(); i++) {
+                PackageInfo info = packageInfos.get(i);
+                JSONObject obj = new JSONObject();
+                obj.put("package_name", getApplicationPackageName(info));
+                obj.put("app_name", getApplicationName(info));
+                obj.put("version_name", getApplicationVersionName(info));
+                obj.put("location", getApplicationInstalledLocation(info));
+                obj.put("install_time", getApplicationInstalledTime(info));
+                obj.put("type", getApplicationType(info));
+                obj.put("size", getApplicationSize(info));
+                obj.put("description", getApplicationDescription(info));
+                array.put(obj);
+            }
+            root.put("result", array);
+        } catch (Exception e) {
+            error(RETCODE_APP_FAIL, e.getMessage());
         }
-        return getOKAY() + data;
-    }
-
-    /*
-     * 获取要返回的所有包相关数据
-     */
-    private String getApplicationInfoData(PackageInfo info) {
-        String data = getApplicationPackageName(info) + ":" +
-                getApplicationName(info) + ":" +
-                getApplicationVersionName(info) + ":" +
-                getApplicationInstalledTime(info) + ":" +
-                getApplicationInstalledLocation(info) + ":" +
-                getApplicationType(info) + ":" +
-                getApplicationDescription(info) +
-                "\n";
-        return data;
+        return root.toString();
     }
 
     private String getApplicationDescription(PackageInfo info) {
@@ -112,11 +108,11 @@ public class ApplicationsResponse extends Response {
         return "user";
     }
 
-    private String getApplicationSize(PackageInfo info) {
+    private long getApplicationSize(PackageInfo info) {
         /* not work, FIXME */
         PackageStats packageStats = new PackageStats(info.packageName);
-        String size = Long.toString(packageStats.cacheSize + packageStats.codeSize + packageStats.dataSize +
-                packageStats.externalCacheSize + packageStats.externalDataSize + packageStats.externalCodeSize);
+        long size = packageStats.cacheSize + packageStats.codeSize + packageStats.dataSize +
+                packageStats.externalCacheSize + packageStats.externalDataSize + packageStats.externalCodeSize;
         return size;
     }
 }

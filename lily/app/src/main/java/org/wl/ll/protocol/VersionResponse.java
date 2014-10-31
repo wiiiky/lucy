@@ -2,7 +2,8 @@ package org.wl.ll.protocol;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+
+import org.json.JSONObject;
 
 /**
  * Created by wiky on 9/22/14.
@@ -17,11 +18,14 @@ public class VersionResponse extends Response {
     @Override
     public String getString() {
         PackageInfo info;
+        JSONObject root = new JSONObject();
         try {
             info = mContext.getPackageManager().getPackageInfo(mContext.getPackageName(), 0);
-        } catch (PackageManager.NameNotFoundException e) {
-            return "unknown";
+            root.put("retcode", RETCODE_OKAY);
+            root.put("result", Integer.toString(info.versionCode));
+        } catch (Exception e) {
+            return error(RETCODE_VERSION_FAIL, e.getMessage());
         }
-        return getOKAY() + Integer.toString(info.versionCode);
+        return root.toString();
     }
 }

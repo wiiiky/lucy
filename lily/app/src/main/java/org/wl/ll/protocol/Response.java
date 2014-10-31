@@ -1,7 +1,6 @@
 package org.wl.ll.protocol;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,10 +11,15 @@ import java.io.OutputStream;
  */
 public abstract class Response {
 
-    protected Context mContext;
-
+    protected static final int RETCODE_OKAY = 10086;
+    protected static final int RETCODE_UNKNOWN_REQUEST = 0;
+    protected static final int RETCODE_CONTACT_FAIL = 2;
+    protected static final int RETCODE_VERSION_FAIL = 3;
+    protected static final int RETCODE_PHONE_FAIL = 4;
+    protected static final int RETCODE_APP_FAIL = 5;
     private static String OKAY = "OKAY";
     private static String FAIL = "FAIL";
+    protected Context mContext;
 
     public Response(Context ctx) {
         mContext = ctx;
@@ -41,6 +45,13 @@ public abstract class Response {
         return FAIL;
     }
 
+    /*
+     * 因为JSONObject.put会产生异常，所以直接用字符串构造
+     */
+    protected String error(int code, String s) {
+        return "{\"retcode\":" + code + ",\"result\":\"" + s + "\"}";
+    }
+
     public void onResponse(OutputStream writer) {
         byte[] data = null;
         if (getType() == ResponseType.RESPONSE_TYPE_BYTE) {
@@ -64,11 +75,6 @@ public abstract class Response {
         return String.format("%04x", data.getBytes().length);
     }
 
-    protected enum ResponseType {
-        RESPONSE_TYPE_STRING,
-        RESPONSE_TYPE_BYTE,
-    }
-
     protected byte[] mergeBytes(byte[] b1, byte[] b2) {
         byte[] b3 = new byte[b1.length + b2.length];
         System.arraycopy(b1, 0, b3, 0, b1.length);
@@ -76,7 +82,12 @@ public abstract class Response {
         return b3;
     }
 
-    protected String permissionDenied(){
+    protected String permissionDenied() {
         return "Permission Denied";
+    }
+
+    protected enum ResponseType {
+        RESPONSE_TYPE_STRING,
+        RESPONSE_TYPE_BYTE,
     }
 }

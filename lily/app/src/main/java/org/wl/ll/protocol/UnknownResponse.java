@@ -15,7 +15,7 @@ public class UnknownResponse extends Response {
 
     @Override
     public String getString() {
-        return getFAIL() + data;
+        return error(RETCODE_UNKNOWN_REQUEST, data);
     }
 
 }

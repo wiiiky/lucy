@@ -20,6 +20,7 @@
 #define __LC_UTIL_H__
 
 #include <gtk/gtk.h>
+#include <json-glib/json-glib.h>
 #include "lcprotocol.h"
 #include "lcresource.h"
 

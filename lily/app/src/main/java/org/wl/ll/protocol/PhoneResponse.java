@@ -4,8 +4,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.StatFs;
 import android.telephony.TelephonyManager;
-import android.text.format.Formatter;
 
+import org.json.JSONObject;
 import org.wl.ll.MainActivity;
 
 import java.io.BufferedReader;
@@ -26,68 +26,59 @@ public class PhoneResponse extends Response {
 
     @Override
     public String getString() {
-        String data = getPhoneInfo() + getMemorySize() + getExternalStorageSize() + getDataStorageSize();
-        return getOKAY() + data;
-    }
-
-
-    private String getPhoneInfo() {
-        String mtype = "unknown";
-        String mtyb = "unknown";
-        String number = "0";
+        JSONObject root = new JSONObject();
         try {
-            TelephonyManager mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
-            mtype = android.os.Build.MODEL; // 手机型号
-            mtyb = android.os.Build.BRAND;//手机品牌
-            number = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
+            root.put("retcode", RETCODE_OKAY);
+            /* 获取手机型号信息 */
+            String mtype = "unknown";
+            String mtyb = "unknown";
+            String number = "0";
+            try {
+                TelephonyManager mTm = (TelephonyManager) mContext.getSystemService(Context.TELEPHONY_SERVICE);
+                mtype = android.os.Build.MODEL; // 手机型号
+                mtyb = android.os.Build.BRAND;//手机品牌
+                number = mTm.getLine1Number(); // 手机号码，有的可得，有的不可得
+            } catch (Exception e) {
+                MainActivity.LOG(e.getMessage());
+            }
+            root.put("model", mtype);
+            root.put("brand", mtyb);
+            root.put("number", number);
+            /* 获取内存信息 */
+            ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
+            am.getMemoryInfo(mi);
+            root.put("avail_mem", mi.availMem);
+            root.put("total_mem", getTotalMemory());
+            /* 存储空间信息 */
+            String path = getExternalStoragePath();
+            long total = 0;
+            long avail = 0;
+            try {
+                StatFs fstat = new StatFs(path);
+                int size = fstat.getBlockSize();
+                total = size * fstat.getBlockCount();
+                avail = size * fstat.getAvailableBlocks();
+            } catch (Exception e) {
+            }
+            root.put("avail_external", avail);
+            root.put("total_external", total);
+            /* 手机内部存储空间 */
+            total = 0;
+            avail = 0;
+            try {
+                StatFs statFs = new StatFs(android.os.Environment.getDataDirectory().getPath());
+                long size = statFs.getBlockSize();
+                total = size * statFs.getBlockCount();
+                avail = size * statFs.getAvailableBlocks();
+            } catch (Exception e) {
+            }
+            root.put("avail_data", avail);
+            root.put("total_data", total);
         } catch (Exception e) {
-            MainActivity.LOG(e.getMessage());
+            return error(RETCODE_PHONE_FAIL, e.getMessage());
         }
-        return mtype + "\n" + mtyb + "\n" + number + "\n";
-    }
-
-    private String getMemorySize() {// 获取android当前可用内存大小
-
-        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-        ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
-        am.getMemoryInfo(mi);
-
-        return Formatter.formatFileSize(mContext, mi.availMem) + "\n" +
-                Formatter.formatFileSize(mContext, getTotalMemory()) + "\n";// 将获取的内存大小规格化
-    }
-
-    private String getExternalStorageSize() {
-        String path = getExternalStoragePath();
-        long total = 0;
-        long avail = 0;
-        try {
-            StatFs fstat = new StatFs(path);
-            int size = fstat.getBlockSize();
-            total = size * fstat.getBlockCount();
-            avail = size * fstat.getAvailableBlocks();
-        } catch (Exception e) {
-        }
-
-        return Formatter.formatFileSize(mContext, avail) + "\n" +
-                Formatter.formatFileSize(mContext, total) + "\n";
-    }
-
-    /*
-     * 获取手机内部存储器大小
-     */
-    private String getDataStorageSize() {
-        long total = 0;
-        long avail = 0;
-        try {
-            StatFs statFs = new StatFs(android.os.Environment.getDataDirectory().getPath());
-            long size = statFs.getBlockSize();
-            total = size * statFs.getBlockCount();
-            avail = size * statFs.getAvailableBlocks();
-        } catch (Exception e) {
-
-        }
-        return Formatter.formatFileSize(mContext, avail) + "\n" +
-                Formatter.formatFileSize(mContext, total) + "\n";
+        return root.toString();
     }
 
     private String getExternalStoragePath() {
