@@ -24,7 +24,7 @@ public class ContactResponse extends Response {
     protected String getString() {
         ArrayList<ContactModel> list = getContactList();
         if (list == null) {
-            return getFAIL();
+            return error(RETCODE_CONTACT_FAIL, permissionDenied());
         }
         JSONObject root = new JSONObject();
         try {

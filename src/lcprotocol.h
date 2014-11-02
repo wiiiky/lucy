@@ -84,7 +84,7 @@ LcProtocolApplication *lc_protocol_application_copy(const
  * 从lily返回的json数据中解析出应用列表
  */
 LcProtocolApplication
-    *lc_protoocl_application_create_from_json_object(JsonObject * obj);
+    * lc_protoocl_application_create_from_json_object(JsonObject * obj);
 GList *lc_protocol_application_list_create_from_json_array(JsonArray *
                                                            array);
 /*
@@ -156,6 +156,9 @@ LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
                                         gchar * body, gchar * address,
                                         guint64 date, gint person);
 LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self);
+
+LcProtocolSMS *lc_protocol_sms_create_from_json_object(JsonObject * obj);
+GList *lc_protocol_sms_list_create_from_json_array(JsonArray * array);
 
 GList *lc_protocol_create_sms_list(const gchar * data);
 void lc_protocol_free_sms_list(GList * list);

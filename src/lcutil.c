@@ -216,12 +216,12 @@ GList *lc_util_clean_list_by(GList * list, GListElementNotify judge,
     return list;
 }
 
-gssize lc_util_size_from_hex(const gchar buf[4])
+gint64 lc_util_size_from_hex(const gchar buf[8])
 {
-    int i, j;
-    int size = 0;
-    for (i = 0; i < 4; i++) {
-        int power = 3 - i;
+    gint i, j;
+    gint64 size = 0;
+    for (i = 0; i < 8; i++) {
+        int power = 7 - i;
         int base = 1;
         for (j = 0; j < power; j++) {
             base = base * 16;

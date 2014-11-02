@@ -412,18 +412,27 @@ static void on_command_sms(const gchar * cmd, GByteArray * array,
                            gpointer user_data)
 {
     UIMainWindow *self = (UIMainWindow *) user_data;
-    gchar *result = lc_util_get_string_from_byte_array(array, NULL);
     self->priv->loading_sms = FALSE;
-    if (result == NULL ||
-        lc_protocol_get_result_from_string(result) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("Command '%s' Failed:%s", cmd, result);
+    JsonParser *parser = json_parser_new();
+    if (array && json_parser_load_from_data
+        (parser, (const gchar *) array->data, array->len, NULL)) {
+        JsonNode *root_node = json_parser_get_root(parser);
+        JsonObject *root_obj = json_node_get_object(root_node);
+        gint64 retcode = json_object_get_int_member(root_obj, "retcode");
+        if (retcode == LC_PROTOCOL_RETCODE_OKAY) {
+            JsonArray *array =
+                json_object_get_array_member(root_obj, "result");
+            GList *list =
+                lc_protocol_sms_list_create_from_json_array(array);
+            ui_sms_view_update(self->priv->sms_view, list);
+        } else {
+            g_warning("Command '%s' Failed:%ld", cmd, retcode);
+        }
     } else {
-        GList *list =
-            lc_protocol_create_sms_list(result + LC_PROTOCOL_HDR_LEN);
-        ui_sms_view_update(self->priv->sms_view, list);
+        g_warning("Command '%s' Failed!", cmd);
     }
-    g_free(result);
+
+    g_object_unref(parser);
 }
 
 static void on_command_applications(const gchar * cmd, GByteArray * array,
@@ -432,7 +441,7 @@ static void on_command_applications(const gchar * cmd, GByteArray * array,
     UIMainWindow *self = (UIMainWindow *) user_data;
     self->priv->loading_app = FALSE;
     JsonParser *parser = json_parser_new();
-    if (json_parser_load_from_data
+    if (array && json_parser_load_from_data
         (parser, (const gchar *) array->data, array->len, NULL)) {
         JsonNode *root_node = json_parser_get_root(parser);
         JsonObject *root_obj = json_node_get_object(root_node);

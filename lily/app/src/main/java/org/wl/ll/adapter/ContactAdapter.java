@@ -15,13 +15,13 @@ import java.util.ArrayList;
 /**
  * Created by wiky on 10/29/14.
  */
-public class ContactAdapter extends BaseAdapter{
+public class ContactAdapter extends BaseAdapter {
     protected Context context;
     protected ArrayList<ContactModel> data;
 
-    public ContactAdapter(Context ctx,ArrayList<ContactModel> list){
-        context=ctx;
-        data=list;
+    public ContactAdapter(Context ctx, ArrayList<ContactModel> list) {
+        context = ctx;
+        data = list;
     }
 
     @Override
@@ -41,38 +41,38 @@ public class ContactAdapter extends BaseAdapter{
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        ViewHolder holder=getViewHolder(view);
-        ContactModel contact=(ContactModel)getItem(i);
+        ViewHolder holder = getViewHolder(view);
+        ContactModel contact = (ContactModel) getItem(i);
         holder.tvId.setText(contact.id);
         holder.tvName.setText(contact.name);
-        if(holder.tvNumber.length()>0) {
+        if (holder.tvNumber.length() > 0) {
             holder.tvNumber.setText(contact.number.get(0));
-        }else{
+        } else {
             holder.tvNumber.setText("NULL");
         }
         return holder.view;
     }
 
-    private final class ViewHolder{
+    private ViewHolder getViewHolder(View v) {
+        ViewHolder holder;
+        if (v == null) {
+            holder = new ViewHolder();
+            v = LayoutInflater.from(context).inflate(R.layout.contact_item, null);
+            holder.tvId = (TextView) v.findViewById(R.id.tvId);
+            holder.tvName = (TextView) v.findViewById(R.id.tvName);
+            holder.tvNumber = (TextView) v.findViewById(R.id.tvNumber);
+            holder.view = v;
+            v.setTag(holder);
+        } else {
+            holder = (ViewHolder) v.getTag();
+        }
+        return holder;
+    }
+
+    private final class ViewHolder {
         View view;
         TextView tvId;
         TextView tvName;
         TextView tvNumber;
-    }
-
-    private ViewHolder getViewHolder(View v){
-        ViewHolder holder;
-        if(v==null){
-            holder = new ViewHolder();
-            v = LayoutInflater.from(context).inflate(R.layout.contact_item, null);
-            holder.tvId =(TextView) v.findViewById(R.id.tvId);
-            holder.tvName = (TextView)v.findViewById(R.id.tvName);
-            holder.tvNumber = (TextView) v.findViewById(R.id.tvNumber);
-            holder.view=v;
-            v.setTag(holder);
-        }else{
-            holder=(ViewHolder)v.getTag();
-        }
-        return holder;
     }
 }

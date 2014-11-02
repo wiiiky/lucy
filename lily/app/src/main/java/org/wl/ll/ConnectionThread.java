@@ -2,13 +2,19 @@ package org.wl.ll;
 
 import android.content.Context;
 
+import org.wl.ll.protocol.ApplicationsResponse;
+import org.wl.ll.protocol.ContactResponse;
+import org.wl.ll.protocol.IconResponse;
+import org.wl.ll.protocol.PhoneResponse;
+import org.wl.ll.protocol.SMSResponse;
+import org.wl.ll.protocol.UnknownResponse;
+import org.wl.ll.protocol.VersionResponse;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
-
-import org.wl.ll.protocol.*;
 
 /**
  * Created by wiky on 9/16/14.
@@ -16,12 +22,6 @@ import org.wl.ll.protocol.*;
  * 处理单个链接的线程
  */
 public class ConnectionThread extends Thread {
-    /* 处理一个链接的线程 */
-    private Socket socket = null;
-    private OutputStream outputStream = null;
-    private BufferedReader bufferedReader = null;
-    private Context mContext = null;
-
     /*
      * 请求数据
      */
@@ -31,6 +31,11 @@ public class ConnectionThread extends Thread {
     private static String REQUEST_PHONE = "phone";    /* 手机的基本信息 */
     private static String REQUEST_SMS_INBOX = "sms";    /* 短信收件箱 */
     private static String REQUEST_CONTACT = "contact";
+    /* 处理一个链接的线程 */
+    private Socket socket = null;
+    private OutputStream outputStream = null;
+    private BufferedReader bufferedReader = null;
+    private Context mContext = null;
 
     public ConnectionThread(Context ctx, Socket s) {
         socket = s;
@@ -58,7 +63,7 @@ public class ConnectionThread extends Thread {
                     onPhoneResponse();
                 } else if (lower.equals(REQUEST_SMS_INBOX)) {
                     onSMSInboxResponse();
-                } else if(lower.equals(REQUEST_CONTACT)){
+                } else if (lower.equals(REQUEST_CONTACT)) {
                     onContactResponse();
                 } else {
                     onUnknownResponse(buf);
@@ -108,7 +113,7 @@ public class ConnectionThread extends Thread {
         new SMSResponse(mContext).onResponse(outputStream);
     }
 
-    private void onContactResponse(){
+    private void onContactResponse() {
         new ContactResponse(mContext).onResponse(outputStream);
     }
 

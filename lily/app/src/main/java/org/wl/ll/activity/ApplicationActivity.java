@@ -5,13 +5,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-import org.wl.ll.adapter.ApplicationAdapter;
 import org.wl.ll.R;
+import org.wl.ll.adapter.ApplicationAdapter;
 import org.wl.ll.model.ApplicationModel;
 
 import java.util.ArrayList;
@@ -51,6 +50,11 @@ public class ApplicationActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
+    }
+
     private class ReadApplicationTask extends AsyncTask<Void, Void, ArrayList<ApplicationModel>> {
 
         @Override
@@ -78,10 +82,5 @@ public class ApplicationActivity extends Activity {
             }
             return list;
         }
-    }
-
-    public void onBackPressed() {
-        moveTaskToBack(true);
-        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 }

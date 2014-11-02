@@ -4,6 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Created by wiky on 10/14/14.
  * 短信收件箱内容
@@ -32,14 +35,16 @@ public class SMSResponse extends Response {
 
     @Override
     protected String getString() {
-        StringBuilder builder = new StringBuilder();
+        JSONObject root = new JSONObject();
         try {
+            root.put("retcode", RETCODE_OKAY);
             Uri uri = Uri.parse(URI_SMS_ALL);
             String[] projection = new String[]{SMS_COLUMN_ID, SMS_COLUMN_ADDRESS,
                     SMS_COLUMN_PERSON, SMS_COLUMN_BODY,
                     SMS_COLUMN_DATE, SMS_COLUMN_TYPE, SMS_COLUMN_THREAD};
             Cursor cursor = mContext.getContentResolver().query(uri, projection, null, null, "date desc");
             if (cursor.moveToFirst()) {
+                JSONArray array = new JSONArray();
                 int idIndex = cursor.getColumnIndex(SMS_COLUMN_ID);
                 int addressIndex = cursor.getColumnIndex(SMS_COLUMN_ADDRESS);
                 int personIndex = cursor.getColumnIndex(SMS_COLUMN_PERSON);
@@ -58,21 +63,25 @@ public class SMSResponse extends Response {
                         long date = cursor.getLong(dateIndex);
                         int threadId = cursor.getInt(threadIndex);
 
-                        builder.append(threadId).append(":").
-                                append(type).append(":").
-                                append(date / 1000).append(":").      //时间单位是毫秒...
-                                append(address).append(":").
-                                append(person).append(":").
-                                append(getLength(body)).append(body);
+                        JSONObject object = new JSONObject();
+                        object.put("thread_id", threadId);
+                        object.put("type", type);
+                        object.put("date", date / 1000);
+                        object.put("address", address);
+                        object.put("person", person);
+                        object.put("body", body);
+
+                        array.put(object);
                     }
                 } while (cursor.moveToNext());
+                root.put("result", array);
             } else {  //没有权限
-                return getFAIL() + permissionDenied();
+                return error(RETCODE_SMS_FAIL, permissionDenied());
             }
         } catch (Exception e) {
-            return getFAIL() + e.getMessage();
+            return error(RETCODE_SMS_FAIL, e.getMessage());
         }
 
-        return getOKAY() + builder.toString();
+        return root.toString();
     }
 }

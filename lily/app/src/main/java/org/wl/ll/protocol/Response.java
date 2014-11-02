@@ -1,6 +1,7 @@
 package org.wl.ll.protocol;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,8 +18,8 @@ public abstract class Response {
     protected static final int RETCODE_VERSION_FAIL = 3;
     protected static final int RETCODE_PHONE_FAIL = 4;
     protected static final int RETCODE_APP_FAIL = 5;
-    private static String OKAY = "OKAY";
-    private static String FAIL = "FAIL";
+    protected static final int RETCODE_SMS_FAIL = 6;
+
     protected Context mContext;
 
     public Response(Context ctx) {
@@ -37,14 +38,6 @@ public abstract class Response {
         return ResponseType.RESPONSE_TYPE_STRING;
     }
 
-    protected String getOKAY() {
-        return OKAY;
-    }
-
-    protected String getFAIL() {
-        return FAIL;
-    }
-
     /*
      * 因为JSONObject.put会产生异常，所以直接用字符串构造
      */
@@ -60,26 +53,16 @@ public abstract class Response {
             data = getString().getBytes();
         }
         try {
-            writer.write(getLength(data), 0, 4);
+            writer.write(getLength(data), 0, 8);
             writer.write(data, 0, data.length);
             writer.flush();
         } catch (IOException e) {
+            Log.e("IOException while writing", e.getMessage());
         }
     }
 
     protected byte[] getLength(byte[] data) {
-        return String.format("%04x", data.length).getBytes();
-    }
-
-    protected String getLength(String data) {
-        return String.format("%04x", data.getBytes().length);
-    }
-
-    protected byte[] mergeBytes(byte[] b1, byte[] b2) {
-        byte[] b3 = new byte[b1.length + b2.length];
-        System.arraycopy(b1, 0, b3, 0, b1.length);
-        System.arraycopy(b2, 0, b3, b1.length, b2.length);
-        return b3;
+        return String.format("%08x", data.length).getBytes();
     }
 
     protected String permissionDenied() {

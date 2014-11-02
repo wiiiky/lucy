@@ -50,13 +50,6 @@ public class ApplicationAdapter extends BaseAdapter {
         return holder.view;
     }
 
-    private final class ViewHolder {
-        public View view;
-        public ImageView imgIcon;
-        public TextView tvPackageName;
-        public TextView tvAppName;
-    }
-
     private ViewHolder getViewHolder(View v) {
         ViewHolder holder = null;
         if (v == null) {
@@ -70,5 +63,12 @@ public class ApplicationAdapter extends BaseAdapter {
             holder = (ViewHolder) v.getTag();
         }
         return holder;
+    }
+
+    private final class ViewHolder {
+        public View view;
+        public ImageView imgIcon;
+        public TextView tvPackageName;
+        public TextView tvAppName;
     }
 }

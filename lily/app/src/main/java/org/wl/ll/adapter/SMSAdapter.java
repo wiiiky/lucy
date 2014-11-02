@@ -49,13 +49,6 @@ public class SMSAdapter extends BaseAdapter {
         return holder.view;
     }
 
-    private final class ViewHolder {
-        public View view;
-        public TextView tvBody;
-        public TextView tvDate;
-        public TextView tvAddress;
-    }
-
     private ViewHolder getViewHolder(View v) {
         ViewHolder holder;
         if (v == null) {
@@ -69,5 +62,12 @@ public class SMSAdapter extends BaseAdapter {
             holder = (ViewHolder) v.getTag();
         }
         return holder;
+    }
+
+    private final class ViewHolder {
+        public View view;
+        public TextView tvBody;
+        public TextView tvDate;
+        public TextView tvAddress;
     }
 }

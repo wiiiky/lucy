@@ -184,15 +184,15 @@ GByteArray *lc_socket_send_command(LcSocket * socket,
     }
     gchar buf[4096];
     gssize n;
-    n = lc_socket_receive(socket, buf, 4);
-    if (n != 4) {
+    n = lc_socket_receive(socket, buf, 8);
+    if (n != 8) {
         goto ERROR;
     }
-    gssize length = lc_util_size_from_hex(buf);
+    gint64 length = lc_util_size_from_hex(buf);
     if (length < 4) {           /* the response must be longer than 4 */
         goto ERROR;
     }
-    array = g_byte_array_sized_new(4096);
+    array = g_byte_array_sized_new(length);
     while (length > 0
            && (n = lc_socket_receive(socket, buf, sizeof(buf))) > 0) {
         g_byte_array_append(array, (guint8 *) buf, n);

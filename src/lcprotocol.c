@@ -125,7 +125,7 @@ LcProtocolApplication *lc_protocol_application_find(GList * list,
 }
 
 LcProtocolApplication
-    *lc_protoocl_application_create_from_json_object(JsonObject * obj)
+    * lc_protoocl_application_create_from_json_object(JsonObject * obj)
 {
     const gchar *package_name =
         json_object_get_string_member(obj, "package_name");
@@ -378,6 +378,51 @@ GList *lc_protocol_create_sms_list(const gchar * data)
         lp = g_list_append(lp, sms);
         g_hash_table_replace(table, GINT_TO_POINTER(_id), (gpointer) lp);
     }
+
+    GList *ret = NULL;
+    g_hash_table_foreach(table, sms_hash_func, &ret);
+    g_hash_table_destroy(table);
+
+    ret = g_list_sort(ret, (GCompareFunc) sms_compare_func);
+
+    return ret;
+}
+
+LcProtocolSMS *lc_protocol_sms_create_from_json_object(JsonObject * obj)
+{
+    gint64 thread_id = json_object_get_int_member(obj, "thread_id");
+    gint64 type = json_object_get_int_member(obj, "type");
+    gint64 date = json_object_get_int_member(obj, "date");
+    const gchar *address = json_object_get_string_member(obj, "address");
+    gint64 person = json_object_get_int_member(obj, "person");
+    const gchar *body = json_object_get_string_member(obj, "body");
+
+    LcProtocolSMS *sms =
+        lc_protocol_sms_new((gint) thread_id, (LcProtocolSMSType) type,
+                            body, address, date, (gint) person);
+    return sms;
+}
+
+GList *lc_protocol_sms_list_create_from_json_array(JsonArray * array)
+{
+    GHashTable *table = g_hash_table_new(g_direct_hash, g_direct_equal);
+    GList *nodes = json_array_get_elements(array);
+    GList *lp = nodes;
+    while (lp) {
+        JsonNode *node = (JsonNode *) lp->data;
+        JsonObject *obj = json_node_get_object(node);
+        LcProtocolSMS *sms = lc_protocol_sms_create_from_json_object(obj);
+
+        GList *l = (GList *) g_hash_table_lookup(table,
+                                                 GINT_TO_POINTER(sms->
+                                                                 thread_id));
+        l = g_list_append(l, sms);
+        g_hash_table_replace(table, GINT_TO_POINTER(sms->thread_id),
+                             (gpointer) l);
+
+        lp = g_list_next(lp);
+    }
+    g_list_free(nodes);
 
     GList *ret = NULL;
     g_hash_table_foreach(table, sms_hash_func, &ret);

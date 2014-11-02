@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 
+import org.wl.ll.R;
+
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -25,20 +27,20 @@ public class IconResponse extends Response {
     @Override
     public byte[] getByte() {
         PackageManager pManager = mContext.getPackageManager();
-        PackageInfo info = null;
+        PackageInfo info;
+        Drawable drawable;
         try {
             info = pManager.getPackageInfo(packageName, 0);
+            drawable = info.applicationInfo.loadIcon(pManager);
         } catch (PackageManager.NameNotFoundException e) {
-            return getFAIL().getBytes();
+            drawable = mContext.getResources().getDrawable(R.drawable.ic_launcher);
         }
-        Drawable drawable = info.applicationInfo.loadIcon(pManager);
         Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
 
-        byte[] okay = getOKAY().getBytes();
         byte[] icon = byteArrayOutputStream.toByteArray();
-        return mergeBytes(okay, icon);
+        return icon;
     }
 
     @Override

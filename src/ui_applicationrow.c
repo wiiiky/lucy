@@ -252,20 +252,14 @@ static void on_command_icon(const gchar * cmd, GByteArray * array,
         g_warning("%s failed! Connection Problem!", cmd);
         return;
     }
-    if (lc_protocol_get_result_from_bytes(bytes) !=
-        LC_PROTOCOL_RESULT_OKAY) {
-        g_warning("%s failed! Protocol Problem!", cmd);
-        g_bytes_unref(bytes);
-        return;
-    }
     LcProtocolApplication *info = self->priv->user_data;
     const gchar *path =
         lc_util_get_image_cache_path_by_name(info->package_name);
     GFile *file = g_file_new_for_path(path);
     gsize size;
     gchar *data = g_bytes_unref_to_data(bytes, &size);
-    g_file_replace_contents_async(file, data + LC_PROTOCOL_HDR_LEN,
-                                  size - LC_PROTOCOL_HDR_LEN, NULL, FALSE,
+    g_file_replace_contents_async(file, data,
+                                  size, NULL, FALSE,
                                   G_FILE_CREATE_NONE, NULL, on_icon_saved,
                                   self);
     g_object_set_data(G_OBJECT(file), SAVE_DATA_KEY, data);

@@ -11,9 +11,9 @@ public class ContactModel {
     public String name;
     public ArrayList<String> number;
 
-    public ContactModel(String _id,String _name,ArrayList<String> _number){
-        id=_id;
-        name=_name;
-        number=_number;
+    public ContactModel(String _id, String _name, ArrayList<String> _number) {
+        id = _id;
+        name = _name;
+        number = _number;
     }
 }

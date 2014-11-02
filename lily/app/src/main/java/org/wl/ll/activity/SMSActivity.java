@@ -2,7 +2,6 @@ package org.wl.ll.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -15,25 +14,22 @@ import org.wl.ll.R;
 import org.wl.ll.adapter.SMSAdapter;
 import org.wl.ll.model.SMSModel;
 
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import android.support.v4.app.NavUtils;
 
 public class SMSActivity extends Activity {
 
-    private ListView listView = null;
-
     private final String URI_SMS_INBOX = "content://sms/inbox";
+    private ListView listView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sms);
 
-        ActionBar bar=getActionBar();
-        if(bar!=null){
+        ActionBar bar = getActionBar();
+        if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
 
@@ -56,13 +52,25 @@ public class SMSActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id==android.R.id.home){
+        if (id == android.R.id.home) {
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    public void onBackPressed() {
+        moveTaskToBack(true);
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
+    }
+
     private class ReadSMSTask extends AsyncTask<Void, Void, ArrayList<SMSModel>> {
+
+        private final String SMS_COLUMN_ID = "_id";
+        private final String SMS_COLUMN_ADDRESS = "address";
+        private final String SMS_COLUMN_PERSON = "person";
+        private final String SMS_COLUMN_BODY = "body";
+        private final String SMS_COLUMN_DATE = "date";
+        private final String SMS_COLUMN_TYPE = "type";
 
         @Override
         protected ArrayList<SMSModel> doInBackground(Void... voids) {
@@ -76,14 +84,6 @@ public class SMSActivity extends Activity {
                 listView.setAdapter(adapter);
             }
         }
-
-
-        private final String SMS_COLUMN_ID = "_id";
-        private final String SMS_COLUMN_ADDRESS = "address";
-        private final String SMS_COLUMN_PERSON = "person";
-        private final String SMS_COLUMN_BODY = "body";
-        private final String SMS_COLUMN_DATE = "date";
-        private final String SMS_COLUMN_TYPE = "type";
 
         private ArrayList<SMSModel> readSMS() {
             ArrayList<SMSModel> list = new ArrayList<SMSModel>();
@@ -121,10 +121,5 @@ public class SMSActivity extends Activity {
 
             return list;
         }
-    }
-
-    public void onBackPressed() {
-        moveTaskToBack(true);
-        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
     }
 }
