@@ -27,11 +27,12 @@
 #include <json-glib/json-glib.h>
 
 /* all commands */
-#define LC_PROTOCOL_APPLICATIONS "applications\n"
+#define LC_PROTOCOL_APPLICATIONS "application\n"
 #define LC_PROTOCOL_VERSION      "version\n"
 #define LC_PROTOCOL_PHONE        "phone\n"
 #define LC_PROTOCOL_ICON         "icon:%s\n"
 #define LC_PROTOCOL_SMS  		   "sms\n"
+#define LC_PROTOCOL_CONTACT		 "contact\n"
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 
@@ -151,6 +152,8 @@ LcProtocolSMS *lc_protocol_sms_new(gint thread_id,
                                    const gchar * body,
                                    const gchar * address,
                                    guint64 date, gint person);
+void lc_protocol_sms_free(LcProtocolSMS * sms);
+
 LcProtocolSMS *lc_protocol_sms_new_take(gint thread_id,
                                         LcProtocolSMSType type,
                                         gchar * body, gchar * address,
@@ -159,10 +162,23 @@ LcProtocolSMS *lc_protocol_sms_copy(LcProtocolSMS * self);
 
 LcProtocolSMS *lc_protocol_sms_create_from_json_object(JsonObject * obj);
 GList *lc_protocol_sms_list_create_from_json_array(JsonArray * array);
-
-GList *lc_protocol_create_sms_list(const gchar * data);
 void lc_protocol_free_sms_list(GList * list);
 
-void lc_protocol_sms_free(LcProtocolSMS * sms);
+/**********************************CONTACT*******************************/
+typedef struct {
+    gint64 id;
+    gchar *name;
+    gchar *number;
+} LcProtocolContact;
+
+LcProtocolContact *lc_protocol_contact_new(gint64 id, const gchar * name,
+                                           const gchar * number);
+void lc_protocol_contact_free(LcProtocolContact * contact);
+
+LcProtocolContact *lc_protocol_contact_create_from_json_object(JsonObject *
+                                                               obj);
+GList *lc_protocol_contact_list_create_from_json_array(JsonArray * array);
+
+void lc_protocol_contact_list_free(GList * list);
 
 #endif

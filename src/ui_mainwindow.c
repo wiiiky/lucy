@@ -117,6 +117,8 @@ static void on_command_applications(const gchar * cmd, GByteArray * array,
                                     gpointer user_data);
 static void on_command_sms(const gchar * cmd, GByteArray * array,
                            gpointer user_data);
+static void on_command_contact(const gchar * cmd, GByteArray * array,
+                               gpointer user_data);
 
 /* 各个界面的初始化 */
 static void ui_main_window_my_android_init(UIMainWindow * self);
@@ -248,7 +250,10 @@ static void on_sms_view(gboolean visible, gpointer user_data)
                                             on_command_sms, user_data);
         }
     }
+    lc_commander_send_command_async(LC_PROTOCOL_CONTACT,
+                                    on_command_contact, user_data);
 }
+
 
 static void on_application_view(gboolean visible, gpointer user_data)
 {
@@ -452,6 +457,41 @@ static void on_command_applications(const gchar * cmd, GByteArray * array,
             GList *list =
                 lc_protocol_application_list_create_from_json_array(array);
             ui_application_view_update(self->priv->app_view, list);
+        } else {
+            g_warning("Command '%s' Failed:%ld", cmd, retcode);
+        }
+    } else {
+        g_warning("Command '%s' Failed!", cmd);
+    }
+    g_object_unref(parser);
+}
+
+static void on_command_contact(const gchar * cmd, GByteArray * array,
+                               gpointer user_data)
+{
+    UIMainWindow *self = (UIMainWindow *) user_data;
+
+    JsonParser *parser = json_parser_new();
+    if (array && json_parser_load_from_data
+        (parser, (const gchar *) array->data, array->len, NULL)) {
+        g_message("%s", array->data);
+        JsonNode *root_node = json_parser_get_root(parser);
+        JsonObject *root_obj = json_node_get_object(root_node);
+        gint64 retcode = json_object_get_int_member(root_obj, "retcode");
+        if (retcode == LC_PROTOCOL_RETCODE_OKAY) {
+            JsonArray *array =
+                json_object_get_array_member(root_obj, "result");
+            GList *contacts =
+                lc_protocol_contact_list_create_from_json_array(array);
+            GList *lp = contacts;
+            while (lp) {
+                LcProtocolContact *contact =
+                    (LcProtocolContact *) lp->data;
+                g_message("%d:%s:%s", contact->id, contact->name,
+                          contact->number);
+                lp = g_list_next(lp);
+            }
+            lc_protocol_contact_list_free(contacts);
         } else {
             g_warning("Command '%s' Failed:%ld", cmd, retcode);
         }

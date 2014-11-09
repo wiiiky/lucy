@@ -25,7 +25,7 @@ public class ConnectionThread extends Thread {
     /*
      * 请求数据
      */
-    private static String REQUEST_PACKAGES = "applications";  /* 应用列表 */
+    private static String REQUEST_PACKAGES = "application";  /* 应用列表 */
     private static String REQUEST_ICON = "icon:";     /* 应用图标 */
     private static String REQUEST_VERSION = "version";    /* 当前手机客户端的版本号 */
     private static String REQUEST_PHONE = "phone";    /* 手机的基本信息 */

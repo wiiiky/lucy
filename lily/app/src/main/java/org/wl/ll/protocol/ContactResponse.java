@@ -33,7 +33,7 @@ public class ContactResponse extends Response {
             for (int i = 0; i < list.size(); i++) {
                 JSONObject obj = new JSONObject();
                 ContactModel model = list.get(i);
-                obj.put("id", model.id);
+                obj.put("id", new Integer(model.id));
                 obj.put("name", model.name);
                 obj.put("number", model.number);
                 array.put(obj);

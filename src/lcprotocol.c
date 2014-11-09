@@ -305,88 +305,6 @@ static gint sms_compare_func(gconstpointer a, gconstpointer b)
     return 0;
 }
 
-GList *lc_protocol_create_sms_list(const gchar * data)
-{
-    GHashTable *table = g_hash_table_new(g_direct_hash, g_direct_equal);
-
-    const gchar *cur = data;
-    const gchar *colon;
-    while ((colon = strchr(cur, ':'))) {
-        gchar *id = g_strndup(cur, colon - cur);
-        cur = colon + 1;
-        if ((colon = strchr(cur, ':')) == NULL) {
-            g_free(id);
-            break;
-        }
-        gchar *type = g_strndup(cur, colon - cur);
-        cur = colon + 1;
-        if ((colon = strchr(cur, ':')) == NULL) {
-            /* ERROR */
-            g_free(id);
-            g_free(type);
-            break;
-        }
-        gchar *date = g_strndup(cur, colon - cur);
-        cur = colon + 1;
-        if ((colon = strchr(cur, ':')) == NULL) {
-            /* ERROR */
-            g_free(id);
-            g_free(type);
-            g_free(date);
-            break;
-        }
-        gchar *address = g_strndup(cur, colon - cur);
-        cur = colon + 1;
-        if ((colon = strchr(cur, ':')) == NULL) {
-            /* ERROR */
-            g_free(id);
-            g_free(type);
-            g_free(date);
-            g_free(address);
-            break;
-        }
-        gchar *person = g_strndup(cur, colon - cur);
-        cur = colon + 1;
-        gssize size = lc_util_size_from_hex(cur);
-        if (size < 0) {
-            /* ERROR */
-            g_free(id);
-            g_free(type);
-            g_free(date);
-            g_free(address);
-            g_free(person);
-            break;
-        }
-        cur = cur + 4;
-        gchar *body = g_strndup(cur, size);
-        cur = cur + size;
-
-        LcProtocolSMSType _type = LC_PROTOCOL_SMS_TYPE_INBOX;
-        if (g_strcmp0("2", type) == 0) {
-            _type = LC_PROTOCOL_SMS_TYPE_SENT;
-        }
-        gint _id = atoi(id);
-        LcProtocolSMS *sms =
-            lc_protocol_sms_new_take(_id, _type, body, address,
-                                     (guint64) atol(date),
-                                     atoi(person));
-        g_free(id);
-        g_free(type);
-        g_free(person);
-        GList *lp =
-            (GList *) g_hash_table_lookup(table, GINT_TO_POINTER(_id));
-        lp = g_list_append(lp, sms);
-        g_hash_table_replace(table, GINT_TO_POINTER(_id), (gpointer) lp);
-    }
-
-    GList *ret = NULL;
-    g_hash_table_foreach(table, sms_hash_func, &ret);
-    g_hash_table_destroy(table);
-
-    ret = g_list_sort(ret, (GCompareFunc) sms_compare_func);
-
-    return ret;
-}
 
 LcProtocolSMS *lc_protocol_sms_create_from_json_object(JsonObject * obj)
 {
@@ -414,8 +332,8 @@ GList *lc_protocol_sms_list_create_from_json_array(JsonArray * array)
         LcProtocolSMS *sms = lc_protocol_sms_create_from_json_object(obj);
 
         GList *l = (GList *) g_hash_table_lookup(table,
-                                                 GINT_TO_POINTER(sms->
-                                                                 thread_id));
+                                                 GINT_TO_POINTER
+                                                 (sms->thread_id));
         l = g_list_append(l, sms);
         g_hash_table_replace(table, GINT_TO_POINTER(sms->thread_id),
                              (gpointer) l);
@@ -450,4 +368,55 @@ void lc_protocol_sms_free(LcProtocolSMS * sms)
     g_free(sms->address);
 
     g_slice_free1(sizeof(LcProtocolSMS), sms);
+}
+
+LcProtocolContact *lc_protocol_contact_new(gint64 id, const gchar * name,
+                                           const gchar * number)
+{
+    LcProtocolContact *contact =
+        (LcProtocolContact *) g_slice_alloc0(sizeof(LcProtocolContact));
+    contact->id = id;
+    contact->name = g_strdup(name);
+    contact->number = g_strdup(number);
+
+    return contact;
+}
+
+void lc_protocol_contact_free(LcProtocolContact * contact)
+{
+    g_free(contact->name);
+    g_free(contact->number);
+
+    g_slice_free1(sizeof(LcProtocolContact), contact);
+}
+
+LcProtocolContact *lc_protocol_contact_create_from_json_object(JsonObject *
+                                                               obj)
+{
+    gint64 id = json_object_get_int_member(obj, "id");
+    const gchar *name = json_object_get_string_member(obj, "name");
+    const gchar *number = json_object_get_string_member(obj, "number");
+    return lc_protocol_contact_new(id, name, number);
+}
+
+GList *lc_protocol_contact_list_create_from_json_array(JsonArray * array)
+{
+    GList *elements = json_array_get_elements(array);
+    GList *list = NULL;
+    GList *lp = elements;
+    while (lp) {
+        JsonNode *node = (JsonNode *) lp->data;
+        JsonObject *obj = json_node_get_object(node);
+        LcProtocolContact *contact =
+            lc_protocol_contact_create_from_json_object(obj);
+        list = g_list_append(list, contact);
+        lp = g_list_next(lp);
+    }
+    g_list_free(elements);
+    return list;
+}
+
+void lc_protocol_contact_list_free(GList * list)
+{
+    g_list_free_full(list, (GDestroyNotify) lc_protocol_contact_free);
 }
