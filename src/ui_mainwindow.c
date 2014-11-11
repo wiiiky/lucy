@@ -173,11 +173,11 @@ static void ui_main_window_my_android_init(UIMainWindow * self)
 
     /* 添加 */
     ui_tool_stack_append(self->priv->tool_stack,
-                         gtk_image_new_from_file
-                         (lc_util_get_resource_by_name
-                          (MY_ANDROID_TITLE_ICON)), MY_ANDROID_TITLE,
-                         GTK_WIDGET(self->priv->phone), on_my_android_view,
-                         self);
+                         gtk_image_new_from_pixbuf
+                         (lc_util_load_pixbuf_from_resource_with_size
+                          (MY_ANDROID_TITLE_ICON, 48, 48)),
+                         MY_ANDROID_TITLE, GTK_WIDGET(self->priv->phone),
+                         on_my_android_view, self);
 }
 
 static void ui_main_window_application_init(UIMainWindow * self)
@@ -192,9 +192,9 @@ static void ui_main_window_application_init(UIMainWindow * self)
 
     /* 添加 */
     ui_tool_stack_append(self->priv->tool_stack,
-                         gtk_image_new_from_file
-                         (lc_util_get_resource_by_name
-                          (APPLICATION_VIEW_TITLE_ICON)),
+                         gtk_image_new_from_pixbuf
+                         (lc_util_load_pixbuf_from_resource_with_size
+                          (APPLICATION_VIEW_TITLE_ICON, 48, 48)),
                          APPLICATION_VIEW_TITLE,
                          GTK_WIDGET(self->priv->app_view),
                          on_application_view, self);
@@ -208,10 +208,9 @@ static void ui_main_window_sms_init(UIMainWindow * self)
     self->priv->loading_sms = FALSE;
     /* 添加 */
     ui_tool_stack_append(self->priv->tool_stack,
-                         gtk_image_new_from_file
-                         (lc_util_get_resource_by_name
-                          (SMS_VIEW_TITLE_ICON)),
-                         SMS_VIEW_TITLE,
+                         gtk_image_new_from_pixbuf
+                         (lc_util_load_pixbuf_from_resource_with_size
+                          (SMS_VIEW_TITLE_ICON, 48, 48)), SMS_VIEW_TITLE,
                          GTK_WIDGET(self->priv->sms_view), on_sms_view,
                          self);
 }

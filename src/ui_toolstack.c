@@ -164,6 +164,7 @@ void ui_tool_stack_append(UIToolStack * self,
         (GtkRadioToolButton *) gtk_toolbar_get_nth_item(toolbar, 0);
 
     GtkToolItem *button = gtk_radio_tool_button_new_from_widget(radio);
+    gtk_widget_set_size_request(GTK_WIDGET(button), 110, -1);
     gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(button), title_widget);
     gtk_tool_button_set_label(GTK_TOOL_BUTTON(button), title_label);
     gtk_toolbar_insert(toolbar, button, -1);
