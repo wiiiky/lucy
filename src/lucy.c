@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#define  TRACE_TAG   TRACE_ADB
+/*#define  TRACE_TAG   TRACE_ADB*/
 
 #include <stdio.h>
 #include <stdlib.h>
