@@ -8,3 +8,4 @@ a.out
 src/*.o
 *.a
 src/*.a
+.deps/
