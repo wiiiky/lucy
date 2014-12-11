@@ -27,12 +27,12 @@
 #include <json-glib/json-glib.h>
 
 /* all commands */
-#define LC_PROTOCOL_APPLICATIONS "application\n"
-#define LC_PROTOCOL_VERSION      "version\n"
-#define LC_PROTOCOL_PHONE        "phone\n"
-#define LC_PROTOCOL_ICON         "icon:%s\n"
-#define LC_PROTOCOL_SMS  		   "sms\n"
-#define LC_PROTOCOL_CONTACT		 "contact\n"
+#define LC_PROTOCOL_APPLICATIONS "application"
+#define LC_PROTOCOL_VERSION      "version"
+#define LC_PROTOCOL_PHONE        "phone"
+#define LC_PROTOCOL_ICON         "icon:%s"
+#define LC_PROTOCOL_SMS  		   "sms"
+#define LC_PROTOCOL_CONTACT		 "contact"
 
 #define LC_PROTOCOL_HDR_LEN     (4)
 

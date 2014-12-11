@@ -1,8 +1,0 @@
-list.o: list.c /usr/include/stdc-predef.h list.h \
- /usr/lib/gcc/x86_64-linux-gnu/4.9/include/stddef.h
-
-/usr/include/stdc-predef.h:
-
-list.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/4.9/include/stddef.h:
