@@ -12,6 +12,7 @@ import org.wl.ll.protocol.VersionResponse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -34,7 +35,7 @@ public class ConnectionThread extends Thread {
     /* 处理一个链接的线程 */
     private Socket socket = null;
     private OutputStream outputStream = null;
-    private BufferedReader bufferedReader = null;
+    private InputStream inputStream = null;
     private Context mContext = null;
 
     public ConnectionThread(Context ctx, Socket s) {
@@ -44,13 +45,32 @@ public class ConnectionThread extends Thread {
         MainActivity.LOG(socket.getRemoteSocketAddress().toString() + " is connected!!!");
     }
 
+    private String readCommand(InputStream input){
+        try {
+            byte[] size = new byte[8];
+            int n = input.read(size);
+            if(n!=8){
+                return null;
+            }
+            int len=Integer.valueOf(new String(size),16);
+            byte[] buf=new byte[len];
+            n=input.read(buf);
+            if(n!=len){
+                return null;
+            }
+            return new String(buf);
+        }catch (Exception e){
+            MainActivity.LOG(e.getMessage() != null ? e.getMessage() : "!");
+            return null;
+        }
+    }
+
     public void run() {
         try {
-            InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
+            inputStream =socket.getInputStream();
             outputStream = socket.getOutputStream();
-            bufferedReader = new BufferedReader(inputReader);
             String buf;
-            while ((buf = bufferedReader.readLine()) != null) {
+            while ((buf = readCommand(inputStream)) != null) {
                 String lower = buf.toLowerCase();
                 MainActivity.LOG(socket.getRemoteSocketAddress().toString() + ":" + buf);
                 if (lower.equals(REQUEST_PACKAGES)) {
@@ -78,15 +98,6 @@ public class ConnectionThread extends Thread {
     }
 
     private void cleanup() {
-        try {
-            if (outputStream != null) {
-                outputStream.close();
-            }
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
-        } catch (IOException e) {
-        }
         try {
             socket.close();
         } catch (IOException e) {

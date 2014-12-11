@@ -133,7 +133,7 @@ static void on_command_version(const gchar * cmd, GByteArray * array,
     LcCommanderData *cdata = (LcCommanderData *) user_data;
     JsonParser *parser = json_parser_new();
     LcCommanderInitResult ret = LC_COMMANDER_INIT_OK;
-    if (json_parser_load_from_data
+    if (array && json_parser_load_from_data
         (parser, (const gchar *) array->data, array->len, NULL)) {
         /* json解析成功 */
         JsonNode *root_node = json_parser_get_root(parser);

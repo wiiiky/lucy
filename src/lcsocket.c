@@ -178,8 +178,13 @@ GByteArray *lc_socket_send_command(LcSocket * socket,
 {
     GByteArray *array = NULL;
 
+    char sizebuf[16];
+    int len = strlen(command);
+    g_snprintf(sizebuf, sizeof(sizebuf), "%08X", len);
+
     lc_socket_set_busy(socket, TRUE);
-    if (lc_socket_send(socket, command, strlen(command)) <= 0) {
+    if (lc_socket_send(socket, sizebuf, 8) <= 0
+        || lc_socket_send(socket, command, strlen(command)) <= 0) {
         goto ERROR;
     }
     gchar buf[4096];
