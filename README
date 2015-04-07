@@ -4,7 +4,7 @@ Lucy
 Linux上的Android设备管理器
 
 ###Introduce
-基于ADB的源代码开发，实现Android设备管理的基本功能。目前还在努力开发中。
+基于ADB的源代码开发，实现Android设备管理的基本功能。目前已经暂停开发。
 
 ###Screenshot
 ![ ](https://github.com/wiiiky/lucy/blob/master/screenshot/screenrecord.gif  "record")
