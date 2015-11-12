@@ -1,11 +1,3 @@
-Debug/
-*~
-test/
-nbproject/
-*.cache
-a.out
-*.o
-src/*.o
-*.a
-src/*.a
-.deps/
+*.pyc
+build/
+__pycache__

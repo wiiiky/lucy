@@ -1,9 +1,0 @@
-Lily
-======
-
-###Introduce
-Lily is the Android part of Android Manager. This is an Android APP that opens a listening socket to wait for Lucy (runs in host PC ) to connnect.
-
-Lucy communicates with lily through USB cable.
-
-###TODO
