@@ -15,6 +15,7 @@
 #
 
 import gi
+import pyadb
 gi.require_version('Gtk', '3.0')
 
 from pydroid.mainwindow import MainWindow
