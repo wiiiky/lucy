@@ -26,6 +26,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <ctype.h>
+#include <signal.h>
 #include <linux/usbdevice_fs.h>
 #include <linux/version.h>
 #include <pthread.h>
@@ -35,6 +36,12 @@
 #include <linux/usb_ch9.h>
 #endif
 #include <asm/byteorder.h>
+
+#if defined(USB_DEBUG)
+#define D(...) printf(__VA_ARGS__)
+#else
+#define D(...)
+#endif
 
 typedef struct _usb_handle usb_handle;
 
@@ -72,6 +79,9 @@ static usb_handle handle_list = {
     .next = &handle_list,
 };
 
+static int known_device(const char *dev_name);
+static void kick_disconnected_devices(void);
+static void usb_kick(usb_handle *h);
 
 static void register_device(const char *dev_name, const char *devpath,
             unsigned char ep_in, unsigned char ep_out,
@@ -135,6 +145,10 @@ static void find_usb_device(const char *base,
             if(badname(de->d_name)){
                 continue;
             }
+            if(known_device(devname)){
+                continue;
+            }
+            
             snprintf(devname, sizeof(devname), "%s/%s", busname, de->d_name);
 
             if((fd=open(devname, O_RDONLY|O_CLOEXEC))<0){
@@ -180,7 +194,6 @@ static void find_usb_device(const char *base,
                     bufptr += length;
 
                     if(length!=USB_DT_INTERFACE_SIZE){
-                        printf("interface descriptor has wrong size\n");
                         break;
                     }
 
@@ -204,14 +217,12 @@ static void find_usb_device(const char *base,
                                     ep1->bDescriptorType!=USB_DT_ENDPOINT||
                                     ep2->bLength!=USB_DT_ENDPOINT_SIZE||
                                     ep2->bDescriptorType!=USB_DT_ENDPOINT){
-                            printf("endpoints not found!\n");
                             break;
                         }
 
                         /* both endpoints should be bulk */
                         if(ep1->bmAttributes != USB_ENDPOINT_XFER_BULK||
                                     ep2->bmAttributes !=USB_ENDPOINT_XFER_BULK){
-                            printf("bulk endpoints not found\n");
                             continue;
                         }
 
@@ -253,8 +264,6 @@ static void find_usb_device(const char *base,
                             }
                         }
 
-                        printf("devname:%s, devpath:%s\n",devname, devpath);
-
                         register_device_callback(devname, devpath,
                                     local_ep_in, local_ep_out,
                                     interface->bInterfaceNumber,
@@ -288,7 +297,7 @@ static void register_device(const char *dev_name, const char *devpath,
     }
     pthread_mutex_unlock(&usb_lock);
 
-    printf("usb localed new device %s (%d/%d/%d)\n",
+    D("usb localed new device %s (%d/%d/%d)\n",
                 dev_name, ep_in, ep_out, ifc);
     usb=calloc(1, sizeof(usb_handle));
     strcpy(usb->fname, dev_name);
@@ -383,12 +392,79 @@ FAIL:
     free(usb);
 }
 
-int main(int argc, const char *argv[]){
-    find_usb_device("/dev/bus/usb", register_device);
+static int known_device(const char *dev_name){
+    usb_handle *usb;
+    
+    pthread_mutex_lock(&usb_lock);
+    for(usb = handle_list.next; usb != &handle_list; usb = usb->next) {
+        if(!strcmp(usb->fname, dev_name)) {
+            // set mark flag to indicate this device is still alive
+            usb->mark = 1;
+            pthread_mutex_unlock(&usb_lock);
+            return 1;
+        }
+    }
+    pthread_mutex_unlock(&usb_lock);
+    return 0;
+}
 
-    usb_handle *ptr=NULL;
-    for(ptr=handle_list.next;ptr!=&handle_list;ptr=ptr->next){
-        printf("%s:%d\n",ptr->fname, ptr->desc);
+static void kick_disconnected_devices(void) {
+    usb_handle *usb;
+
+    pthread_mutex_lock(&usb_lock);
+    // kick any devices in the device list that were not found in the device scan
+    for(usb = handle_list.next; usb != &handle_list; usb = usb->next) {
+        if (usb->mark == 0) {
+            usb_kick(usb);
+        } else {
+            usb->mark = 0;
+        }
+    }
+    pthread_mutex_unlock(&usb_lock);
+}
+
+static void usb_kick(usb_handle *h) {
+
+    pthread_mutex_lock(&h->lock);
+    if(h->dead == 0) {
+        h->dead = 1;
+
+        if (h->writable) {
+            /* HACK ALERT!
+            ** Sometimes we get stuck in ioctl(USBDEVFS_REAPURB).
+            ** This is a workaround for that problem.
+            */
+            if (h->reaper_thread) {
+                pthread_kill(h->reaper_thread, SIGALRM);
+            }
+
+            /* cancel any pending transactions
+            ** these will quietly fail if the txns are not active,
+            ** but this ensures that a reader blocked on REAPURB
+            ** will get unblocked
+            */
+            ioctl(h->desc, USBDEVFS_DISCARDURB, &h->urb_in);
+            ioctl(h->desc, USBDEVFS_DISCARDURB, &h->urb_out);
+            h->urb_in.status = -ENODEV;
+            h->urb_out.status = -ENODEV;
+            h->urb_in_busy = 0;
+            h->urb_out_busy = 0;
+            pthread_cond_broadcast(&h->notify);
+        }
+    }
+    pthread_mutex_unlock(&h->lock);
+}
+
+int main(int argc, const char *argv[]){
+    while(1){
+        find_usb_device("/dev/bus/usb", register_device);
+        kick_disconnected_devices();
+        usb_handle *ptr=NULL;
+        for(ptr=handle_list.next;ptr!=&handle_list;ptr=ptr->next){
+            printf("%d - %s:%d\n", ptr->dead, ptr->fname, ptr->desc);
+        }
+        printf("--------------------------\n");
+        sleep(2);
     }
     return 0;
 }
