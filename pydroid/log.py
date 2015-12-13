@@ -14,19 +14,13 @@
 # 02110-1301, USA.
 #
 
-import gi
-gi.require_version('Gtk', '3.0')
-
-from pdb import pdb_init
-from pydroid.mainwindow import MainWindow
-from pydroid.log import E
+import sys
 
 
-def pydroid_main():
-    if pdb_init():
-        D('pdb init!')
-    else:
-        E('fail to init pdb!')
+def D(text):
+    print('[DEBUG] %s' % text)
 
-    win = MainWindow()
-    win.run()
+
+def E(text):
+    print(u'**ERROR** %s' % text)
+    sys.exit(1)

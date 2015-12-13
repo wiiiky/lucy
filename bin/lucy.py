@@ -24,12 +24,15 @@ if __name__ != '__main__':
     sys.exit(1)
 
 
-here = sys.path[0]
-if here != '/usr/bin':
-    toplevel = os.path.dirname(here)
-    sys.path[0] = toplevel
-
-
-from pydroid.main import pydroid_main
+try:
+    from pdb import *
+    from pydroid.main import pydroid_main
+except ImportError:
+    sys.path.append('.')
+    sys.path.append('./pdb/')
+    print(sys.path)
+    from pdb import *
+    print(dir())
+    from pydroid.main import pydroid_main
 
 pydroid_main()
