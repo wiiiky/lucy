@@ -16,6 +16,9 @@
 
 
 from gi.repository import Gtk
+from gi.repository import GLib
+from pyadb import pdb_devices
+from pydroid.log import D
 
 
 class MainWindow(Gtk.Window):
@@ -25,6 +28,22 @@ class MainWindow(Gtk.Window):
         self.set_default_size(width, height)
         self.set_position(Gtk.WindowPosition.CENTER)
         self.connect('destroy', Gtk.main_quit)
+
+        self.devices = []
+        GLib.timeout_add(500, self.devices_listener)
+
+    def devices_listener(self):
+        """监听设备连接"""
+        devices = [tuple(d.split('\t')) for d in pdb_devices().split('\n') if '\t' in d]
+        devices = [d[0] for d in devices if d[1] == 'device']
+        for d in devices:
+            if d not in self.devices:
+                D('%s is connected!' % d)
+        for d in self.devices:
+            if d not in devices:
+                D('%s is disconnected!' % d)
+        self.devices = devices
+        return True
 
     def run(self):
         """启动主界面"""
