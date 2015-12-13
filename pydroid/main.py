@@ -17,9 +17,9 @@
 import gi
 gi.require_version('Gtk', '3.0')
 
-from pdb import pdb_init
+from pyadb import pdb_init
 from pydroid.mainwindow import MainWindow
-from pydroid.log import E
+from pydroid.log import D, E
 
 
 def pydroid_main():

@@ -25,14 +25,13 @@ if __name__ != '__main__':
 
 
 try:
-    from pdb import *
+    from pyadb import *
     from pydroid.main import pydroid_main
 except ImportError:
+    """不安装执行"""
     sys.path.append('.')
-    sys.path.append('./pdb/')
-    print(sys.path)
-    from pdb import *
-    print(dir())
+    sys.path.append('./pyadb/')
+    from pyadb import *
     from pydroid.main import pydroid_main
 
 pydroid_main()
