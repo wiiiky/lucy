@@ -19,10 +19,11 @@ gi.require_version('Gtk', '3.0')
 
 from pyadb import pdb_init
 from pydroid.mainwindow import MainWindow
-from pydroid.log import D, E
+from pydroid.log import *
 
 
 def pydroid_main():
+    log_init()
     if pdb_init():
         D('pdb init!')
     else:

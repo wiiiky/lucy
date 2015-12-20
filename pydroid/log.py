@@ -15,12 +15,14 @@
 #
 
 import sys
+import logging
 
 
-def D(text):
-    print('[DEBUG] %s' % text)
+def log_init():
+    """初始化日至输出"""
+    logging.basicConfig(level=logging.DEBUG,
+                        format='[%(levelname)-s]: %(message)s')
 
 
-def E(text):
-    print(u'**ERROR** %s' % text)
-    sys.exit(1)
+D = logging.debug
+E = logging.error
