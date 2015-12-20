@@ -23,7 +23,6 @@ from pydroid.log import *
 
 
 def pydroid_main():
-    log_init()
     if pdb_init():
         D('pdb init!')
     else:

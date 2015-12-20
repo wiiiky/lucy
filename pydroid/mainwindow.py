@@ -19,6 +19,7 @@ from gi.repository import Gtk
 from gi.repository import GLib
 from pyadb import pdb_devices
 from pydroid.log import D
+from pydroid.task import start_lily
 
 
 class MainWindow(Gtk.Window):
@@ -31,6 +32,7 @@ class MainWindow(Gtk.Window):
 
         self.devices = []
         GLib.timeout_add(500, self.devices_listener)
+        start_lily(self._start_lily_cb)
 
     def devices_listener(self):
         """监听设备连接"""
@@ -44,6 +46,9 @@ class MainWindow(Gtk.Window):
                 D('%s is disconnected!' % d)
         self.devices = devices
         return True
+
+    def _start_lily_cb(self, result, data):
+        print('start_lily:%s' % result)
 
     def run(self):
         """启动主界面"""

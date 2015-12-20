@@ -18,10 +18,8 @@ import sys
 import logging
 
 
-def log_init():
-    """初始化日至输出"""
-    logging.basicConfig(level=logging.DEBUG,
-                        format='[%(levelname)-s]: %(message)s')
+logging.basicConfig(level=logging.DEBUG,
+                    format='[%(levelname)-s]: %(message)s')
 
 
 D = logging.debug
